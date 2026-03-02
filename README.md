@@ -125,7 +125,7 @@ git push origin --delete feat/nav-bar
 
 ### Hvis noe går galt
 
-Se historikk:
+Se historikk: 
 ```
 git log
 ```
