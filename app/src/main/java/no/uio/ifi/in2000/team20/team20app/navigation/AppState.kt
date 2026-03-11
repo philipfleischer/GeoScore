@@ -23,7 +23,7 @@ class AppState {
      * Backstack for navigasjon i appen.
      * Starter alltid på HomeDestination (startskjermen).
      */
-    val backStack = mutableStateListOf<NavKey>(HomeDestination)
+    val backStack = mutableStateListOf<NavKey>(Route.HomeDestination)
 
     /*
      * Informasjon om området brukeren har valgt.

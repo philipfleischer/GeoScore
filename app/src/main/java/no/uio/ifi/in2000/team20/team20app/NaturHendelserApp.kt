@@ -16,20 +16,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation3.runtime.NavKey
-import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.ui.NavDisplay
-import no.uio.ifi.in2000.team20.team20app.navigation.HomeDestination
-import no.uio.ifi.in2000.team20.team20app.navigation.MapDestination
 import no.uio.ifi.in2000.team20.team20app.navigation.AppState
-import no.uio.ifi.in2000.team20.team20app.navigation.AreaDetailsDestination
-import no.uio.ifi.in2000.team20.team20app.navigation.ClimateStatsDestination
-import no.uio.ifi.in2000.team20.team20app.navigation.FavoritesDestination
 import no.uio.ifi.in2000.team20.team20app.navigation.NavigationRoot
-import no.uio.ifi.in2000.team20.team20app.ui.screens.details.AreaDetailsScreen
-import no.uio.ifi.in2000.team20.team20app.ui.screens.details.ClimateStatsScreen
-import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesScreen
-import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeScreen
-import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapScreen
+import no.uio.ifi.in2000.team20.team20app.navigation.Route
 
 
 @Composable
@@ -41,9 +30,9 @@ fun NaturhendelserApp() {
         bottomBar = {
             NaturhendelserBottomBar(
                 currentDestination = currentDestination,
-                onHomeClick = { appState.navigateTo(HomeDestination) },
-                onMapClick = { appState.navigateTo(MapDestination) },
-                onFavoritesClick = { appState.navigateTo(FavoritesDestination) }
+                onHomeClick = { appState.navigateTo(Route.HomeDestination) },
+                onMapClick = { appState.navigateTo(Route.MapDestination) },
+                onFavoritesClick = { appState.navigateTo(Route.FavoritesDestination) }
             )
         }
     ) { innerPadding ->
@@ -60,19 +49,19 @@ private fun NaturhendelserBottomBar(
 ) {
     NavigationBar {
         NavigationBarItem(
-            selected = currentDestination is HomeDestination,
+            selected = currentDestination is Route.HomeDestination,
             onClick = onHomeClick,
             icon = { Icon(Icons.Default.Home, contentDescription = "Hjem") },
             label = { Text("Hjem") }
         )
         NavigationBarItem(
-            selected = currentDestination is MapDestination,
+            selected = currentDestination is Route.MapDestination,
             onClick = onMapClick,
             icon = { Icon(Icons.Default.ThumbUp, contentDescription = "Kart") },
             label = { Text("Kart") }
         )
         NavigationBarItem(
-            selected = currentDestination is FavoritesDestination,
+            selected = currentDestination is Route.FavoritesDestination,
             onClick = onFavoritesClick,
             icon = { Icon(Icons.Default.Favorite, contentDescription = "Favoritter") },
             label = { Text("Favoritter") }
