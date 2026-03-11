@@ -25,18 +25,27 @@ import no.uio.ifi.in2000.team20.team20app.navigation.Route
 fun NaturhendelserApp() {
     val appState = remember { AppState() }
     val currentDestination = appState.backStack.lastOrNull()
-
+    NavigationRoot(appState = appState)
+}
+@Composable
+fun ScreenScaffold(
+    goToHome: () -> Unit,
+    goToMap: () -> Unit,
+    goToFavorites: () -> Unit,
+    currentDestination: NavKey,
+    currentComposable: @Composable (Modifier) -> Unit
+){
     Scaffold(
         bottomBar = {
             NaturhendelserBottomBar(
                 currentDestination = currentDestination,
-                onHomeClick = { appState.navigateTo(Route.HomeDestination) },
-                onMapClick = { appState.navigateTo(Route.MapDestination) },
-                onFavoritesClick = { appState.navigateTo(Route.FavoritesDestination) }
+                onHomeClick = goToHome,
+                onMapClick = goToMap,
+                onFavoritesClick = goToFavorites
             )
         }
-    ) { innerPadding ->
-        NavigationRoot(appState = appState, modifier = Modifier.padding(innerPadding))
+    ) {innerPadding ->
+        currentComposable(Modifier.padding(innerPadding))
     }
 }
 
