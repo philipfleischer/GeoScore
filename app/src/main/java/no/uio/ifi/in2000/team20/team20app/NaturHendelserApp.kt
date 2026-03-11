@@ -24,6 +24,7 @@ import no.uio.ifi.in2000.team20.team20app.navigation.AppState
 import no.uio.ifi.in2000.team20.team20app.navigation.AreaDetailsDestination
 import no.uio.ifi.in2000.team20.team20app.navigation.ClimateStatsDestination
 import no.uio.ifi.in2000.team20.team20app.navigation.FavoritesDestination
+import no.uio.ifi.in2000.team20.team20app.navigation.NavigationRoot
 import no.uio.ifi.in2000.team20.team20app.ui.screens.details.AreaDetailsScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.details.ClimateStatsScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesScreen
@@ -46,86 +47,7 @@ fun NaturhendelserApp() {
             )
         }
     ) { innerPadding ->
-        NavDisplay(
-            backStack = appState.backStack,
-            onBack = { appState.goBack() },
-            modifier = Modifier.padding(innerPadding),
-            entryProvider = entryProvider {
-                entry<HomeDestination> {
-                    HomeScreen(
-                        areaName = appState.selectedAreaName,
-                        onOpenMap = { appState.navigateTo(MapDestination) },
-                        onOpenDetails = {
-                            appState.navigateTo(
-                                AreaDetailsDestination(
-                                    areaName = appState.selectedAreaName,
-                                    latitude = appState.selectedLatitude,
-                                    longitude = appState.selectedLongitude
-                                )
-                            )
-                        },
-                        onOpenClimateStats = {
-                            appState.navigateTo(
-                                ClimateStatsDestination(
-                                    areaName = appState.selectedAreaName,
-                                    latitude = appState.selectedLatitude,
-                                    longitude = appState.selectedLongitude
-                                )
-                            )
-                        }
-                    )
-                }
-
-                entry<MapDestination> {
-                    MapScreen(
-                        selectedAreaName = appState.selectedAreaName,
-                        onAreaSelected = { name, lat, lon ->
-                            appState.setSelectedArea(name, lat, lon)
-                        },
-                        onOpenDetails = { name, lat, lon ->
-                            appState.setSelectedArea(name, lat, lon)
-                            appState.navigateTo(AreaDetailsDestination(name, lat, lon))
-                        }
-                    )
-                }
-
-                entry<FavoritesDestination> {
-                    FavoritesScreen(
-                        onFavoriteSelected = { name, lat, lon ->
-                            appState.setSelectedArea(name, lat, lon)
-                            appState.navigateTo(AreaDetailsDestination(name, lat, lon))
-                        }
-                    )
-                }
-
-                entry<AreaDetailsDestination> { destination ->
-                    AreaDetailsScreen(
-                        areaName = destination.areaName,
-                        latitude = destination.latitude,
-                        longitude = destination.longitude,
-                        onBackClick = { appState.goBack() },
-                        onOpenClimateStats = {
-                            appState.navigateTo(
-                                ClimateStatsDestination(
-                                    areaName = destination.areaName,
-                                    latitude = destination.latitude,
-                                    longitude = destination.longitude
-                                )
-                            )
-                        }
-                    )
-                }
-
-                entry<ClimateStatsDestination> { destination ->
-                    ClimateStatsScreen(
-                        areaName = destination.areaName,
-                        latitude = destination.latitude,
-                        longitude = destination.longitude,
-                        onBackClick = { appState.goBack() }
-                    )
-                }
-            }
-        )
+        NavigationRoot(appState = appState, modifier = Modifier.padding(innerPadding))
     }
 }
 
