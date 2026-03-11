@@ -37,7 +37,7 @@ fun MapScreen(
 
     BottomSheetScaffold(
 
-        sheetPeekHeight = 64.dp, // ca 1 cm synlig når kollapset, TODO: Øk synligheten
+        sheetPeekHeight = 150.dp, // ca 1 cm synlig når kollapset, TODO: Øk synligheten?
 
         sheetContainerColor = MaterialTheme.colorScheme.surface,
 
@@ -49,18 +49,7 @@ fun MapScreen(
                     .padding(20.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-
                 //Drag handle - Gir brukeren visuelt hint om at sheet kan dras oppover.
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .heightIn(min = 4.dp)
-                        .fillMaxWidth(0.15f)
-                        .background(
-                            MaterialTheme.colorScheme.outline,
-                            RoundedCornerShape(50)
-                        )
-                )
 
                 Text(
                     text = selectedAreaName,
