@@ -1,10 +1,8 @@
 package no.uio.ifi.in2000.team20.team20app.navigation
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.navigation3.runtime.NavKey
 
 /*
  * AppState klassen håndterer navigasjonstilstanden i applikasjonen.
