@@ -23,7 +23,7 @@ class AppState {
      * Backstack for navigasjon i appen.
      * Starter alltid på HomeDestination (startskjermen).
      */
-    val backStack = mutableStateListOf<NavKey>(Route.HomeDestination)
+    //val backStack = mutableStateListOf<NavKey>(Route.HomeDestination)
 
     /*
      * Informasjon om området brukeren har valgt.
@@ -40,17 +40,17 @@ class AppState {
      * Legger til en ny destinasjon på backstacken.
      * Dette tilsvarer altså å navigere til en ny skjerm.
      */
-    fun navigateTo(destination: NavKey) {
-        backStack.add(destination)
-    }
+//    fun navigateTo(destination: NavKey) {
+//        backStack.add(destination)
+//    }
 
     /*
      * Dette er navigasjon tilbake til forrige skjerm.
      * Fjerner siste element fra backstacken hvis vi ikke er på startskjermen.
      */
-    fun goBack() {
-        if (backStack.size > 1) backStack.removeAt(backStack.lastIndex)
-    }
+//    fun goBack() {
+//        if (backStack.size > 1) backStack.removeAt(backStack.lastIndex)
+//    }
 
     /*
      * Denne metoden oppdaterer informasjon om valgt område.
