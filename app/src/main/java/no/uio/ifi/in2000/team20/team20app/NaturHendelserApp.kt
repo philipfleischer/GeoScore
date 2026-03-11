@@ -24,7 +24,6 @@ import no.uio.ifi.in2000.team20.team20app.navigation.Route
 @Composable
 fun NaturhendelserApp() {
     val appState = remember { AppState() }
-    val currentDestination = appState.backStack.lastOrNull()
     NavigationRoot(appState = appState)
 }
 @Composable

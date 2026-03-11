@@ -1,7 +1,6 @@
 package no.uio.ifi.in2000.team20.team20app.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
