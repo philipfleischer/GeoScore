@@ -39,8 +39,8 @@ object Constants {
 
     // MAP DEFAULT SETTINGS
     const val DEFAULT_ZOOM = 6.5
-    const val DEFAULT_LATITUDE = 60.4720
-    const val DEFAULT_LONGITUDE = 8.4689
+    const val DEFAULT_LATITUDE = 60.3913
+    const val DEFAULT_LONGITUDE = 5.3221
 
     const val MAX_ZOOM: Float = 14.0f
     const val MIN_ZOOM: Float = 4.0f

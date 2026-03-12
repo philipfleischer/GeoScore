@@ -31,6 +31,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.TileOverlay
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import no.uio.ifi.in2000.team20.team20app.data.wmsToWmts.TileURLFromWmsProvider
@@ -135,6 +136,7 @@ fun MapScreen(
 //            ) {
 //                Text("Kart-placeholder")
 //            }
+            //TODO: Separate GoogleMap to its own file
             GoogleMap(
                 modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceVariant),
                 cameraPositionState = cameraPositionState,
@@ -143,10 +145,14 @@ fun MapScreen(
                     minZoomPreference = MIN_ZOOM
                 )
             ){
+                TileOverlay(
+                    tileProvider = currTileProvider,
+                    visible = true
+                )
                 Marker(
                     state = defaultMarkerState,
-                    title = "Blindern",
-                    snippet = "Markør for Blindern"
+                    title = "Bergen",
+                    snippet = "Markør for Bergen"
                 )
             }
 
