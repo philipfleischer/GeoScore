@@ -26,6 +26,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberUpdatedMarkerState
+import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_LATITUDE
+import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_LONGITUDE
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,6 +44,13 @@ fun MapScreen(
     onAreaSelected: (String, Double, Double) -> Unit,
     onOpenDetails: (String, Double, Double) -> Unit
 ) {
+    //TODO: PUT THIS IN A VIEWMODEL OR SOMETHING IDK, APPSTATE?? GOOGLE EXAMPLE IS IN A COMPOSABLE SO IDK
+    val default = LatLng(DEFAULT_LATITUDE, DEFAULT_LONGITUDE)
+    val defaultMarkerState = rememberUpdatedMarkerState(position = default)
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(default, 10f)
+    }
+
 
     BottomSheetScaffold(
 
@@ -104,13 +121,23 @@ fun MapScreen(
         ) {
 
             // kartet
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Kart-placeholder")
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .background(MaterialTheme.colorScheme.surfaceVariant),
+//                contentAlignment = Alignment.Center
+//            ) {
+//                Text("Kart-placeholder")
+//            }
+            GoogleMap(
+                modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceVariant),
+                cameraPositionState = cameraPositionState
+            ){
+                Marker(
+                    state = defaultMarkerState,
+                    title = "Blindern",
+                    snippet = "Markør for Blindern"
+                )
             }
 
             // Informasjonskort

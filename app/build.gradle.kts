@@ -57,6 +57,9 @@ dependencies {
     implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.kotlinx.serialization.json)
 
+    implementation(libs.maps.compose)
+    implementation(libs.play.services.maps)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
