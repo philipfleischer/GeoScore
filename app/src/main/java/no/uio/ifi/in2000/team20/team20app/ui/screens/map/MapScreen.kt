@@ -29,13 +29,19 @@ import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
+import no.uio.ifi.in2000.team20.team20app.data.wmsToWmts.TileURLFromWmsProvider
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_LATITUDE
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_LONGITUDE
+import no.uio.ifi.in2000.team20.team20app.util.Constants.MAX_ZOOM
+import no.uio.ifi.in2000.team20.team20app.util.Constants.MIN_ZOOM
+import no.uio.ifi.in2000.team20.team20app.util.Constants.TILE_SIZE
 
-
+//TODO: Not hardcoded obviously
+val currTileProvider = TileURLFromWmsProvider("", TILE_SIZE)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -131,7 +137,11 @@ fun MapScreen(
 //            }
             GoogleMap(
                 modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceVariant),
-                cameraPositionState = cameraPositionState
+                cameraPositionState = cameraPositionState,
+                properties = MapProperties(
+                    maxZoomPreference = MAX_ZOOM,
+                    minZoomPreference = MIN_ZOOM
+                )
             ){
                 Marker(
                     state = defaultMarkerState,
