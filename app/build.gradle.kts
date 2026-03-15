@@ -37,6 +37,14 @@ android {
     buildFeatures {
         compose = true
     }
+
+    packaging {
+        resources {
+            // Exclude duplicate META-INF files from logback-classic and logback-core
+            excludes += "META-INF/INDEX.LIST"
+            excludes += "META-INF/io.netty.versions.properties"
+        }
+    }
 }
 
 dependencies {
