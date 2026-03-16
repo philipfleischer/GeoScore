@@ -2,10 +2,21 @@ package no.uio.ifi.in2000.team20.team20app.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+// Light mode
+val BrightWhite = Color(255, 255, 255)
+val Platinum = Color(243, 245, 246)
+val Palesky = Color(213, 236, 248)
+val CloudySky = Color(200, 220, 233)
+val Mayablue = Color(110, 189, 254)
+val DustyBlue = Color(75, 151, 202)
+val AliceBlue = Color(216, 233, 246)
+
+val Royalgold = Color(254, 223, 108)
+val Salmon = Color(254, 125, 108)
+
+// Dark mode
+
+val Midnight = Color(8, 8, 12)
+val Charcoal = Color(36, 38, 51)
+val Darklake = Color(63, 70, 89)
