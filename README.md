@@ -9,7 +9,6 @@ This project was developed as part of the course IN2000 Software Engineering wit
 The application focuses on visualizing natural hazard risks for homeowners and property developers.
 It allows users to explore geographic areas and understand potential risks related to natural events such as flooding, landslides, and extreme weather.
 
-⸻
 
 ### Table of Contents
 - Project Overview￼
@@ -22,7 +21,7 @@ It allows users to explore geographic areas and understand potential risks relat
 - Testing￼
 - Project Documentation￼
 
-⸻
+
 
 ### Project Overview
 
@@ -38,7 +37,6 @@ The app allows users to:
 
 The concept is inspired by the energy labeling system used for apartments and houses, where each area receives a risk classification based on natural hazards.
 
-⸻
 
 ### Team
 
@@ -50,39 +48,39 @@ Team 20 – IN2000
 - David Hovde – davidhov@uio.no
 - Philip Elias Fleischer – philipef@uio.no
 
-⸻
+
 
 ### Application Features
 
 The application includes the following main features:
 
-Interactive Map
+- Home Screen with overview details of selected locations.
+- Users can explore natural hazard risks across Norway through an interactive map.
+- Favorite Locations Screen.
 
-Users can explore natural hazard risks across Norway through an interactive map.
-
-Features include:
+Map features include:
 - Zoom and navigation
 - Visual hazard overlays
 - Area risk classification
 
-⸻
+
 
 ### Area Risk Overview
 
-For each selected location the app provides:
+For each selected location, the app displays:
 - Flood risk
 - Landslide risk
 - Wind and storm exposure
 - Overall hazard rating
 - Recommendations for housing and construction
 
-⸻
+
 
 ### Favorites
 
 Users can save locations to quickly revisit important areas.
 
-⸻
+
 
 ### Screens
 
@@ -95,24 +93,15 @@ The application currently includes the following screens:
   Detailed hazard analysis for a selected location
 - FavoritesScreen
   Saved locations for quick access
-- ClimateScreen
-  Climate related indicators relevant for long-term risk
+- SettingsScreen
+  Push notifications, light/dark theme, project information, and more.
 
-⸻
 
 ### Architecture
 
 The application follows a Model–View–ViewModel (MVVM) architecture.
 
-UI (Jetpack Compose)
-↓
-ViewModel
-↓
-Repository
-↓
-API Layer
-↓
-External APIs
+UI (Jetpack Compose) -> ViewModel -> Repository -> API Layer -> MET APIs
 
 This structure ensures:
 - separation of concerns
@@ -134,41 +123,35 @@ The project structure is organized as:
     - viewmodel
 
 
-⸻
-
 ### Technologies
 
 The application is built using modern Android development tools.
 
-Technology	Purpose
-Kotlin	Main programming language
-Jetpack Compose	UI framework
-Material 3	UI components
-MVVM	Application architecture
-Ktor Client	Network requests
-Kotlinx Serialization	JSON parsing
-MockK	Unit testing
-JUnit	Testing framework
-MapLibre	Map rendering
+Technologies and Purposes:
+- Kotlin: Main programming language
+- Jetpack Compose: UI framework
+- Material 3: UI components
+- MVVM: Application architecture
+- Ktor Client: Network requests
+- Kotlinx Serialization: JSON parsing
+- MockK	Unit: testing
+- JUnit: Testing framework
+- Google Maps: Map rendering
 
-
-⸻
 
 ### API Usage
 
-The application retrieves environmental data from APIs provided by the Norwegian Meteorological Institute (MET Norway).
+The application retrieves environmental data from APIs provided by the Norwegian Meteorological Institute (MET).
 
 Examples include:
 - Locationforecast API
 - MetAlerts API
-- Additional geospatial data sources
 
 These APIs provide:
 - environmental indicators
 - weather forecasts
 - hazard warnings
 
-⸻
 
 ### Installation
 
@@ -178,15 +161,14 @@ Requirements
 - Minimum SDK: 24
 - Recommended SDK: 34 or higher
 
-⸻
 
 ### Clone the repository
 
 git clone https://github.uio.no/IN2000-V26/team-20.git
+
 cd team-20
 
 
-⸻
 
 ### Open the project
 	1.	Open Android Studio
@@ -194,7 +176,6 @@ cd team-20
 	3.	Choose the project directory
 	4.	Wait for Gradle Sync to complete
 
-⸻
 
 ### Run the application
 	1.	Open Device Manager
@@ -203,7 +184,6 @@ cd team-20
 	4.	Recommended API level: 34+
 	5.	Press Run ▶
 
-⸻
 
 ### Testing
 
@@ -225,20 +205,16 @@ Tests can be run using:
 ./gradlew test
 
 
-⸻
-
 ### Project Documentation
 
 Additional documentation is included in the repository:
 
-File	Description
-README.md	Project overview
-ARCHITECTURE.md	Architecture explanation
-MODELING.md	System diagrams
-PROCESS.md	Development process
+File: Description
+- README.md: Project overview
+- ARCHITECTURE.md: Architecture explanation
+- MODELING.md: System diagrams
+- PROCESS.md: Development process
 
-
-⸻
 
 ### Conclusion
 
@@ -246,15 +222,10 @@ This project demonstrates how software engineering principles such as clean arch
 
 The goal of the project is to make natural hazard information accessible and understandable for people involved in housing and urban development.
 
-⸻
 
 ### Screenshots
 
 
-⸻
-
 ### License
 
 This project was developed for educational purposes as part of the IN2000 Software Engineering course at the University of Oslo.
-
-⸻
