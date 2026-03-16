@@ -10,15 +10,21 @@ import no.uio.ifi.in2000.team20.team20app.ui.screens.details.ClimateStatsScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapScreen
+import no.uio.ifi.in2000.team20.team20app.ui.screens.settings.SettingsScreen
 
 @Composable
 fun NavigationRoot(appState: AppState){
 
     val backStack = rememberNavBackStack(Route.HomeDestination)
-    val goBack: () -> Unit = {backStack.removeAt(backStack.lastIndex)}
+    val goBack: () -> Unit = {
+        if (backStack.size > 1) {
+            backStack.removeAt(backStack.lastIndex)
+        }
+    }
     val goToHome: () -> Unit = {backStack.add(Route.HomeDestination)}
     val goToMap: () -> Unit = {backStack.add(Route.MapDestination)}
     val goToFavorites: () -> Unit = {backStack.add(Route.FavoritesDestination)}
+    val goToSettings: () -> Unit = { backStack.add(Route.SettingsDestination) }
 
     NavDisplay(
         backStack = backStack,
@@ -51,6 +57,9 @@ fun NavigationRoot(appState: AppState){
                                     longitude = appState.selectedLongitude
                                 )
                             )
+                        },
+                        onOpenSettings = {
+                            backStack.add(Route.SettingsDestination)
                         }
                     )
                 }
@@ -88,6 +97,20 @@ fun NavigationRoot(appState: AppState){
                             appState.setSelectedArea(name, lat, lon)
                             backStack.add(Route.AreaDetailsDestination(name, lat, lon))
                         }
+                    )
+                }
+            }
+
+            // NEW SETTINGS ENTRY
+            entry<Route.SettingsDestination> {
+                ScreenScaffold(
+                    goToHome = goToHome,
+                    goToMap = goToMap,
+                    goToFavorites = goToFavorites,
+                    currentDestination = Route.HomeDestination
+                ) {
+                    SettingsScreen(
+                        onBackClick = goBack
                     )
                 }
             }

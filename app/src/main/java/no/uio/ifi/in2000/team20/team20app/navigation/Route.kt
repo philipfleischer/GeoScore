@@ -72,4 +72,8 @@ sealed interface Route: NavKey {
         val latitude: Double,
         val longitude: Double
     ) : Route, NavKey
+
+    // DEtte er skjermen for SettingsScreen
+    @Serializable
+    object SettingsDestination : Route, NavKey
 }
