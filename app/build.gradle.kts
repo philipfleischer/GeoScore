@@ -37,6 +37,14 @@ android {
     buildFeatures {
         compose = true
     }
+
+    packaging {
+        resources {
+            // Exclude duplicate META-INF files from logback-classic and logback-core
+            excludes += "META-INF/INDEX.LIST"
+            excludes += "META-INF/io.netty.versions.properties"
+        }
+    }
 }
 
 dependencies {
@@ -67,4 +75,18 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    // testing
+    testImplementation(libs.junit)
+
+    // API
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.ktor.client.logging)
+    implementation(libs.logback.classic)
+    implementation(libs.kotlinx.serialization.json.v163)
+
 }
