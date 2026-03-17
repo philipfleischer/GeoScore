@@ -28,15 +28,30 @@ data class CustomTheme (
 
 val lightThemeColors = CustomTheme (
     background = Platinum,
-    backgroundGradient = Palesky,
+    backgroundGradient = PaleSky,
     middleground = BrightWhite, // Should be 50% opaque
     foreground = BrightWhite,
     detail = CloudySky,
-    button = Mayablue,
+    button = MayaBlue,
     buttonDetail = DustyBlue,
     disabledButton = AliceBlue,
     disabledButtonDetail = CloudySky,
     error = Salmon,
-    warning = Royalgold,
+    warning = RoyalGold,
     isLight = true,
+)
+
+val darkThemeColors = CustomTheme(
+    background = Midnight,
+    backgroundGradient = Color.Black,
+    middleground = CharCoal,
+    foreground = DarkLake,
+    detail = TODO(),
+    button = TODO(),
+    buttonDetail = TODO(),
+    disabledButton = TODO(),
+    disabledButtonDetail = TODO(),
+    error = TODO(),
+    warning = TODO(),
+    isLight = TODO()
 )
