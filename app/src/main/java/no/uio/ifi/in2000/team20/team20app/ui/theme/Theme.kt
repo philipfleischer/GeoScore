@@ -41,17 +41,17 @@ val lightThemeColors = CustomTheme (
     isLight = true,
 )
 
-val darkThemeColors = CustomTheme(
+val darkThemeColors = CustomTheme( // To be changed
     background = Midnight,
     backgroundGradient = Color.Black,
     middleground = CharCoal,
     foreground = DarkLake,
-    detail = TODO(),
-    button = TODO(),
-    buttonDetail = TODO(),
-    disabledButton = TODO(),
-    disabledButtonDetail = TODO(),
-    error = TODO(),
-    warning = TODO(),
-    isLight = TODO()
+    detail = Color.Black,
+    button = MayaBlue,
+    buttonDetail = DustyBlue,
+    disabledButton = AliceBlue,
+    disabledButtonDetail = Color.Black,
+    error = Salmon,
+    warning = RoyalGold,
+    isLight = false
 )
