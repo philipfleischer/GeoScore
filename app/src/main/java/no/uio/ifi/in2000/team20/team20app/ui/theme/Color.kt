@@ -18,5 +18,5 @@ val Salmon = Color(254, 125, 108)
 // Dark mode
 
 val Midnight = Color(8, 8, 12)
-val CharCoal = Color(36, 38, 51)
+val Charcoal = Color(36, 38, 51)
 val DarkLake = Color(63, 70, 89)

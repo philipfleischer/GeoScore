@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team20.team20app.ui.theme
 
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
 data class CustomTheme (
@@ -55,3 +56,7 @@ val darkThemeColors = CustomTheme( // To be changed
     warning = RoyalGold,
     isLight = false
 )
+
+val LocalTheme = staticCompositionLocalOf<CustomTheme> {
+    error("Color not provided")
+}
