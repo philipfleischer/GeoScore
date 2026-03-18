@@ -39,6 +39,8 @@ fun NavigationRoot(appState: AppState){
                 ) {
                     HomeScreen(
                         areaName = appState.selectedAreaName,
+                        latitude = appState.selectedLatitude,
+                        longitude = appState.selectedLongitude,
                         onOpenMap = { backStack.add(Route.MapDestination) },
                         onOpenDetails = {
                             backStack.add(
