@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     //Serialization
     alias(libs.plugins.kotlin.serialization)
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -35,6 +36,7 @@ android {
     }
 
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 
@@ -67,6 +69,8 @@ dependencies {
     implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.kotlinx.serialization.json)
 
+    implementation(libs.maps.compose)
+    implementation(libs.play.services.maps)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.appcompat)
 

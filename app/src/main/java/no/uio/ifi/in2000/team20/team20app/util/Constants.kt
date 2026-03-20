@@ -31,13 +31,21 @@ object Constants {
     const val NVE_BASE_URL = "https://api.nve.no/"
     const val TIMEOUT_SECONDS = 30L
 
+    // WMS BOUNDS
+    const val X_MIN = -20037508.34
+    const val X_MAX = 20037508.34
+    const val Y_MIN = -20037508.34
+    const val Y_MAX = 20037508.34
+
     // MAP DEFAULT SETTINGS
     const val DEFAULT_ZOOM = 6.5
-    const val DEFAULT_LATITUDE = 60.4720
-    const val DEFAULT_LONGITUDE = 8.4689
+    const val DEFAULT_LATITUDE = 60.3913
+    const val DEFAULT_LONGITUDE = 5.3221
 
-    const val MAX_ZOOM = 14.0
-    const val MIN_ZOOM = 4.0
+    const val MAX_ZOOM: Float = 14.0f
+    const val MIN_ZOOM: Float = 4.0f
+
+    const val TILE_SIZE = 256
 
     // RISK THRESHOLDS
     const val LOW_WIND_THRESHOLD = 5.0
