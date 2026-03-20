@@ -2,6 +2,7 @@ package no.uio.ifi.in2000.team20.team20app.ui.screens.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,42 +10,101 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import no.uio.ifi.in2000.team20.team20app.ui.components.EmptyState
+import no.uio.ifi.in2000.team20.team20app.ui.components.ErrorState
+import no.uio.ifi.in2000.team20.team20app.ui.components.LoadingState
+import no.uio.ifi.in2000.team20.team20app.ui.theme.LocalTheme
+import no.uio.ifi.in2000.team20.team20app.viewmodel.HomeViewModel
 
 @Composable
 fun HomeScreen(
     areaName: String,
+    latitude: Double,
+    longitude: Double,
     onOpenMap: () -> Unit,
+    onOpenDetails: () -> Unit,
+    onOpenClimateStats: () -> Unit,
+    onOpenSettings: () -> Unit,
+    viewModel: HomeViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    // Laster data på nytt hver gang valgt område endres
+    LaunchedEffect(areaName, latitude, longitude) {
+        viewModel.loadArea(areaName, latitude, longitude)
+    }
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        // Header vises alltid, uavhengig av tilstand
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Naturhendelser",
+                style = MaterialTheme.typography.headlineLarge
+            )
+            IconButton(onClick = onOpenSettings) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "Åpne innstillinger"
+                )
+            }
+        }
+
+        // Kortene vises alltid, tilstandsindikator er inline øverst
+        HomeScreenContent(
+            uiState = uiState,
+            onOpenDetails = onOpenDetails,
+            onOpenClimateStats = onOpenClimateStats
+        )
+    }
+}
+
+
+@Composable
+private fun HomeScreenContent(
+    uiState: HomeUiState,
     onOpenDetails: () -> Unit,
     onOpenClimateStats: () -> Unit
 ) {
+    val theme = LocalTheme.current
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        item {
-            Text(
-                text = "Naturhendelser",
-                style = MaterialTheme.typography.headlineLarge
-            )
-        }
-
         //TODO: Endre til nedtrekksmeny?
         item {
-            Text(
-                text = "Valgt område: $areaName",
-                style = MaterialTheme.typography.titleMedium
-            )
+            when {
+                uiState.isLoading          -> LoadingState(modifier = Modifier.fillMaxWidth())
+                uiState.error != null      -> ErrorState(message = uiState.error, modifier = Modifier.fillMaxWidth())
+                uiState.areaName.isEmpty() -> EmptyState(modifier = Modifier.fillMaxWidth())
+                else                       -> Text("Valgt område: ${uiState.areaName}", style = MaterialTheme.typography.titleMedium)
+            }
         }
 
         item {
@@ -144,9 +204,8 @@ fun HomeScreen(
 @Composable
 private fun HomeScreenPreview() {
     MaterialTheme {
-        HomeScreen(
-            areaName = "Oslo",
-            onOpenMap = {},
+        HomeScreenContent(
+            uiState = HomeUiState(areaName = "Oslo", latitude = 59.9139, longitude = 10.7522),
             onOpenDetails = {},
             onOpenClimateStats = {}
         )
