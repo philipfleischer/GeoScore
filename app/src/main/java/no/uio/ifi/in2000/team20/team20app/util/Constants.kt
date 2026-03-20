@@ -1,5 +1,7 @@
 package no.uio.ifi.in2000.team20.team20app.util
 
+import no.uio.ifi.in2000.team20.team20app.BuildConfig
+
 /**
  * Application-wide constants.
  *
@@ -30,6 +32,8 @@ object Constants {
     const val FROST_BASE_URL = "https://frost.met.no/"
     const val NVE_BASE_URL = "https://api.nve.no/"
     const val TIMEOUT_SECONDS = 30L
+    const val FROST_CLIENT_ID = BuildConfig.FROST_V0_CLIENT_ID
+    const val FROST_CLIENT_SECRET = BuildConfig.FROST_V0_CLIENT_SECRET
 
     // WMS BOUNDS
     const val X_MIN = -20037508.34
@@ -42,7 +46,7 @@ object Constants {
     const val DEFAULT_LATITUDE = 60.3913
     const val DEFAULT_LONGITUDE = 5.3221
 
-    const val MAX_ZOOM: Float = 14.0f
+    const val MAX_ZOOM: Float = 19.0f
     const val MIN_ZOOM: Float = 4.0f
 
     const val TILE_SIZE = 256

@@ -1,6 +1,8 @@
 package no.uio.ifi.in2000.team20.team20app
 
 import kotlinx.coroutines.runBlocking
+import no.uio.ifi.in2000.team20.team20app.BuildConfig.FROST_V0_CLIENT_ID
+import no.uio.ifi.in2000.team20.team20app.BuildConfig.FROST_V0_CLIENT_SECRET
 import no.uio.ifi.in2000.team20.team20app.data.api.FrostClientProvider
 import no.uio.ifi.in2000.team20.team20app.data.datasource.FrostDataSource
 import org.junit.Assert.assertNotNull
@@ -10,13 +12,13 @@ import org.junit.Test
 /**
  * Integration test for FrostDataSource.
  */
-/*
+
 class FrostDataSourceTest {
 
     // Arrange (shared setup)
-    // TODO: These credentials should not be hardcoded here.
-    //  David had an idea for secrets
-    private val credentials = "clientId:clientSecret"
+    // Access credentials from constants generated from local.properties
+    private val credentials = "${FROST_V0_CLIENT_ID}:$FROST_V0_CLIENT_SECRET}"
+    
     private val dataSource = FrostDataSource(
         client = FrostClientProvider.client,
         credentials = credentials
@@ -49,6 +51,3 @@ class FrostDataSourceTest {
         assertTrue(response.data.isNotEmpty())
     }
 }
-
-
- */
