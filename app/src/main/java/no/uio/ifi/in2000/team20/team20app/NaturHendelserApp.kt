@@ -26,56 +26,6 @@ fun NaturhendelserApp() {
     val appState = remember { AppState() }
     NavigationRoot(appState = appState)
 }
-@Composable
-fun ScreenScaffold(
-    goToHome: () -> Unit,
-    goToMap: () -> Unit,
-    goToFavorites: () -> Unit,
-    currentDestination: NavKey,
-    currentComposable: @Composable (Modifier) -> Unit
-){
-    Scaffold(
-        bottomBar = {
-            NaturhendelserBottomBar(
-                currentDestination = currentDestination,
-                onHomeClick = goToHome,
-                onMapClick = goToMap,
-                onFavoritesClick = goToFavorites
-            )
-        }
-    ) {innerPadding ->
-        currentComposable(Modifier.padding(innerPadding))
-    }
-}
-
-@Composable
-private fun NaturhendelserBottomBar(
-    currentDestination: NavKey?,
-    onHomeClick: () -> Unit,
-    onMapClick: () -> Unit,
-    onFavoritesClick: () -> Unit
-) {
-    NavigationBar {
-        NavigationBarItem(
-            selected = currentDestination is Route.HomeDestination,
-            onClick = onHomeClick,
-            icon = { Icon(Icons.Default.Home, contentDescription = "Hjem") },
-            label = { Text("Hjem") }
-        )
-        NavigationBarItem(
-            selected = currentDestination is Route.MapDestination,
-            onClick = onMapClick,
-            icon = { Icon(Icons.Default.ThumbUp, contentDescription = "Kart") },
-            label = { Text("Kart") }
-        )
-        NavigationBarItem(
-            selected = currentDestination is Route.FavoritesDestination,
-            onClick = onFavoritesClick,
-            icon = { Icon(Icons.Default.Favorite, contentDescription = "Favoritter") },
-            label = { Text("Favoritter") }
-        )
-    }
-}
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
