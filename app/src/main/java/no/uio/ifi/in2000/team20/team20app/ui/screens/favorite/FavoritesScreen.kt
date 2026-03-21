@@ -15,12 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-
-private data class FavoriteArea(
-    val name: String,
-    val latitude: Double,
-    val longitude: Double
-)
+import no.uio.ifi.in2000.team20.team20app.domain.model.CreatedLocation
 
 @Composable
 fun FavoritesScreen(
@@ -28,9 +23,9 @@ fun FavoritesScreen(
 ) {
     // La inn disse bare for å ha
     val favorites = listOf(
-        FavoriteArea("Oslo", 59.9139, 10.7522),
-        FavoriteArea("Bergen", 60.3913, 5.3221),
-        FavoriteArea("Voss", 60.6287, 6.4147)
+        CreatedLocation("Oslo", 59.9139, 10.7522, null),
+        CreatedLocation("Bergen", 60.3913, 5.3221, null),
+        CreatedLocation("Voss", 60.6287, 6.4147, null)
     )
 
     Column(
