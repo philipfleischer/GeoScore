@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -18,6 +20,15 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        val keystoreFile = project.rootProject.file("local.properties")
+        val properties = Properties()
+        properties.load(keystoreFile.inputStream())
+
+        val FROST_V0_CLIENT_ID = properties.getProperty("FROST_V0_CLIENT_ID") ?: ""
+            buildConfigField("String", "FROST_V0_CLIENT_ID", FROST_V0_CLIENT_ID)
+
+        val FROST_V0_CLIENT_SECRET = properties.getProperty("FROST_V0_CLIENT_SECRET") ?: ""
+            buildConfigField("String", "FROST_V0_CLIENT_SECRET", FROST_V0_CLIENT_SECRET)
     }
 
     buildTypes {
@@ -84,7 +95,7 @@ dependencies {
 
     // testing
     testImplementation(libs.junit)
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
+    testImplementation(libs.kotlinx.coroutines.test)
 
     // API
     implementation(libs.ktor.client.core)
