@@ -3,6 +3,7 @@ package no.uio.ifi.in2000.team20.team20app.navigation
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import no.uio.ifi.in2000.team20.team20app.domain.model.CreatedLocation
 
 /*
  * AppState klassen håndterer navigasjonstilstanden i applikasjonen.
@@ -17,11 +18,6 @@ import androidx.compose.runtime.setValue
  * oppdateres automatisk når verdiene endres.
  */
 class AppState {
-    /*
-     * Backstack for navigasjon i appen.
-     * Starter alltid på HomeDestination (startskjermen).
-     */
-    //val backStack = mutableStateListOf<NavKey>(Route.HomeDestination)
 
     /*
      * Informasjon om området brukeren har valgt.
@@ -33,6 +29,9 @@ class AppState {
     var selectedAreaName by mutableStateOf("Oslo")
     var selectedLatitude by mutableStateOf(59.9139)
     var selectedLongitude by mutableStateOf(10.7522)
+
+    var selectedLocation: CreatedLocation by mutableStateOf(CreatedLocation("Oslo", 59.9139, 10.7522, null))
+
 
     /*
      * Legger til en ny destinasjon på backstacken.

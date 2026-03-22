@@ -1,6 +1,7 @@
 package no.uio.ifi.in2000.team20.team20app.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
@@ -11,6 +12,7 @@ import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.settings.SettingsScreen
+import no.uio.ifi.in2000.team20.team20app.viewmodel.HomeViewModel
 
 @Composable
 fun NavigationRoot(appState: AppState){
@@ -31,6 +33,7 @@ fun NavigationRoot(appState: AppState){
         onBack = goBack,
         entryProvider = entryProvider {
             entry<Route.HomeDestination> {
+                val homeViewModel: HomeViewModel = viewModel()
                 ScreenScaffold(
                     goToHome = goToHome,
                     goToMap = goToMap,
@@ -62,7 +65,8 @@ fun NavigationRoot(appState: AppState){
                         },
                         onOpenSettings = {
                             backStack.add(Route.SettingsDestination)
-                        }
+                        },
+                        viewModel = homeViewModel
                     )
                 }
             }
