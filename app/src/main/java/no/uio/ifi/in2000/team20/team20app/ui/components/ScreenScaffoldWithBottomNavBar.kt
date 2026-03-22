@@ -14,7 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation3.runtime.NavKey
-import no.uio.ifi.in2000.team20.team20app.navigation.Route
+import no.uio.ifi.in2000.team20.team20app.ui.navigation.Route
 
 @Composable
 fun ScreenScaffold(

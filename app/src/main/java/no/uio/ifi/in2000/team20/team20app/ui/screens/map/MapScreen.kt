@@ -28,7 +28,7 @@ import com.google.maps.android.compose.TileOverlay
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import no.uio.ifi.in2000.team20.team20app.data.wmsToWmts.TileURLFromWmsProvider
-import no.uio.ifi.in2000.team20.team20app.navigation.Route
+import no.uio.ifi.in2000.team20.team20app.ui.navigation.Route
 import no.uio.ifi.in2000.team20.team20app.ui.components.ScreenScaffold
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_LATITUDE
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_LONGITUDE

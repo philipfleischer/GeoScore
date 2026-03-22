@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team20.team20app.viewmodel
+package no.uio.ifi.in2000.team20.team20app.ui.screens.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,7 +11,6 @@ import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team20.team20app.data.api.LocationForecsastClientProvider
 import no.uio.ifi.in2000.team20.team20app.data.datasource.LocationForecastRemoteDataSource
 import no.uio.ifi.in2000.team20.team20app.data.repository.LocationForecastRepository
-import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeUiState
 
 /**
  * ViewModel for HomeScreen.

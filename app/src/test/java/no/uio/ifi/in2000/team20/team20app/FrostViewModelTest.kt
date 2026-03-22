@@ -6,7 +6,7 @@ import kotlinx.coroutines.test.runTest
 import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepositoryService
 import no.uio.ifi.in2000.team20.team20app.domain.model.ClimateData
 import no.uio.ifi.in2000.team20.team20app.domain.model.ClimateObservation
-import no.uio.ifi.in2000.team20.team20app.viewmodel.FrostViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull

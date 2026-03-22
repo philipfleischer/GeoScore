@@ -32,7 +32,8 @@ import no.uio.ifi.in2000.team20.team20app.ui.components.EmptyState
 import no.uio.ifi.in2000.team20.team20app.ui.components.ErrorState
 import no.uio.ifi.in2000.team20.team20app.ui.components.LoadingState
 import no.uio.ifi.in2000.team20.team20app.ui.theme.LocalTheme
-import no.uio.ifi.in2000.team20.team20app.viewmodel.HomeViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 
 @Composable
 fun HomeScreen(
@@ -43,7 +44,8 @@ fun HomeScreen(
     onOpenDetails: () -> Unit,
     onOpenClimateStats: () -> Unit,
     onOpenSettings: () -> Unit,
-    viewModel: HomeViewModel = viewModel()
+    viewModel: HomeViewModel = viewModel(),
+    sharedViewModel: AppViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
