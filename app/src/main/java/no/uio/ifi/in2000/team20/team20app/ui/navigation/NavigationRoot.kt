@@ -40,11 +40,13 @@ fun NavigationRoot(appViewModel: AppViewModel){
             entry<Route.HomeDestination> {
                 val homeViewModel: HomeViewModel = viewModel()
                 ScreenScaffold(
+                    title = "GeoMerking",
                     goToHome = goToHome,
                     goToMap = goToMap,
                     goToFavorites = goToFavorites,
+                    onOpenSettings = goToSettings,
                     currentDestination = Route.HomeDestination
-                ) {
+                ) { modifier ->
                     HomeScreen(
                         areaName = appViewModel.selectedAreaName,
                         latitude = appViewModel.selectedLatitude,
@@ -70,6 +72,7 @@ fun NavigationRoot(appViewModel: AppViewModel){
                         },
                         onOpenSettings = goToSettings,
                         onOpenSearch = goToSearch,
+                        modifier = modifier,
                         viewModel = homeViewModel,
                         sharedViewModel = appViewModel
                     )
@@ -78,11 +81,13 @@ fun NavigationRoot(appViewModel: AppViewModel){
 
             entry<Route.MapDestination> {
                 ScreenScaffold(
+                    title = "Kart",
                     goToHome = goToHome,
                     goToMap = goToMap,
                     goToFavorites = goToFavorites,
+                    onOpenSettings = goToSettings,
                     currentDestination = Route.MapDestination
-                ) {
+                ) { modifier ->
                     MapScreen(
                         selectedAreaName = appViewModel.selectedAreaName,
                         onAreaSelected = { name, lat, lon ->
@@ -91,39 +96,36 @@ fun NavigationRoot(appViewModel: AppViewModel){
                         onOpenDetails = { name, lat, lon ->
                             appViewModel.setSelectedArea(name, lat, lon)
                             backStack.add(Route.AreaDetailsDestination(name, lat, lon))
-                        }
+                        },
+                        modifier = modifier
                     )
                 }
             }
 
             entry<Route.FavoritesDestination> {
                 ScreenScaffold(
+                    title = "Favoritter",
                     goToHome = goToHome,
                     goToMap = goToMap,
                     goToFavorites = goToFavorites,
+                    onOpenSettings = goToSettings,
                     currentDestination = Route.FavoritesDestination
-                ) {
+                ) { modifier ->
                     FavoritesScreen(
                         onFavoriteSelected = { name, lat, lon ->
                             appViewModel.setSelectedArea(name, lat, lon)
                             backStack.add(Route.AreaDetailsDestination(name, lat, lon))
-                        }
+                        },
+                        modifier = modifier
                     )
                 }
             }
 
             // NEW SETTINGS ENTRY
             entry<Route.SettingsDestination> {
-                ScreenScaffold(
-                    goToHome = goToHome,
-                    goToMap = goToMap,
-                    goToFavorites = goToFavorites,
-                    currentDestination = Route.HomeDestination
-                ) {
-                    SettingsScreen(
-                        onBackClick = goBack
-                    )
-                }
+                SettingsScreen(
+                    onBackClick = goBack
+                )
             }
 
             entry<Route.SearchDestination> {

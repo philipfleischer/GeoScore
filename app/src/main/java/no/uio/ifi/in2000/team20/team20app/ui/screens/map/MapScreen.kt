@@ -44,7 +44,8 @@ val currTileProvider = TileURLFromWmsProvider("", TILE_SIZE)
 fun MapScreen(
     selectedAreaName: String,
     onAreaSelected: (String, Double, Double) -> Unit,
-    onOpenDetails: (String, Double, Double) -> Unit
+    onOpenDetails: (String, Double, Double) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     //TODO: PUT THIS IN A VIEWMODEL OR SOMETHING IDK, APPSTATE?? GOOGLE EXAMPLE IS IN A COMPOSABLE SO IDK
     val default = LatLng(DEFAULT_LATITUDE, DEFAULT_LONGITUDE)
@@ -55,8 +56,9 @@ fun MapScreen(
 
 
     BottomSheetScaffold(
+        modifier = modifier,
 
-        sheetPeekHeight = 150.dp, // ca 1 cm synlig når kollapset, TODO: Øk synligheten?
+        sheetPeekHeight = 100.dp, // ca 1 cm synlig når kollapset, TODO: Øk synligheten?
 
         sheetContainerColor = MaterialTheme.colorScheme.surface,
 
@@ -177,9 +179,11 @@ fun MapScreen(
 private fun MapScreenPreview() {
     MaterialTheme {
         ScreenScaffold(
+            title = "Kart",
             goToHome = {},
             goToMap = {},
             goToFavorites = {},
+            onOpenSettings = {},
             currentDestination = Route.MapDestination
         ) {
             MapScreen(

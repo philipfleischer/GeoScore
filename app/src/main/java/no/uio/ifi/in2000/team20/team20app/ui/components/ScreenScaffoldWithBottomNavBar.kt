@@ -18,15 +18,23 @@ import no.uio.ifi.in2000.team20.team20app.ui.navigation.Route
 
 @Composable
 fun ScreenScaffold(
+    title: String,
     goToHome: () -> Unit,
     goToMap: () -> Unit,
     goToFavorites: () -> Unit,
+    onOpenSettings: () -> Unit,
     currentDestination: NavKey,
     currentComposable: @Composable (Modifier) -> Unit
 ){
     Scaffold(
+        topBar = {
+            SharedTopAppBar(
+                title = title,
+                onOpenSettings = onOpenSettings
+            )
+        },
         bottomBar = {
-            NaturhendelserBottomBar(
+            SharedBottomBar(
                 currentDestination = currentDestination,
                 onHomeClick = goToHome,
                 onMapClick = goToMap,
@@ -39,7 +47,7 @@ fun ScreenScaffold(
 }
 
 @Composable
-private fun NaturhendelserBottomBar(
+private fun SharedBottomBar(
     currentDestination: NavKey?,
     onHomeClick: () -> Unit,
     onMapClick: () -> Unit,
@@ -71,6 +79,12 @@ private fun NaturhendelserBottomBar(
 @Composable
 fun ScreenScaffoldPreview(){
     ScreenScaffold(
-        {},{},{}, Route.HomeDestination, {}
+        title = "GeoMerking",
+        goToHome = {},
+        goToMap = {},
+        goToFavorites = {},
+        onOpenSettings = {},
+        currentDestination = Route.HomeDestination,
+        currentComposable = {}
     )
 }
