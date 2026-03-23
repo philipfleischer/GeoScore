@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -28,10 +29,14 @@ import com.google.maps.android.compose.TileOverlay
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import no.uio.ifi.in2000.team20.team20app.data.wmsToWmts.TileURLFromWmsProvider
+import no.uio.ifi.in2000.team20.team20app.domain.model.CreatedLocation
 import no.uio.ifi.in2000.team20.team20app.ui.navigation.Route
 import no.uio.ifi.in2000.team20.team20app.ui.components.ScreenScaffold
+import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_LATITUDE
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_LONGITUDE
+import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_NAME
+import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_POSITION
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MAX_ZOOM
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MIN_ZOOM
 import no.uio.ifi.in2000.team20.team20app.util.Constants.TILE_SIZE
@@ -44,13 +49,14 @@ val currTileProvider = TileURLFromWmsProvider("", TILE_SIZE)
 fun MapScreen(
     selectedAreaName: String,
     onAreaSelected: (String, Double, Double) -> Unit,
-    onOpenDetails: (String, Double, Double) -> Unit
+    onOpenDetails: (String, Double, Double) -> Unit,
+    sharedViewModel: AppViewModel = viewModel()
 ) {
-    //TODO: PUT THIS IN A VIEWMODEL OR SOMETHING IDK, APPSTATE?? GOOGLE EXAMPLE IS IN A COMPOSABLE SO IDK
-    val default = LatLng(DEFAULT_LATITUDE, DEFAULT_LONGITUDE)
-    val defaultMarkerState = rememberUpdatedMarkerState(position = default)
+    val chosenPosition = sharedViewModel.selectedLocation ?: DEFAULT_POSITION
+    val cameraPosition = LatLng(chosenPosition.latitude, chosenPosition.longitude)
+    val markerPosition = rememberUpdatedMarkerState(position = cameraPosition)
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(default, 10f)
+        position = CameraPosition.fromLatLngZoom(cameraPosition, 10f)
     }
 
 
@@ -147,9 +153,9 @@ fun MapScreen(
                     visible = true
                 )
                 Marker(
-                    state = defaultMarkerState,
-                    title = "Bergen",
-                    snippet = "Markør for Bergen"
+                    state = markerPosition,
+                    title = chosenPosition.name,
+                    snippet = "Markør for ${chosenPosition.name}"
                 )
             }
 
