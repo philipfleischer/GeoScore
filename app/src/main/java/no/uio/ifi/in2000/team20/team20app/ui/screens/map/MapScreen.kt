@@ -28,6 +28,8 @@ import com.google.maps.android.compose.TileOverlay
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import no.uio.ifi.in2000.team20.team20app.data.wmsToWmts.TileURLFromWmsProvider
+import no.uio.ifi.in2000.team20.team20app.ui.navigation.Route
+import no.uio.ifi.in2000.team20.team20app.ui.components.ScreenScaffold
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_LATITUDE
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_LONGITUDE
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MAX_ZOOM
@@ -131,7 +133,9 @@ fun MapScreen(
 //            }
             //TODO: Separate GoogleMap to its own file
             GoogleMap(
-                modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceVariant),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
                 cameraPositionState = cameraPositionState,
                 properties = MapProperties(
                     maxZoomPreference = MAX_ZOOM,
@@ -172,10 +176,17 @@ fun MapScreen(
 @Composable
 private fun MapScreenPreview() {
     MaterialTheme {
-        MapScreen(
-            selectedAreaName = "Bergen",
-            onAreaSelected = { _, _, _ -> },
-            onOpenDetails = { _, _, _ -> }
-        )
+        ScreenScaffold(
+            goToHome = {},
+            goToMap = {},
+            goToFavorites = {},
+            currentDestination = Route.MapDestination
+        ) {
+            MapScreen(
+                selectedAreaName = "Bergen",
+                onAreaSelected = { _, _, _ -> },
+                onOpenDetails = { _, _, _ -> }
+            )
+        }
     }
 }

@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team20.team20app.viewmodel
+package no.uio.ifi.in2000.team20.team20app.ui.screens.map
 
 /**
  * ViewModel for MapScreen.

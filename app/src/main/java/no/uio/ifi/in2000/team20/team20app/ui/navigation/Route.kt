@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team20.team20app.navigation
+package no.uio.ifi.in2000.team20.team20app.ui.navigation
 
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable

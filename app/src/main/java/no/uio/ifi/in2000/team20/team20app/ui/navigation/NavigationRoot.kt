@@ -1,21 +1,26 @@
-package no.uio.ifi.in2000.team20.team20app.navigation
+package no.uio.ifi.in2000.team20.team20app.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import no.uio.ifi.in2000.team20.team20app.ScreenScaffold
+import no.uio.ifi.in2000.team20.team20app.ui.components.ScreenScaffold
 import no.uio.ifi.in2000.team20.team20app.ui.screens.details.AreaDetailsScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.details.ClimateStatsScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.settings.SettingsScreen
+import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 
 @Composable
-fun NavigationRoot(appState: AppState){
-
+fun NavigationRoot(appViewModel: AppViewModel){
+    //BackStack
     val backStack = rememberNavBackStack(Route.HomeDestination)
+
+    //Navigation-lambdas
     val goBack: () -> Unit = {
         if (backStack.size > 1) {
             backStack.removeAt(backStack.lastIndex)
@@ -31,6 +36,7 @@ fun NavigationRoot(appState: AppState){
         onBack = goBack,
         entryProvider = entryProvider {
             entry<Route.HomeDestination> {
+                val homeViewModel: HomeViewModel = viewModel()
                 ScreenScaffold(
                     goToHome = goToHome,
                     goToMap = goToMap,
@@ -38,31 +44,31 @@ fun NavigationRoot(appState: AppState){
                     currentDestination = Route.HomeDestination
                 ) {
                     HomeScreen(
-                        areaName = appState.selectedAreaName,
-                        latitude = appState.selectedLatitude,
-                        longitude = appState.selectedLongitude,
-                        onOpenMap = { backStack.add(Route.MapDestination) },
+                        areaName = appViewModel.selectedAreaName,
+                        latitude = appViewModel.selectedLatitude,
+                        longitude = appViewModel.selectedLongitude,
+                        onOpenMap = goToMap,
                         onOpenDetails = {
                             backStack.add(
                                 Route.AreaDetailsDestination(
-                                    areaName = appState.selectedAreaName,
-                                    latitude = appState.selectedLatitude,
-                                    longitude = appState.selectedLongitude
+                                    areaName = appViewModel.selectedAreaName,
+                                    latitude = appViewModel.selectedLatitude,
+                                    longitude = appViewModel.selectedLongitude
                                 )
                             )
                         },
                         onOpenClimateStats = {
                             backStack.add(
                                 Route.ClimateStatsDestination(
-                                    areaName = appState.selectedAreaName,
-                                    latitude = appState.selectedLatitude,
-                                    longitude = appState.selectedLongitude
+                                    areaName = appViewModel.selectedAreaName,
+                                    latitude = appViewModel.selectedLatitude,
+                                    longitude = appViewModel.selectedLongitude
                                 )
                             )
                         },
-                        onOpenSettings = {
-                            backStack.add(Route.SettingsDestination)
-                        }
+                        onOpenSettings = goToSettings,
+                        viewModel = homeViewModel,
+                        sharedViewModel = appViewModel
                     )
                 }
             }
@@ -75,12 +81,12 @@ fun NavigationRoot(appState: AppState){
                     currentDestination = Route.MapDestination
                 ) {
                     MapScreen(
-                        selectedAreaName = appState.selectedAreaName,
+                        selectedAreaName = appViewModel.selectedAreaName,
                         onAreaSelected = { name, lat, lon ->
-                            appState.setSelectedArea(name, lat, lon)
+                            appViewModel.setSelectedArea(name, lat, lon)
                         },
                         onOpenDetails = { name, lat, lon ->
-                            appState.setSelectedArea(name, lat, lon)
+                            appViewModel.setSelectedArea(name, lat, lon)
                             backStack.add(Route.AreaDetailsDestination(name, lat, lon))
                         }
                     )
@@ -96,7 +102,7 @@ fun NavigationRoot(appState: AppState){
                 ) {
                     FavoritesScreen(
                         onFavoriteSelected = { name, lat, lon ->
-                            appState.setSelectedArea(name, lat, lon)
+                            appViewModel.setSelectedArea(name, lat, lon)
                             backStack.add(Route.AreaDetailsDestination(name, lat, lon))
                         }
                     )
