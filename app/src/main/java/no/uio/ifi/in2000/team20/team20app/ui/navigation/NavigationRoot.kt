@@ -13,6 +13,7 @@ import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.settings.SettingsScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchScreen
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 
 @Composable
@@ -30,6 +31,7 @@ fun NavigationRoot(appViewModel: AppViewModel){
     val goToMap: () -> Unit = {backStack.add(Route.MapDestination)}
     val goToFavorites: () -> Unit = {backStack.add(Route.FavoritesDestination)}
     val goToSettings: () -> Unit = { backStack.add(Route.SettingsDestination) }
+    val goToSearch: () -> Unit = { backStack.add(Route.SearchDestination) }
 
     NavDisplay(
         backStack = backStack,
@@ -67,6 +69,7 @@ fun NavigationRoot(appViewModel: AppViewModel){
                             )
                         },
                         onOpenSettings = goToSettings,
+                        onOpenSearch = goToSearch,
                         viewModel = homeViewModel,
                         sharedViewModel = appViewModel
                     )
@@ -121,6 +124,16 @@ fun NavigationRoot(appViewModel: AppViewModel){
                         onBackClick = goBack
                     )
                 }
+            }
+
+            entry<Route.SearchDestination> {
+                SearchScreen(
+                    onBackClick = goBack,
+                    onLocationSelected = { name, lat, lon ->
+                        appViewModel.setSelectedArea(name, lat, lon)
+                        goBack()
+                    }
+                )
             }
 
             entry<Route.AreaDetailsDestination> { destination ->

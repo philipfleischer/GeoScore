@@ -33,6 +33,7 @@ import no.uio.ifi.in2000.team20.team20app.ui.components.ErrorState
 import no.uio.ifi.in2000.team20.team20app.ui.components.LoadingState
 import no.uio.ifi.in2000.team20.team20app.ui.theme.LocalTheme
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchBarObject
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 
 @Composable
@@ -44,6 +45,7 @@ fun HomeScreen(
     onOpenDetails: () -> Unit,
     onOpenClimateStats: () -> Unit,
     onOpenSettings: () -> Unit,
+    onOpenSearch: () -> Unit,
     viewModel: HomeViewModel = viewModel(),
     sharedViewModel: AppViewModel = viewModel()
 ) {
@@ -74,6 +76,12 @@ fun HomeScreen(
                 )
             }
         }
+
+        // Søkefelt
+        SearchBarObject(
+            onOpenSearch = onOpenSearch,
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
 
         // Kortene vises alltid, tilstandsindikator er inline øverst
         HomeScreenContent(
