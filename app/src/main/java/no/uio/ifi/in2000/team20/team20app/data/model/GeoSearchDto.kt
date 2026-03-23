@@ -14,7 +14,7 @@ data class MetadataDto(
     val sokeStreng: String,
     val totaltAntallTreff: Int,
     val treffPerSide: Int,
-    val utkoordsys: Int,
+    //val utkoordsys: Int,
     val viserFra: Int,
     val viserTil: Int
 )
