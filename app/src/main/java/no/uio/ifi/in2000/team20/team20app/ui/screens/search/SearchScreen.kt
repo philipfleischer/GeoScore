@@ -35,6 +35,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -43,6 +45,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.components.ErrorState
 import no.uio.ifi.in2000.team20.team20app.ui.components.LoadingState
+import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 
 @Composable
 fun SearchBarObject(
@@ -83,10 +86,10 @@ fun SearchBarObject(
 fun SearchScreen(
     onBackClick: () -> Unit,
     onLocationSelected: (name: String, lat: Double, lon: Double) -> Unit,
-    viewModel: SearchViewModel = viewModel()
+    searchviewModel: SearchViewModel = viewModel(),
 ) {
     var query by remember { mutableStateOf("") }
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by searchviewModel.uiState.collectAsStateWithLifecycle()
 
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -123,9 +126,9 @@ fun SearchScreen(
                 value = query,
                 onValueChange = {
                     query = it
-                    viewModel.search(it)
+                    searchviewModel.search(it)
                 },
-                label = { Text("Adresse") },
+                label = { Text("Sted") },
                 placeholder = { Text("Skriv inn adresse...") },
                 leadingIcon = {
                     Icon(
@@ -140,9 +143,32 @@ fun SearchScreen(
 
             when {
                 query.isBlank() -> {
-                    Box(modifier = Modifier.fillMaxWidth()) {
-                        Text("Begynn å skrive for å se forslag")
+
+                    if(uiState.recentlySearched.isEmpty()){
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            Text("Begynn å skrive for å se forslag")
+                        }
+                    } else {
+                        Text(text = "Siste søk")
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f, fill = false)
+                        ) {
+                            items(uiState.recentlySearched) { location ->
+                                SearchResultItem(
+                                    location = location,
+                                    onSelect = {
+                                        val name = location.name ?: return@SearchResultItem
+                                        val lat = location.lat ?: return@SearchResultItem
+                                        val lon = location.lon ?: return@SearchResultItem
+                                        onLocationSelected(name, lat, lon)
+                                    }
+                                )
+                            }
+                        }
                     }
+
                 }
                 uiState.isLoading -> LoadingState(modifier = Modifier.fillMaxWidth())
                 uiState.error != null -> ErrorState(message = uiState.error!!, modifier = Modifier.fillMaxWidth())
@@ -164,6 +190,7 @@ fun SearchScreen(
                                     val name = location.name ?: return@SearchResultItem
                                     val lat = location.lat ?: return@SearchResultItem
                                     val lon = location.lon ?: return@SearchResultItem
+                                    uiState.recentlySearched.add(0, location)
                                     onLocationSelected(name, lat, lon)
                                 }
                             )
@@ -181,6 +208,7 @@ private fun SearchResultItem(
     location: Location,
     onSelect: () -> Unit
 ) {
+    var isHovered by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxWidth()

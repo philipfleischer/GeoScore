@@ -72,7 +72,7 @@ fun HomeScreen(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Her vil informasjon om valgt område vises.",
+                            text = "Her vil informasjon om valgt område vises. \n valgt område er $areaName",
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }

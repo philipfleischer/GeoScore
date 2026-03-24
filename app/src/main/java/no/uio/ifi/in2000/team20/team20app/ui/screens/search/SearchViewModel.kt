@@ -30,7 +30,7 @@ class SearchViewModel : ViewModel() {
     fun search(query: String) {
         if (query.isBlank()) {
             _uiState.update { it.copy(results = emptyList(), isLoading = false, error = null) }
-            return
+            return 
         }
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update { it.copy(isLoading = true, error = null) }

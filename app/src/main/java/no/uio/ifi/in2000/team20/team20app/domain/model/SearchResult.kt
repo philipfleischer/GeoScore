@@ -1,7 +1,7 @@
 package no.uio.ifi.in2000.team20.team20app.domain.model
 
 data class SearchResult(
-    val locations: List<Location>
+    val locations: List<Location> = emptyList(),
 )
 
 data class Location(
