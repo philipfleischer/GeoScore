@@ -1,8 +1,11 @@
 package no.uio.ifi.in2000.team20.team20app.data.repository
 
-import no.uio.ifi.in2000.team20.team20app.data.datasource.GeoSearchRemoteDataSource
+import android.util.Log
+import no.uio.ifi.in2000.team20.team20app.data.datasource.AddressRemoteDataSource
+import no.uio.ifi.in2000.team20.team20app.data.datasource.LocationRemoteDatasource
+import no.uio.ifi.in2000.team20.team20app.data.model.Address
 import no.uio.ifi.in2000.team20.team20app.data.model.FylkerItemsDto
-import no.uio.ifi.in2000.team20.team20app.data.model.GeoResponse
+import no.uio.ifi.in2000.team20.team20app.data.model.LocationResponse
 import no.uio.ifi.in2000.team20.team20app.data.model.KommuneItemsDto
 import no.uio.ifi.in2000.team20.team20app.data.model.NavnItemsDto
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
@@ -13,7 +16,8 @@ interface GeoSearchRepositoryService {
 }
 
 class GeoSearchRepository(
-    private val datasource: GeoSearchRemoteDataSource
+    private val locationdatasource: LocationRemoteDatasource,
+    private val addressDatasource: AddressRemoteDataSource
 ) : GeoSearchRepositoryService {
     private fun NavnItemsDto.toDomain(): String {
         return skrivemåte
@@ -27,7 +31,7 @@ class GeoSearchRepository(
         return kommunenavn
     }
 
-    private fun GeoResponse.toDomain(): SearchResult {
+    private fun LocationResponse.toDomain(): SearchResult {
         val listOfResults = navn.mapNotNull {
             val navn = it.toDomain()
             val fylke = it.fylker.firstOrNull()?.toDomain()
@@ -46,13 +50,34 @@ class GeoSearchRepository(
 
         return SearchResult(listOfResults)
     }
+    private fun Address.toDomain(): Location {
+        return Location(
+            name = adressetekst,
+            kommune = kommunenavn,
+            fylke = null,
+            lat = representasjonspunkt?.lat,
+            lon = representasjonspunkt?.lon
+        )
+    }
 
     override suspend fun getSearchResults(
         query: String,
         lat: Double?,
         lon: Double?
     ): SearchResult {
-        val geoResponse = datasource.searchLocationWithQuery(query, lat, lon)
-        return geoResponse.toDomain()
+        val locations = locationdatasource.searchLocationWithQuery(query, lat, lon)
+            .toDomain().locations
+
+        val adresses = addressDatasource.searchAddress(query)
+            .adresser.map { it.toDomain() }
+
+
+        //to net show same results from API
+        val combined = (adresses + locations).distinctBy { Pair(it.lat, it.lon) }
+
+
+        return SearchResult(combined)
+
+
     }
 }

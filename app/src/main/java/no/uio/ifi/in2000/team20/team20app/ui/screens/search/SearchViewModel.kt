@@ -9,13 +9,17 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team20.team20app.data.api.GeoSearchClientProvider
-import no.uio.ifi.in2000.team20.team20app.data.datasource.GeoSearchRemoteDataSource
+import no.uio.ifi.in2000.team20.team20app.data.datasource.AddressRemoteDataSource
+import no.uio.ifi.in2000.team20.team20app.data.datasource.LocationRemoteDatasource
 import no.uio.ifi.in2000.team20.team20app.data.repository.GeoSearchRepository
 
 class SearchViewModel : ViewModel() {
 
     private val repository = GeoSearchRepository(
-        datasource = GeoSearchRemoteDataSource(
+        locationdatasource = LocationRemoteDatasource(
+            client = GeoSearchClientProvider.client
+        ),
+        addressDatasource = AddressRemoteDataSource(
             client = GeoSearchClientProvider.client
         )
     )
