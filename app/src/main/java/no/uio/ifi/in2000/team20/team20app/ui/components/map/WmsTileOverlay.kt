@@ -1,19 +1,17 @@
-package no.uio.ifi.in2000.team20.team20app.data.wmsToWmts
-
+package no.uio.ifi.in2000.team20.team20app.ui.components.map
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import com.google.android.gms.maps.model.TileOverlay
 import com.google.maps.android.compose.GoogleMapComposable
-import com.google.maps.android.compose.TileOverlay
 import com.google.maps.android.compose.TileOverlayState
 import com.google.maps.android.compose.rememberTileOverlayState
-
+import no.uio.ifi.in2000.team20.team20app.data.remote.wms.WmsUrlTileProviderEpsg3857
+import no.uio.ifi.in2000.team20.team20app.util.Constants.GMAP_WMS_BOUND
 /**
  * The maximum bound for Web Mercator (EPSG:3857) projection when the world is cropped to square,
  * which is the case for GoogleMap
  */
-const val GMAP_WMS_BOUND: Double = 20037508.34
 
 @Composable
 @GoogleMapComposable
@@ -43,7 +41,7 @@ fun WmsTileOverlayEpsg3857(
         wmsDataSetYMaxBound,
         tileSize,
         urlFormatter
-    ){
+    ) {
         WmsUrlTileProviderEpsg3857(
             datasetXMinBound = wmsDataSetXMinBound,
             datasetXMaxBound = wmsDataSetXMaxBound,
@@ -53,7 +51,7 @@ fun WmsTileOverlayEpsg3857(
             urlFormatter = urlFormatter
         )
     }
-    TileOverlay(
+    com.google.maps.android.compose.TileOverlay(
         tileProvider = wmsUrlTileProvider,
         state = state,
         fadeIn = fadeIn,

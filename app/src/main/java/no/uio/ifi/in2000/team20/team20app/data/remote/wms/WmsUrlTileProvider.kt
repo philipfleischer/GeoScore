@@ -1,7 +1,8 @@
-package no.uio.ifi.in2000.team20.team20app.data.wmsToWmts
+package no.uio.ifi.in2000.team20.team20app.data.remote.wms
 
 
 import com.google.android.gms.maps.model.UrlTileProvider
+import no.uio.ifi.in2000.team20.team20app.util.Constants.GMAP_WMS_BOUND
 import java.net.URL
 
 class WmsUrlTileProviderEpsg3857(
