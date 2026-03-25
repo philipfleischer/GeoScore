@@ -16,7 +16,7 @@ interface GeoSearchRepositoryService {
 }
 
 class GeoSearchRepository(
-    private val locationdatasource: LocationRemoteDatasource,
+    private val locationDatasource: LocationRemoteDatasource,
     private val addressDatasource: AddressRemoteDataSource
 ) : GeoSearchRepositoryService {
     private fun NavnItemsDto.toDomain(): String {
@@ -65,15 +65,15 @@ class GeoSearchRepository(
         lat: Double?,
         lon: Double?
     ): SearchResult {
-        val locations = locationdatasource.searchLocationWithQuery(query, lat, lon)
+        val locations = locationDatasource.searchLocationWithQuery(query, lat, lon)
             .toDomain().locations
 
-        val adresses = addressDatasource.searchAddress(query)
+        val addresses = addressDatasource.searchAddress(query)
             .adresser.map { it.toDomain() }
 
 
-        //to net show same results from API
-        val combined = (adresses + locations).distinctBy { Pair(it.lat, it.lon) }
+        //to not show same results from API
+        val combined = (addresses + locations).distinctBy { Pair(it.lat, it.lon) }
 
 
         return SearchResult(combined)

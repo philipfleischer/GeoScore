@@ -6,5 +6,5 @@ data class SearchUiState(
     val isLoading: Boolean = false,
     val results: List<Location> = emptyList(),
     val error: String? = null,
-    val recentlySearched: MutableList<Location> = mutableListOf()
+    val recentlySearched: List<Location> = emptyList()
 )

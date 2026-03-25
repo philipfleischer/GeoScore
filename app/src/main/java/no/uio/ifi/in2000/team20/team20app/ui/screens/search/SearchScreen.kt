@@ -86,10 +86,10 @@ fun SearchBarObject(
 fun SearchScreen(
     onBackClick: () -> Unit,
     onLocationSelected: (name: String, lat: Double, lon: Double) -> Unit,
-    searchviewModel: SearchViewModel = viewModel(),
+    searchViewModel: SearchViewModel = viewModel(),
 ) {
     var query by remember { mutableStateOf("") }
-    val uiState by searchviewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by searchViewModel.uiState.collectAsStateWithLifecycle()
 
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -126,7 +126,7 @@ fun SearchScreen(
                 value = query,
                 onValueChange = {
                     query = it
-                    searchviewModel.search(it)
+                    searchViewModel.search(it)
                 },
                 label = { Text("Sted") },
                 placeholder = { Text("Skriv inn adresse...") },
@@ -190,7 +190,7 @@ fun SearchScreen(
                                     val name = location.name ?: return@SearchResultItem
                                     val lat = location.lat ?: return@SearchResultItem
                                     val lon = location.lon ?: return@SearchResultItem
-                                    uiState.recentlySearched.add(0, location)
+                                    searchViewModel.addRecentlySearched(location)
                                     onLocationSelected(name, lat, lon)
                                 }
                             )

@@ -12,11 +12,12 @@ import no.uio.ifi.in2000.team20.team20app.data.api.GeoSearchClientProvider
 import no.uio.ifi.in2000.team20.team20app.data.datasource.AddressRemoteDataSource
 import no.uio.ifi.in2000.team20.team20app.data.datasource.LocationRemoteDatasource
 import no.uio.ifi.in2000.team20.team20app.data.repository.GeoSearchRepository
+import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 
 class SearchViewModel : ViewModel() {
 
     private val repository = GeoSearchRepository(
-        locationdatasource = LocationRemoteDatasource(
+        locationDatasource = LocationRemoteDatasource(
             client = GeoSearchClientProvider.client
         ),
         addressDatasource = AddressRemoteDataSource(
@@ -34,7 +35,7 @@ class SearchViewModel : ViewModel() {
     fun search(query: String) {
         if (query.isBlank()) {
             _uiState.update { it.copy(results = emptyList(), isLoading = false, error = null) }
-            return 
+            return
         }
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update { it.copy(isLoading = true, error = null) }
@@ -45,5 +46,10 @@ class SearchViewModel : ViewModel() {
                 _uiState.update { it.copy(isLoading = false, error = "Søk feilet. Prøv igjen.") }
             }
         }
+    }
+
+    fun addRecentlySearched(location: Location) {
+        val updated = listOf(location) + _uiState.value.recentlySearched.filter { it != location }
+        _uiState.update { it.copy(recentlySearched = updated) }
     }
 }
