@@ -1,6 +1,7 @@
 package no.uio.ifi.in2000.team20.team20app.util
 
 import no.uio.ifi.in2000.team20.team20app.BuildConfig
+import no.uio.ifi.in2000.team20.team20app.domain.model.CreatedLocation
 
 /**
  * Application-wide constants.
@@ -36,15 +37,14 @@ object Constants {
     const val FROST_CLIENT_SECRET = BuildConfig.FROST_V0_CLIENT_SECRET
 
     // WMS BOUNDS
-    const val X_MIN = -20037508.34
-    const val X_MAX = 20037508.34
-    const val Y_MIN = -20037508.34
-    const val Y_MAX = 20037508.34
+    const val GMAP_WMS_BOUND: Double = 20037508.34
 
     // MAP DEFAULT SETTINGS
     const val DEFAULT_ZOOM = 6.5
+    const val DEFAULT_NAME = "Bergen"
     const val DEFAULT_LATITUDE = 60.3913
     const val DEFAULT_LONGITUDE = 5.3221
+    val DEFAULT_POSITION: CreatedLocation = CreatedLocation(DEFAULT_NAME,DEFAULT_LATITUDE, DEFAULT_LONGITUDE, null)
 
     const val MAX_ZOOM: Float = 19.0f
     const val MIN_ZOOM: Float = 4.0f
