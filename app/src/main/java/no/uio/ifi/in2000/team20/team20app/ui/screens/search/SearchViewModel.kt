@@ -51,7 +51,10 @@ class SearchViewModel : ViewModel() {
         searchJob?.cancel()
         searchJob = viewModelScope.launch(Dispatchers.IO) {
             delay(300) //debounce
-            if (text.isBlank()) {
+            // Geonorge-APIet (AddressRemoteDataSource) returnerer feil (ikke 200) på veldig korte søk (f eks "fr"),
+            // så vi venter til brukeren har skrevet minst 3 tegn før vi kaller API-et. obs filtrerer bort f eks Bø
+            // TODO: vurder å håndtere dette anneledes, Norge har mange korte stedsnavn
+            if (text.isBlank() || text.length < 3) {
                 _uiState.update { it.copy(isLoading = false, results = emptyList(), error = null) }
                 return@launch
             }
@@ -70,6 +73,12 @@ class SearchViewModel : ViewModel() {
      * Legger lokasjonen øverst i listen og fjerner eventuelle duplikater.
      * Listen lagres i uiState og vises når søkefeltet er tomt.
      */
+    // Tilbakestiller søkefeltet og resultater, f.eks. når man åpner søkeskjermen på nytt
+    fun resetQuery() {
+        searchJob?.cancel()
+        _uiState.update { it.copy(query = "", isLoading = false, results = emptyList(), error = null) }
+    }
+
     fun addRecentlySearched(location: Location) {
         val updated = listOf(location) + _uiState.value.recentlySearched.filter { it != location }
         _uiState.update { it.copy(recentlySearched = updated) }

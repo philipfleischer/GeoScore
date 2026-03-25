@@ -88,8 +88,9 @@ fun SearchScreen(
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    // Slik at man er inni textfielden med engang man går inn i skjermen
+    // Slik at man er inni textfielden med engang man går inn i skjermen, og søkefeltet er tomt
     LaunchedEffect(Unit) {
+        searchViewModel.resetQuery()
         focusRequester.requestFocus()
         keyboardController?.show()
     }
