@@ -27,16 +27,12 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -45,7 +41,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.components.ErrorState
 import no.uio.ifi.in2000.team20.team20app.ui.components.LoadingState
-import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 
 @Composable
 fun SearchBarObject(
@@ -88,7 +83,6 @@ fun SearchScreen(
     onLocationSelected: (name: String, lat: Double, lon: Double) -> Unit,
     searchViewModel: SearchViewModel = viewModel(),
 ) {
-    var query by remember { mutableStateOf("") }
     val uiState by searchViewModel.uiState.collectAsStateWithLifecycle()
 
     val focusRequester = remember { FocusRequester() }
@@ -123,11 +117,8 @@ fun SearchScreen(
                     .background(MaterialTheme.colorScheme.surfaceVariant)
                     .padding(horizontal = 16.dp)
                     .focusRequester(focusRequester),
-                value = query,
-                onValueChange = {
-                    query = it
-                    searchViewModel.search(it)
-                },
+                value = uiState.query,
+                onValueChange = { searchViewModel.updateInput(it) },
                 label = { Text("Sted") },
                 placeholder = { Text("Skriv inn adresse...") },
                 leadingIcon = {
@@ -142,7 +133,7 @@ fun SearchScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             when {
-                query.isBlank() -> {
+                uiState.query.isBlank() -> {
 
                     if(uiState.recentlySearched.isEmpty()){
                         Box(modifier = Modifier.fillMaxWidth()) {
@@ -174,7 +165,7 @@ fun SearchScreen(
                 uiState.error != null -> ErrorState(message = uiState.error!!, modifier = Modifier.fillMaxWidth())
                 uiState.results.isEmpty() -> {
                     Box(modifier = Modifier.fillMaxWidth()) {
-                        Text("Ingen resultater for \"$query\"")
+                        Text("Ingen resultater for \"${uiState.query}\"")
                     }
                 }
                 else -> {
@@ -208,7 +199,6 @@ private fun SearchResultItem(
     location: Location,
     onSelect: () -> Unit
 ) {
-    var isHovered by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxWidth()

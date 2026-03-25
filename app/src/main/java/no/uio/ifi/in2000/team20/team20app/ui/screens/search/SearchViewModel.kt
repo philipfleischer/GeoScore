@@ -1,8 +1,11 @@
 package no.uio.ifi.in2000.team20.team20app.ui.screens.search
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,19 +31,33 @@ class SearchViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(SearchUiState())
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
+    init {
+        Log.d("SearchViewModel", "SearchViewModel created")
+    }
+
+    // Holder på den aktive søke-jobben slik at vi kan avbryte den hvis brukeren skriver mer.
+    private var searchJob: Job? = null
+
     /*
-     * Kalles hver gang søkefeltet endres.
-     * Henter stednavn fra Kartverket og oppdaterer UI-tilstanden.
+     * Kalles hver gang søkefeltet endres i UI-en.
+     * Kansellerer forrige søk, venter 300ms (debounce), og kaller så API-et.
+     * Dette hindrer unødvendige API-kall mens brukeren skriver.
+     *
+     * MERK: Vi kan gå for debounce + collectLatest som skal være mer idiomatisk Kotlin/Flow
+     * begge fungerer likt, men Flow krever @OptIn(FlowPreview::class)
      */
-    fun search(query: String) {
-        if (query.isBlank()) {
-            _uiState.update { it.copy(results = emptyList(), isLoading = false, error = null) }
-            return
-        }
-        viewModelScope.launch(Dispatchers.IO) {
+    fun updateInput(text: String) {
+        _uiState.update { it.copy(query = text) }
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch(Dispatchers.IO) {
+            delay(300) //debounce
+            if (text.isBlank()) {
+                _uiState.update { it.copy(isLoading = false, results = emptyList(), error = null) }
+                return@launch
+            }
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
-                val result = repository.getSearchResults(query)
+                val result = repository.getSearchResults(text)
                 _uiState.update { it.copy(isLoading = false, results = result.locations) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, error = "Søk feilet. Prøv igjen.") }
@@ -48,6 +65,11 @@ class SearchViewModel : ViewModel() {
         }
     }
 
+    /*
+     * Kalles når brukeren trykker på et søkeresultat.
+     * Legger lokasjonen øverst i listen og fjerner eventuelle duplikater.
+     * Listen lagres i uiState og vises når søkefeltet er tomt.
+     */
     fun addRecentlySearched(location: Location) {
         val updated = listOf(location) + _uiState.value.recentlySearched.filter { it != location }
         _uiState.update { it.copy(recentlySearched = updated) }
