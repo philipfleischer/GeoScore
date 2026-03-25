@@ -76,4 +76,12 @@ sealed interface Route: NavKey {
     // DEtte er skjermen for SettingsScreen
     @Serializable
     object SettingsDestination : Route, NavKey
+
+    /*
+     * Dette er søkeskjermen.
+     * Brukeren søker etter stednavn via Kartverkets API.
+     * Valgt sted oppdaterer AppViewModel og sender brukeren tilbake.
+     */
+    @Serializable
+    object SearchDestination : Route, NavKey
 }

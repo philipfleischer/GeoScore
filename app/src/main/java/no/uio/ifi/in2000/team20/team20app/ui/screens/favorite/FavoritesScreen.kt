@@ -19,7 +19,8 @@ import no.uio.ifi.in2000.team20.team20app.domain.model.CreatedLocation
 
 @Composable
 fun FavoritesScreen(
-    onFavoriteSelected: (String, Double, Double) -> Unit
+    onFavoriteSelected: (String, Double, Double) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     // La inn disse bare for å ha
     val favorites = listOf(
@@ -29,16 +30,11 @@ fun FavoritesScreen(
     )
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(
-            text = "Favoritter",
-            style = MaterialTheme.typography.headlineLarge
-        )
-
         Text(
             text = "// TODO: Koble skjermen til lagrede favorittområder fra lokal database.",
             style = MaterialTheme.typography.bodyMedium
