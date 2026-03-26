@@ -34,11 +34,11 @@ class GeoSearchRepository(
             val kommune = it.kommuner.firstOrNull()?.toDomain()
             val nord = it.representasjonspunkt.nord
             val øst = it.representasjonspunkt.øst
-
+            //TODO: look at this again
             Location(
-                name = navn,
-                kommune = kommune,
-                fylke = fylke,
+                address = navn,
+                municipality = kommune,
+                county = fylke,
                 lat = nord,
                 lon = øst
             )

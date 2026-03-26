@@ -41,13 +41,9 @@ class HomeViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
-                val weather = repository.getWeatherForPoint(latitude, longitude)
+                //val weather = repository.getWeatherForPoint(latitude, longitude)
                 _uiState.update { it.copy(
                     isLoading = false,
-                    areaName = name,
-                    latitude = latitude,
-                    longitude = longitude,
-                    weather = weather
                 ) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(

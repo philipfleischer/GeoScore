@@ -56,18 +56,14 @@ fun NavigationRoot(appViewModel: AppViewModel){
                         onOpenDetails = {
                             backStack.add(
                                 Route.AreaDetailsDestination(
-                                    areaName = appViewModel.selectedAreaName,
-                                    latitude = appViewModel.selectedLatitude,
-                                    longitude = appViewModel.selectedLongitude
+                                    location = appViewModel.selectedLocation
                                 )
                             )
                         },
                         onOpenClimateStats = {
                             backStack.add(
                                 Route.ClimateStatsDestination(
-                                    areaName = appViewModel.selectedAreaName,
-                                    latitude = appViewModel.selectedLatitude,
-                                    longitude = appViewModel.selectedLongitude
+                                    location = appViewModel.selectedLocation
                                 )
                             )
                         },
@@ -105,8 +101,9 @@ fun NavigationRoot(appViewModel: AppViewModel){
                     currentDestination = Route.FavoritesDestination
                 ) { modifier ->
                     FavoritesScreen(
-                        appViewModel.selectedLocation,
-                        modifier = modifier
+                        modifier = modifier,
+                        appViewModel
+
                     )
                 }
             }
@@ -122,7 +119,7 @@ fun NavigationRoot(appViewModel: AppViewModel){
                 SearchScreen(
                     onBackClick = goBack,
                     onLocationSelected = { name, lat, lon ->
-                        appViewModel.setSelectedArea(name, lat, lon)
+                        appViewModel.setSelectedArea(Location(name, municipality = null, county = null, lat=lat, lon=lon))
                         goBack()
                     }
                 )
@@ -130,16 +127,12 @@ fun NavigationRoot(appViewModel: AppViewModel){
 
             entry<Route.AreaDetailsDestination> { destination ->
                 AreaDetailsScreen(
-                    areaName = destination.areaName,
-                    latitude = destination.latitude,
-                    longitude = destination.longitude,
+                    location = destination.location,
                     onBackClick = goBack,
                     onOpenClimateStats = {
                         backStack.add(
                             Route.ClimateStatsDestination(
-                                areaName = destination.areaName,
-                                latitude = destination.latitude,
-                                longitude = destination.longitude
+                                destination.location
                             )
                         )
                     }
@@ -148,9 +141,7 @@ fun NavigationRoot(appViewModel: AppViewModel){
 
             entry<Route.ClimateStatsDestination> { destination ->
                 ClimateStatsScreen(
-                    areaName = destination.areaName,
-                    latitude = destination.latitude,
-                    longitude = destination.longitude,
+                    location = destination.location,
                     onBackClick = goBack
                 )
             }

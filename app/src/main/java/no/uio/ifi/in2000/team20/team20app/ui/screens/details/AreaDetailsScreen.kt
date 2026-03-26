@@ -18,20 +18,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.components.SharedTopAppBar
 
 @Composable
 fun AreaDetailsScreen(
-    areaName: String,
-    latitude: Double,
-    longitude: Double,
+    location: Location,
     onBackClick: () -> Unit,
     onOpenClimateStats: () -> Unit
 ) {
     Scaffold(
         topBar = {
             SharedTopAppBar(
-                title = areaName,
+                title = location.name,
                 onBackClick = onBackClick
             )
         }
@@ -45,7 +44,7 @@ fun AreaDetailsScreen(
         ) {
             item {
                 Text(
-                    text = "Koordinater: $latitude, $longitude",
+                    text = "Koordinater: $location.lat, $location.lon",
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -92,9 +91,9 @@ fun AreaDetailsScreen(
 private fun AreaDetailsScreenPreview() {
     MaterialTheme {
         AreaDetailsScreen(
-            areaName = "Voss",
-            latitude = 60.6287,
-            longitude = 6.4147,
+            Location(address = "Voss",
+            lat = 60.6287,
+            lon = 6.4147),
             onBackClick = {},
             onOpenClimateStats = {}
         )

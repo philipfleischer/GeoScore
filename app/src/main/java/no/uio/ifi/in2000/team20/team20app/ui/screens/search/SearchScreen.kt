@@ -192,7 +192,7 @@ private fun SearchResultItem(
             text = location.name ?: "",
             style = MaterialTheme.typography.bodyLarge
         )
-        val subtitle = listOfNotNull(location.kommune, location.fylke).joinToString(", ")
+        val subtitle = listOfNotNull(location.municipality, location.county).joinToString(", ")
         if (subtitle.isNotEmpty()) {
             Text(
                 text = subtitle,

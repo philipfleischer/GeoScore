@@ -67,9 +67,7 @@ sealed interface Route: NavKey {
      */
     @Serializable
     data class ClimateStatsDestination(
-        val areaName: String,
-        val latitude: Double,
-        val longitude: Double
+        val location: Location
     ) : Route, NavKey
 
     // DEtte er skjermen for SettingsScreen

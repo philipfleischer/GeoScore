@@ -10,8 +10,8 @@ data class SearchResult(
 data class Location(
     val address: String,
     val name: String = address,
-    val municipality: String?,
-    val county: String?,
+    val municipality: String? = null,
+    val county: String? = null,
     val lat: Double,
     val lon: Double
 )

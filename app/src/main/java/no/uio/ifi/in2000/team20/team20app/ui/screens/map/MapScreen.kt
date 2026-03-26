@@ -42,8 +42,8 @@ val fylkeUrlFormatterer = {xMin: Double, yMin: Double, xMax: Double, yMax: Doubl
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
-    sharedViewModel: AppViewModel = viewModel(),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    sharedViewModel: AppViewModel = viewModel()
 ) {
     val chosenPosition = sharedViewModel.selectedLocation
     val cameraPosition = LatLng(chosenPosition.lat, chosenPosition.lon)
