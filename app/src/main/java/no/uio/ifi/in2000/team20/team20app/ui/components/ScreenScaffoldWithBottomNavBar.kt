@@ -85,7 +85,7 @@ private fun SharedBottomBar(
 @Composable
 fun ScreenScaffoldPreview(){
     ScreenScaffold(
-        title = "GeoMerking",
+        title = "Geomerking",
         goToHome = {},
         goToMap = {},
         goToFavorites = {},
