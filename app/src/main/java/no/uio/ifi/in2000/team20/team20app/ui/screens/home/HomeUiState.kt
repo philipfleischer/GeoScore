@@ -1,8 +1,7 @@
 package no.uio.ifi.in2000.team20.team20app.ui.screens.home
 
-import no.uio.ifi.in2000.team20.team20app.domain.model.ForecastPoint
-import no.uio.ifi.in2000.team20.team20app.domain.model.HazardRisk
-import no.uio.ifi.in2000.team20.team20app.domain.model.Recommendation
+import no.uio.ifi.in2000.team20.team20app.domain.model.ClimateData
+
 
 /**
  * UI state holder for HomeScreen.
@@ -16,5 +15,6 @@ import no.uio.ifi.in2000.team20.team20app.domain.model.Recommendation
 //TODO undersøk om denne br flyttes inn i HomeViewModel.kt?
 data class HomeUiState(
     val isLoading: Boolean = false,
-    val error: String? = null,                                      // null betyr ingen feil
+    val error: String? = null, //null means no error
+    val climateData: ClimateData? = null
     )

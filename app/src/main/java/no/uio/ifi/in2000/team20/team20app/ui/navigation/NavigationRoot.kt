@@ -49,25 +49,6 @@ fun NavigationRoot(appViewModel: AppViewModel){
                     currentDestination = Route.HomeDestination
                 ) { modifier ->
                     HomeScreen(
-                        areaName = appViewModel.selectedAreaName,
-                        latitude = appViewModel.selectedLatitude,
-                        longitude = appViewModel.selectedLongitude,
-                        onOpenMap = goToMap,
-                        onOpenDetails = {
-                            backStack.add(
-                                Route.AreaDetailsDestination(
-                                    location = appViewModel.selectedLocation
-                                )
-                            )
-                        },
-                        onOpenClimateStats = {
-                            backStack.add(
-                                Route.ClimateStatsDestination(
-                                    location = appViewModel.selectedLocation
-                                )
-                            )
-                        },
-                        onOpenSettings = goToSettings,
                         onOpenSearch = goToSearch,
                         modifier = modifier,
                         viewModel = homeViewModel,
