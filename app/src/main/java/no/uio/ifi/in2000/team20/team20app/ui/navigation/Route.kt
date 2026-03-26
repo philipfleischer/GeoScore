@@ -2,6 +2,7 @@ package no.uio.ifi.in2000.team20.team20app.ui.navigation
 
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
+import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 
 @Serializable
 sealed interface Route: NavKey {
@@ -45,9 +46,7 @@ sealed interface Route: NavKey {
      */
     @Serializable
     data class AreaDetailsDestination(
-        val areaName: String,
-        val latitude: Double,
-        val longitude: Double
+        val location: Location
     ) : Route, NavKey
 
     /*

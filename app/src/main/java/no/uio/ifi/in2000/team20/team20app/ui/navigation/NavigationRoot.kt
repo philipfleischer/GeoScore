@@ -5,6 +5,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
+import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.components.ScreenScaffold
 import no.uio.ifi.in2000.team20.team20app.ui.screens.details.AreaDetailsScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.details.ClimateStatsScreen
@@ -89,14 +90,6 @@ fun NavigationRoot(appViewModel: AppViewModel){
                     currentDestination = Route.MapDestination
                 ) { modifier ->
                     MapScreen(
-                        selectedAreaName = appViewModel.selectedAreaName,
-                        onAreaSelected = { name, lat, lon ->
-                            appViewModel.setSelectedArea(name, lat, lon)
-                        },
-                        onOpenDetails = { name, lat, lon ->
-                            appViewModel.setSelectedArea(name, lat, lon)
-                            backStack.add(Route.AreaDetailsDestination(name, lat, lon))
-                        },
                         modifier = modifier
                     )
                 }
@@ -112,10 +105,7 @@ fun NavigationRoot(appViewModel: AppViewModel){
                     currentDestination = Route.FavoritesDestination
                 ) { modifier ->
                     FavoritesScreen(
-                        onFavoriteSelected = { name, lat, lon ->
-                            appViewModel.setSelectedArea(name, lat, lon)
-                            backStack.add(Route.AreaDetailsDestination(name, lat, lon))
-                        },
+                        appViewModel.selectedLocation,
                         modifier = modifier
                     )
                 }

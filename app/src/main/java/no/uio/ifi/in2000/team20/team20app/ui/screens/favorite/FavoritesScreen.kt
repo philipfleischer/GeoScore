@@ -15,18 +15,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import no.uio.ifi.in2000.team20.team20app.domain.model.CreatedLocation
+import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 
 @Composable
 fun FavoritesScreen(
-    onFavoriteSelected: (String, Double, Double) -> Unit,
+    onFavoriteSelected: (Location) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // La inn disse bare for å ha
     val favorites = listOf(
-        CreatedLocation("Oslo", 59.9139, 10.7522, null),
-        CreatedLocation("Bergen", 60.3913, 5.3221, null),
-        CreatedLocation("Voss", 60.6287, 6.4147, null)
+        Location(address="Oslo", municipality = null, county = null, lat = 59.9139, lon = 10.7522)
     )
 
     Column(
@@ -46,13 +43,13 @@ fun FavoritesScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
-                            onFavoriteSelected(area.name, area.latitude, area.longitude)
+                            onFavoriteSelected(location)
                         }
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text(area.name, style = MaterialTheme.typography.titleLarge)
+                        area.name?.let { Text(it, style = MaterialTheme.typography.titleLarge) }
                         Text(
-                            text = "Koordinater: ${area.latitude}, ${area.longitude}",
+                            text = "Koordinater: ${area.lat}, ${area.lon}",
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }

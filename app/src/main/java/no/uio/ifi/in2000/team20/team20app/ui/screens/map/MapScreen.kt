@@ -25,17 +25,14 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.TileOverlay
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
-import no.uio.ifi.in2000.team20.team20app.ui.navigation.Route
 import no.uio.ifi.in2000.team20.team20app.ui.components.ScreenScaffold
 import no.uio.ifi.in2000.team20.team20app.ui.components.map.WmsTileOverlayEpsg3857
+import no.uio.ifi.in2000.team20.team20app.ui.navigation.Route
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
-import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_POSITION
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MAX_ZOOM
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MIN_ZOOM
-import no.uio.ifi.in2000.team20.team20app.util.Constants.TILE_SIZE
 
 //TODO: Not hardcoded obviously
 val steinUrl = "https://geo.ngu.no/mapserver/NatursteinWMS3?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=TRUE&CRS=EPSG%3A3857&BGCOLOR=0xfffefd&STYLES=default%2C%2C%2C%2C%2C%2C%2C%2C%2C&EXCEPTIONS=inimage&LAYERS=Skifer_og_hellestein_samlet%2CGranitt_og_andre_storkningsbergarter_samlet%2CKleberstein_og_serpentinitt_samlet%2CMarmor_og_kalkstein_samlet%2CGneis_samlet%2CSandstein_og_konglomerat_samlet%2CBrynestein_samlet%2CAnnen_blokkstein_samlet%2CKvernstein_samlet%2CMurestein_samlet&WIDTH=256&HEIGHT=256&BBOX="
@@ -45,14 +42,11 @@ val fylkeUrlFormatterer = {xMin: Double, yMin: Double, xMax: Double, yMax: Doubl
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
-    selectedAreaName: String,
-    onAreaSelected: (String, Double, Double) -> Unit,
-    onOpenDetails: (String, Double, Double) -> Unit,
     sharedViewModel: AppViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
-    val chosenPosition = sharedViewModel.selectedLocation ?: DEFAULT_POSITION
-    val cameraPosition = LatLng(chosenPosition.latitude, chosenPosition.longitude)
+    val chosenPosition = sharedViewModel.selectedLocation
+    val cameraPosition = LatLng(chosenPosition.lat, chosenPosition.lon)
     val markerPosition = rememberUpdatedMarkerState(position = cameraPosition)
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(cameraPosition, 10f)
@@ -77,7 +71,7 @@ fun MapScreen(
                 //Drag handle - Gir brukeren visuelt hint om at sheet kan dras oppover.
 
                 Text(
-                    text = selectedAreaName,
+                    text = chosenPosition.name,
                     style = MaterialTheme.typography.headlineMedium
                 )
 
@@ -112,7 +106,7 @@ fun MapScreen(
                 }
 
                 Button(
-                    onClick = { onOpenDetails(selectedAreaName, 59.9139, 10.7522) },
+                    onClick = {}, //TODO: legg inn informasjon om stedet
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Åpne full detaljvisning")
@@ -171,30 +165,30 @@ fun MapScreen(
                     modifier = Modifier.padding(16.dp)
                 ) {
                     Text("Valgt område")
-                    Text(selectedAreaName)
+                    Text(chosenPosition.name)
                 }
             }
         }
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-private fun MapScreenPreview() {
-    MaterialTheme {
-        ScreenScaffold(
-            title = "Kart",
-            goToHome = {},
-            goToMap = {},
-            goToFavorites = {},
-            onOpenSettings = {},
-            currentDestination = Route.MapDestination
-        ) {
-            MapScreen(
-                selectedAreaName = "Bergen",
-                onAreaSelected = { _, _, _ -> },
-                onOpenDetails = { _, _, _ -> }
-            )
-        }
-    }
-}
+//@Preview(showBackground = true, showSystemUi = true)
+//@Composable
+//private fun MapScreenPreview() {
+//    MaterialTheme {
+//        ScreenScaffold(
+//            title = "Kart",
+//            goToHome = {},
+//            goToMap = {},
+//            goToFavorites = {},
+//            onOpenSettings = {},
+//            currentDestination = Route.MapDestination
+//        ) {
+//            MapScreen(
+//                selectedAreaName = "Bergen",
+//                onAreaSelected = { _, _, _ -> },
+//                onOpenDetails = { _, _, _ -> }
+//            )
+//        }
+//    }
+//}
