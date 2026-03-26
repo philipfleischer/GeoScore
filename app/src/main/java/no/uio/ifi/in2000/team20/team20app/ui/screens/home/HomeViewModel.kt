@@ -9,11 +9,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team20.team20app.data.api.FrostClientProvider
-import no.uio.ifi.in2000.team20.team20app.data.api.LocationForecsastClientProvider
 import no.uio.ifi.in2000.team20.team20app.data.datasource.FrostDataSource
-import no.uio.ifi.in2000.team20.team20app.data.datasource.LocationForecastRemoteDataSource
 import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepository
-import no.uio.ifi.in2000.team20.team20app.data.repository.LocationForecastRepository
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.util.Constants
 
@@ -28,12 +25,6 @@ import no.uio.ifi.in2000.team20.team20app.util.Constants
  * Separates UI from data logic.
  */
 class HomeViewModel : ViewModel() {
-
-    private val repository = LocationForecastRepository(
-        dataSource = LocationForecastRemoteDataSource(
-            client = LocationForecsastClientProvider.client
-        )
-    )
 
     private val frostRepository = FrostRepository(
         dataSource = FrostDataSource(
