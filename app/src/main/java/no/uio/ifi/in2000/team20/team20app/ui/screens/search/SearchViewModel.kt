@@ -3,6 +3,7 @@ package no.uio.ifi.in2000.team20.team20app.ui.screens.search
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -60,7 +61,10 @@ class SearchViewModel : ViewModel() {
             try {
                 val result = repository.getSearchResults(text)
                 _uiState.update { it.copy(isLoading = false, results = result.locations) }
+            } catch (e: CancellationException) {
+                throw e // let the coroutine framework handle job cancellation normally
             } catch (e: Exception) {
+                Log.e("SearchViewModel", "Search failed for query \"$text\": ${e.message}", e)
                 _uiState.update { it.copy(isLoading = false, error = "Søk feilet. Prøv igjen.") }
             }
         }
