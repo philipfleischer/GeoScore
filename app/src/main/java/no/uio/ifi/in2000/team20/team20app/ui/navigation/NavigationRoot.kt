@@ -41,7 +41,7 @@ fun NavigationRoot(appViewModel: AppViewModel){
             entry<Route.HomeDestination> {
                 val homeViewModel: HomeViewModel = viewModel()
                 ScreenScaffold(
-                    title = "GeoMerking",
+                    title = "Geomerking",
                     goToHome = goToHome,
                     goToMap = goToMap,
                     goToFavorites = goToFavorites,
@@ -74,7 +74,7 @@ fun NavigationRoot(appViewModel: AppViewModel){
 
             entry<Route.FavoritesDestination> {
                 ScreenScaffold(
-                    title = "Favoritter",
+                    title = "Lagret",
                     goToHome = goToHome,
                     goToMap = goToMap,
                     goToFavorites = goToFavorites,
