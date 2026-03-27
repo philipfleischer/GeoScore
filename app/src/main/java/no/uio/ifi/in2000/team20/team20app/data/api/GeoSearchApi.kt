@@ -8,12 +8,16 @@ import io.ktor.client.request.header
 import io.ktor.http.HttpHeaders
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
-import no.uio.ifi.in2000.team20.team20app.data.model.GeoResponse
+import no.uio.ifi.in2000.team20.team20app.data.model.AddressResponse
+import no.uio.ifi.in2000.team20.team20app.data.model.LocationResponse
 
 interface GeoSearchApiService {
-    suspend fun searchLocationWithQuery(query: String, lat: Double? = null, lon: Double? = null): GeoResponse
+    suspend fun searchLocationWithQuery(query: String, lat: Double? = null, lon: Double? = null): LocationResponse
+    suspend fun searchLocationWithCoordinates(lat: Double, lon: Double): LocationResponse
+}
 
-    suspend fun searchLocationWithCoordinates(lat: Double, lon: Double): GeoResponse
+interface AddressApiService {
+    suspend fun searchAddress(query: String): AddressResponse
 }
 
 object GeoSearchClientProvider {

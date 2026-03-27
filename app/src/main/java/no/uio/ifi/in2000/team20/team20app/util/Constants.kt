@@ -36,13 +36,11 @@ object Constants {
     const val FROST_CLIENT_SECRET = BuildConfig.FROST_V0_CLIENT_SECRET
 
     // WMS BOUNDS
-    const val X_MIN = -20037508.34
-    const val X_MAX = 20037508.34
-    const val Y_MIN = -20037508.34
-    const val Y_MAX = 20037508.34
+    const val GMAP_WMS_BOUND: Double = 20037508.34
 
     // MAP DEFAULT SETTINGS
     const val DEFAULT_ZOOM = 6.5
+    const val DEFAULT_NAME = "Bergen"
     const val DEFAULT_LATITUDE = 60.3913
     const val DEFAULT_LONGITUDE = 5.3221
 
