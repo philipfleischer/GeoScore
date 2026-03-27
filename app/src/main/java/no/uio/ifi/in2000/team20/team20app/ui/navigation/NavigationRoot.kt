@@ -74,7 +74,7 @@ fun NavigationRoot(appViewModel: AppViewModel){
 
             entry<Route.FavoritesDestination> {
                 ScreenScaffold(
-                    title = "Favoritter",
+                    title = "Lagret",
                     goToHome = goToHome,
                     goToMap = goToMap,
                     goToFavorites = goToFavorites,
