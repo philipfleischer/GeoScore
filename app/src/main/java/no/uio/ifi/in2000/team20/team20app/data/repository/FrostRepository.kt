@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team20.team20app.data.repository
 
+import android.util.Log
 import no.uio.ifi.in2000.team20.team20app.data.datasource.FrostDataSourceService
 import no.uio.ifi.in2000.team20.team20app.data.model.FrostObservationDataDto
 import no.uio.ifi.in2000.team20.team20app.domain.model.ClimateData
@@ -42,6 +43,7 @@ class FrostRepository(
     }
 
     private fun FrostObservationDataDto.toDomain(): ClimateObservation {
+        Log.d("Frost", "elementIds for $referenceTime: ${observations.map { it.elementId }}")
         val tempObs = observations.find { it.elementId == "mean(air_temperature P1M)" }
         val precipObs = observations.find {
             it.elementId == "best_estimate_sum(precipitation_amount P1M)"

@@ -38,11 +38,11 @@ class GeoSearchRepository(
             val kommune = it.kommuner.firstOrNull()?.toDomain()
             val nord = it.representasjonspunkt.nord
             val øst = it.representasjonspunkt.øst
-
+            //TODO: look at this again
             Location(
-                name = navn,
-                kommune = kommune,
-                fylke = fylke,
+                address = navn,
+                municipality = kommune,
+                county = fylke,
                 lat = nord,
                 lon = øst
             )
@@ -50,13 +50,15 @@ class GeoSearchRepository(
 
         return SearchResult(listOfResults)
     }
-    private fun Address.toDomain(): Location {
+    private fun Address.toDomain(): Location? {
+        val lat = representasjonspunkt?.lat ?: return null
+        val lon = representasjonspunkt?.lon ?: return null
+        val name = adressetekst ?: adressenavn ?: return null
         return Location(
-            name = adressetekst,
-            kommune = kommunenavn,
-            fylke = null,
-            lat = representasjonspunkt?.lat,
-            lon = representasjonspunkt?.lon
+            address = name,
+            municipality = kommunenavn,
+            lat = lat,
+            lon = lon
         )
     }
 
@@ -68,9 +70,16 @@ class GeoSearchRepository(
         val locations = locationDatasource.searchLocationWithQuery(query, lat, lon)
             .toDomain().locations
 
-        val addresses = addressDatasource.searchAddress(query)
-            .adresser.map { it.toDomain() }
+        //Geonorge-adresse-API returns error eror on short queryes, catch the error here and return an emtpty list
+        val addresses = try {
+            addressDatasource.searchAddress(query).adresser.mapNotNull { it.toDomain() }
+        } catch (e: Exception) {
+            Log.d("GeoSearch", "Address API failed for query \"$query\": ${e.message}")
+            emptyList()
+        }
 
+
+        Log.d("GeoSearch", "addresses: ${addresses.size}, locations: ${locations.size}")
 
         //to not show same results from API
         val combined = (addresses + locations).distinctBy { Pair(it.lat, it.lon) }

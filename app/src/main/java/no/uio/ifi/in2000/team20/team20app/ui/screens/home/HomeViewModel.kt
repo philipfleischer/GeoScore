@@ -8,9 +8,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import no.uio.ifi.in2000.team20.team20app.data.api.LocationForecsastClientProvider
-import no.uio.ifi.in2000.team20.team20app.data.datasource.LocationForecastRemoteDataSource
-import no.uio.ifi.in2000.team20.team20app.data.repository.LocationForecastRepository
+import no.uio.ifi.in2000.team20.team20app.data.api.FrostClientProvider
+import no.uio.ifi.in2000.team20.team20app.data.datasource.FrostDataSource
+import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepository
+import no.uio.ifi.in2000.team20.team20app.domain.model.Location
+import no.uio.ifi.in2000.team20.team20app.util.Constants
 
 /**
  * ViewModel for HomeScreen.
@@ -24,9 +26,10 @@ import no.uio.ifi.in2000.team20.team20app.data.repository.LocationForecastReposi
  */
 class HomeViewModel : ViewModel() {
 
-    private val repository = LocationForecastRepository(
-        dataSource = LocationForecastRemoteDataSource(
-            client = LocationForecsastClientProvider.client
+    private val frostRepository = FrostRepository(
+        dataSource = FrostDataSource(
+            client = FrostClientProvider.client,
+            credentials = "${Constants.FROST_CLIENT_ID}:${Constants.FROST_CLIENT_SECRET}"
         )
     )
 
@@ -37,22 +40,19 @@ class HomeViewModel : ViewModel() {
      * Kalles når brukeren har valgt et område.
      * Henter værdata for koordinatene og oppdaterer UI-tilstanden.
      */
-    fun loadArea(name: String, latitude: Double, longitude: Double) {
+    fun loadClimateData(location: Location) {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
-                val weather = repository.getWeatherForPoint(latitude, longitude)
+                val climateData = frostRepository.getClimateData(location.lat, location.lon)
                 _uiState.update { it.copy(
                     isLoading = false,
-                    areaName = name,
-                    latitude = latitude,
-                    longitude = longitude,
-                    weather = weather
+                    climateData = climateData
                 ) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(
                     isLoading = false,
-                    error = "Kunne ikke laste inn data for $name."
+                    error = "Kunne ikke laste inn data for ${location.name}."
                 ) }
             }
         }

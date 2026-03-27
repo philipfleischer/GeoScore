@@ -80,7 +80,7 @@ fun SearchBarObject(
 @Composable
 fun SearchScreen(
     onBackClick: () -> Unit,
-    onLocationSelected: (name: String, lat: Double, lon: Double) -> Unit,
+    onLocationSelected: (Location) -> Unit,
     searchViewModel: SearchViewModel = viewModel(),
 ) {
     val uiState by searchViewModel.uiState.collectAsStateWithLifecycle()
@@ -151,10 +151,7 @@ fun SearchScreen(
                                 SearchResultItem(
                                     location = location,
                                     onSelect = {
-                                        val name = location.name ?: return@SearchResultItem
-                                        val lat = location.lat ?: return@SearchResultItem
-                                        val lon = location.lon ?: return@SearchResultItem
-                                        onLocationSelected(name, lat, lon)
+                                        onLocationSelected(location)
                                     }
                                 )
                             }
@@ -179,11 +176,8 @@ fun SearchScreen(
                             SearchResultItem(
                                 location = location,
                                 onSelect = {
-                                    val name = location.name ?: return@SearchResultItem
-                                    val lat = location.lat ?: return@SearchResultItem
-                                    val lon = location.lon ?: return@SearchResultItem
                                     searchViewModel.addRecentlySearched(location)
-                                    onLocationSelected(name, lat, lon)
+                                    onLocationSelected(location)
                                 }
                             )
                             HorizontalDivider()
@@ -211,7 +205,7 @@ private fun SearchResultItem(
             text = location.name ?: "",
             style = MaterialTheme.typography.bodyLarge
         )
-        val subtitle = listOfNotNull(location.kommune, location.fylke).joinToString(", ")
+        val subtitle = listOfNotNull(location.municipality, location.county).joinToString(", ")
         if (subtitle.isNotEmpty()) {
             Text(
                 text = subtitle,
@@ -227,6 +221,6 @@ private fun SearchResultItem(
 fun SearchScreenPreview() {
     SearchScreen(
         onBackClick = {},
-        onLocationSelected = { _, _, _ -> }
+        onLocationSelected = { _ -> }
     )
 }

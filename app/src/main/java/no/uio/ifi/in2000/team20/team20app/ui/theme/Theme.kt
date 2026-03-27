@@ -5,9 +5,10 @@ import androidx.compose.ui.graphics.Color
 
 data class CustomTheme (
     val background: Color,
-    val backgroundGradient: Color,
-    val middleground: Color,
-    val foreground: Color,
+//    val backgroundGradient: Color,
+    val tertiary: Color, // For headers and navigation bar
+    val secondary: Color, // middleground
+    val primary: Color, // foreground
     val detail: Color,
     val button: Color,
     val buttonDetail: Color,
@@ -27,11 +28,13 @@ data class CustomTheme (
     val isLight: Boolean,
     )
 
-val lightThemeColors = CustomTheme (
+//TODO: Change light theme colors
+val lightThemeColors = CustomTheme(
     background = Platinum,
-    backgroundGradient = PaleSky,
-    middleground = BrightWhite, // Should be 50% opaque
-    foreground = BrightWhite,
+    tertiary = DarkBlue,
+//    backgroundGradient = PaleSky,
+    secondary = BrightWhite, // Should be 50% opaque
+    primary = BrightWhite,
     detail = CloudySky,
     button = MayaBlue,
     buttonDetail = DustyBlue,
@@ -42,16 +45,18 @@ val lightThemeColors = CustomTheme (
     isLight = true,
 )
 
-val darkThemeColors = CustomTheme( // To be changed
+//TODO: Change dark theme colors
+val darkThemeColors = CustomTheme(
     background = Midnight,
-    backgroundGradient = Color.Black,
-    middleground = Charcoal,
-    foreground = DarkLake,
-    detail = Color.Black,
+//    backgroundGradient = Color.Black,
+    tertiary = Midnight,
+    secondary = Charcoal,
+    primary = DarkLake,
+    detail = Midnight,
     button = MayaBlue,
     buttonDetail = DustyBlue,
     disabledButton = AliceBlue,
-    disabledButtonDetail = Color.Black,
+    disabledButtonDetail = Charcoal,
     error = Salmon,
     warning = RoyalGold,
     isLight = false
