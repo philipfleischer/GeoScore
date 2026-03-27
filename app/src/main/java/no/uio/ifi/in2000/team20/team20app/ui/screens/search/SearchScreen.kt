@@ -27,9 +27,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -82,17 +80,17 @@ fun SearchBarObject(
 @Composable
 fun SearchScreen(
     onBackClick: () -> Unit,
-    onLocationSelected: (name: String, lat: Double, lon: Double) -> Unit,
-    viewModel: SearchViewModel = viewModel()
+    onLocationSelected: (Location) -> Unit,
+    searchViewModel: SearchViewModel = viewModel(),
 ) {
-    var query by remember { mutableStateOf("") }
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by searchViewModel.uiState.collectAsStateWithLifecycle()
 
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    // Slik at man er inni textfielden med engang man går inn i skjermen
+    // Slik at man er inni textfielden med engang man går inn i skjermen, og søkefeltet er tomt
     LaunchedEffect(Unit) {
+        searchViewModel.resetQuery()
         focusRequester.requestFocus()
         keyboardController?.show()
     }
@@ -120,12 +118,9 @@ fun SearchScreen(
                     .background(MaterialTheme.colorScheme.surfaceVariant)
                     .padding(horizontal = 16.dp)
                     .focusRequester(focusRequester),
-                value = query,
-                onValueChange = {
-                    query = it
-                    viewModel.search(it)
-                },
-                label = { Text("Adresse") },
+                value = uiState.query,
+                onValueChange = { searchViewModel.updateInput(it) },
+                label = { Text("Sted") },
                 placeholder = { Text("Skriv inn adresse...") },
                 leadingIcon = {
                     Icon(
@@ -139,16 +134,36 @@ fun SearchScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             when {
-                query.isBlank() -> {
-                    Box(modifier = Modifier.fillMaxWidth()) {
-                        Text("Begynn å skrive for å se forslag")
+                uiState.query.isBlank() -> {
+
+                    if(uiState.recentlySearched.isEmpty()){
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            Text("Begynn å skrive for å se forslag")
+                        }
+                    } else {
+                        Text(text = "Siste søk")
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f, fill = false)
+                        ) {
+                            items(uiState.recentlySearched) { location ->
+                                SearchResultItem(
+                                    location = location,
+                                    onSelect = {
+                                        onLocationSelected(location)
+                                    }
+                                )
+                            }
+                        }
                     }
+
                 }
                 uiState.isLoading -> LoadingState(modifier = Modifier.fillMaxWidth())
                 uiState.error != null -> ErrorState(message = uiState.error!!, modifier = Modifier.fillMaxWidth())
                 uiState.results.isEmpty() -> {
                     Box(modifier = Modifier.fillMaxWidth()) {
-                        Text("Ingen resultater for \"$query\"")
+                        Text("Ingen resultater for \"${uiState.query}\"")
                     }
                 }
                 else -> {
@@ -161,10 +176,8 @@ fun SearchScreen(
                             SearchResultItem(
                                 location = location,
                                 onSelect = {
-                                    val name = location.name ?: return@SearchResultItem
-                                    val lat = location.lat ?: return@SearchResultItem
-                                    val lon = location.lon ?: return@SearchResultItem
-                                    onLocationSelected(name, lat, lon)
+                                    searchViewModel.addRecentlySearched(location)
+                                    onLocationSelected(location)
                                 }
                             )
                             HorizontalDivider()
@@ -208,6 +221,6 @@ private fun SearchResultItem(
 fun SearchScreenPreview() {
     SearchScreen(
         onBackClick = {},
-        onLocationSelected = { _, _, _ -> }
+        onLocationSelected = { _ -> }
     )
 }

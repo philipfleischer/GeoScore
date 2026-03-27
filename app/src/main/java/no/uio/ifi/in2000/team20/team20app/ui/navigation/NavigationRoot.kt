@@ -99,8 +99,8 @@ fun NavigationRoot(appViewModel: AppViewModel){
             entry<Route.SearchDestination> {
                 SearchScreen(
                     onBackClick = goBack,
-                    onLocationSelected = { name, lat, lon ->
-                        appViewModel.setSelectedArea(Location(name, municipality = null, county = null, lat=lat, lon=lon))
+                    onLocationSelected = { location ->
+                        appViewModel.setSelectedArea(location)
                         goBack()
                     }
                 )
