@@ -1,5 +1,6 @@
 <h1>Code-style</h1>
-Language: All code and comments are written in english. For norwegian APIs this means annotating fields in DTOs with @SerialName so the value-names can be english.
+Language: All code and comments are written in english. For norwegian APIs this means annotating fields in DTOs with @SerialName so the value-names can be english. 
+
 Linting: Running a ktlint-check of the project at regular intervals.
 
 
