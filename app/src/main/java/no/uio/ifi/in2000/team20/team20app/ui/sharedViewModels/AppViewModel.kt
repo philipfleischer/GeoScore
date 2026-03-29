@@ -10,6 +10,9 @@ import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 //
 class AppViewModel: ViewModel() {
 
+    // USing Oslo as default, security choice we made.
+    // Appen vår starter med forhåndsvalgt område i stedet for å hente brukerens eksakte posisjon.
+    // Dette gjør at appen fungerer uten lokasjonstillatelser og er mer personvernvennlig som standard.
     var selectedLocation: Location by mutableStateOf(
         Location(
             "Oslo",
