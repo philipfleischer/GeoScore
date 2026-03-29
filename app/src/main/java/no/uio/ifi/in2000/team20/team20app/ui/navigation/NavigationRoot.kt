@@ -5,6 +5,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
+import no.uio.ifi.in2000.team20.team20app.data.repository.FavoritesRepository
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.components.ScreenScaffold
 import no.uio.ifi.in2000.team20.team20app.ui.screens.details.AreaDetailsScreen
@@ -16,9 +17,14 @@ import no.uio.ifi.in2000.team20.team20app.ui.screens.settings.SettingsScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchScreen
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
-
+import androidx.lifecycle.viewmodel.compose.viewModel
+import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesViewModelFactory
 @Composable
-fun NavigationRoot(appViewModel: AppViewModel){
+fun NavigationRoot(
+    appViewModel: AppViewModel,
+    favoritesRepository: FavoritesRepository
+){
     //BackStack
     val backStack = rememberNavBackStack(Route.HomeDestination)
 
@@ -58,6 +64,10 @@ fun NavigationRoot(appViewModel: AppViewModel){
             }
 
             entry<Route.MapDestination> {
+                val favoritesViewModel: FavoritesViewModel = viewModel(
+                    factory = FavoritesViewModelFactory(favoritesRepository)
+                )
+
                 ScreenScaffold(
                     title = "Kart",
                     goToHome = goToHome,
@@ -67,12 +77,18 @@ fun NavigationRoot(appViewModel: AppViewModel){
                     currentDestination = Route.MapDestination
                 ) { modifier ->
                     MapScreen(
-                        modifier = modifier
+                        modifier = modifier,
+                        sharedViewModel = appViewModel,
+                        favoritesViewModel = favoritesViewModel
                     )
                 }
             }
 
             entry<Route.FavoritesDestination> {
+                val favoritesViewModel: FavoritesViewModel = viewModel(
+                    factory = FavoritesViewModelFactory(favoritesRepository)
+                )
+
                 ScreenScaffold(
                     title = "Lagret",
                     goToHome = goToHome,
@@ -83,8 +99,8 @@ fun NavigationRoot(appViewModel: AppViewModel){
                 ) { modifier ->
                     FavoritesScreen(
                         modifier = modifier,
-                        appViewModel
-
+                        sharedViewModel = appViewModel,
+                        favoritesViewModel = favoritesViewModel
                     )
                 }
             }
