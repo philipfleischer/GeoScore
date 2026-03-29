@@ -185,6 +185,18 @@ cd team-20
 	5.	Press Run ▶
 
 
+### Security and Privacy
+
+Security and privacy were considered important design principles throughout the project. Although the application is educational, it handles geographic data, therefore it benefits from a cautious and privacy-aware design.
+
+The application follows a manual-search-first approach. Instead of relying on automatic access to the user’s physical location, the app is designed around areas actively selected by the user. This supports privacy by design and gives the user clear control over what location data is used.
+
+The project also follows the principle of least privilege. The application should only access the data and permissions necessary for its core functionality. By avoiding unnecessary location access by default, the app reduces both privacy risk and unnecessary system exposure.
+
+Basic input validation is used in the search flow to make the system more robust and predictable. User input is validated before it is sent to external APIs, which improves reliability and reduces unnecessary or malformed requests.
+
+Together, these choices reflect a practical secure-by-default mindset. They make the application more professional, easier to reason about, and better aligned with responsible software engineering practices.
+
 ### Testing
 
 The project includes unit tests written using Test Driven Development (TDD).
