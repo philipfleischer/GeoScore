@@ -47,7 +47,7 @@ fun FavoritesScreen(
     ) {
         if (favorites.isEmpty()) {
             Text(
-                text = "Du har ingen lagrede favoritter ennå.",
+                text = "Du har ingen lagrede favoritter enda.",
                 style = MaterialTheme.typography.bodyMedium
             )
         } else {
