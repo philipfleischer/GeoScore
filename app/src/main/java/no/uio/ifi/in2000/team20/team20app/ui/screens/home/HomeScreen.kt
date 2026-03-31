@@ -20,7 +20,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Map
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -47,9 +46,8 @@ import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 
 @Composable
 fun HomeScreen(
-    onOpenSearch: () -> Unit,
-    onOpenMap: () -> Unit = {},
     modifier: Modifier = Modifier,
+    onOpenSearch: () -> Unit,
     viewModel: HomeViewModel = viewModel(),
     sharedViewModel: AppViewModel = viewModel()
 ) {
@@ -60,7 +58,7 @@ fun HomeScreen(
         viewModel.loadClimateData(location)
     }
 
-    val selectedLocation = location?.name ?: "Oslo"
+    val selectedLocation = location.name
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -104,7 +102,26 @@ fun HomeScreen(
             )
         }
 
-
+        item {
+            ExpandableInfoBox(
+                title = "Historiske klimadata"
+            ) {
+                when {
+                    uiState.isLoading -> {
+                        Text("Laster data...")
+                    }
+                    uiState.error != null -> {
+                        Text("Feil: ${uiState.error}")
+                    }
+                    uiState.climateData != null -> {
+                        ClimateInfoContent(climateData = uiState.climateData!!)
+                    }
+                    else -> {
+                        Text("Søk et område for å vise historiske data.")
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -393,6 +410,84 @@ fun SummaryMiniCard(
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+    }
+}
+
+@Composable
+private fun ClimateInfoContent(climateData: ClimateData) {
+    Text(
+        text = climateData.stationName,
+        style = MaterialTheme.typography.bodyMedium
+    )
+    Text(
+        text = climateData.stationId,
+        style = MaterialTheme.typography.bodySmall
+    )
+
+    Spacer(modifier = Modifier.height(12.dp))
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text("Måned", style = MaterialTheme.typography.labelSmall)
+        Text("Temp", style = MaterialTheme.typography.labelSmall)
+        Text("Nedbør", style = MaterialTheme.typography.labelSmall)
+    }
+
+    Spacer(modifier = Modifier.height(4.dp))
+
+    climateData.observations.takeLast(3).forEach { obs ->
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(obs.time.take(7), style = MaterialTheme.typography.bodyMedium)
+            Text(
+                obs.airTemperature?.let { "%.1f °C".format(it) } ?: "-",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                obs.precipitation?.let { "%.1f mm".format(it) } ?: "-",
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun HomeScreenLayoutPreview() {
+    MaterialTheme {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            //HomeHeaderSection()
+
+            GeomarkingInfoBox(
+                selectedLocation = "Oslo",
+                geomarking = "C",
+                riskLabel = "Moderat georisiko",
+                expandedText = "Dette området har moderate historiske risikofaktorer knyttet til naturhendelser."
+            )
+
+            AreaSummaryBox(
+                selectedLocation = "Oslo",
+                summary = "Området har en moderat samlet historisk eksponering for naturfare."
+            )
+
+            HistoricalHighlightsGrid(
+                averageTemperature = "5.8 °C",
+                precipitationLevel = "Høy",
+                terrainExposure = "Moderat",
+                floodRisk = "Lav–moderat",
+                selectedLocation = "Oslo",
+                modifier = Modifier
             )
         }
     }
