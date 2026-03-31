@@ -43,6 +43,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import no.uio.ifi.in2000.team20.team20app.domain.model.ClimateData
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchBarObject
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.StarBorder
+import androidx.compose.material3.IconButton
 
 @Composable
 fun HomeScreen(
@@ -58,7 +61,7 @@ fun HomeScreen(
         viewModel.loadClimateData(location)
     }
 
-    val selectedLocation = location.name
+    val selectedLocation = location?.name ?: "Oslo"
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -130,6 +133,8 @@ fun HomeHeaderSection(
     selectedLocation: String,
     modifier: Modifier = Modifier
 ) {
+    var isFavorite by remember { mutableStateOf(false) }
+
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(28.dp),
@@ -141,19 +146,53 @@ fun HomeHeaderSection(
             modifier = Modifier.padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(
-                text = "Naturfareoversikt",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "Naturfareoversikt",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
 
-            Text(
-                text = "Valgt område: $selectedLocation",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
+                    Text(
+                        text = "Valgt område: $selectedLocation",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+
+                IconButton(
+                    onClick = { isFavorite = !isFavorite }
+                ) {
+                    Icon(
+                        imageVector = if (isFavorite) {
+                            Icons.Filled.Star
+                        } else {
+                            Icons.Outlined.StarBorder
+                        },
+                        contentDescription = if (isFavorite) {
+                            "Fjern fra favoritter"
+                        } else {
+                            "Legg til i favoritter"
+                        },
+                        tint = if (isFavorite) {
+                            Color(0xFFFFC107)
+                        } else {
+                            MaterialTheme.colorScheme.onPrimaryContainer
+                        },
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+            }
 
             Text(
                 text = "Se geomerking, historiske nøkkelfaktorer og klimadata for området.",
