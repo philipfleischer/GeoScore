@@ -93,6 +93,18 @@ fun HomeScreen(
                         "Informasjonen er ment å gi brukeren en enkel og forståelig oversikt før videre utforsking i kart og detaljvisninger."
             )
         }
+
+        item {
+            HistoricalHighlightsGrid(
+                selectedLocation = selectedLocation,
+                averageTemperature = "5.8 °C",
+                precipitationLevel = "Høy",
+                terrainExposure = "Moderat",
+                floodRisk = "Lav–moderat"
+            )
+        }
+
+
     }
 }
 
@@ -293,6 +305,94 @@ fun AreaSummaryBox(
             Text(
                 text = summary,
                 style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+}
+
+@Composable
+fun HistoricalHighlightsGrid(
+    selectedLocation: String,
+    averageTemperature: String,
+    precipitationLevel: String,
+    terrainExposure: String,
+    floodRisk: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Text(
+            text = "Historiske nøkkelfaktorer for $selectedLocation",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            SummaryMiniCard(
+                title = "Temp.",
+                value = averageTemperature,
+                modifier = Modifier.weight(1f)
+            )
+            SummaryMiniCard(
+                title = "Nedbør",
+                value = precipitationLevel,
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            SummaryMiniCard(
+                title = "Terreng",
+                value = terrainExposure,
+                modifier = Modifier.weight(1f)
+            )
+            SummaryMiniCard(
+                title = "Flomfare",
+                value = floodRisk,
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
+@Composable
+fun SummaryMiniCard(
+    title: String,
+    value: String,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.aspectRatio(1.9f),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(18.dp),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Text(
+                text = value,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     }
