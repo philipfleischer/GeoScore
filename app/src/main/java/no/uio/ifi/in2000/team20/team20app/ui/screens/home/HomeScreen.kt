@@ -85,6 +85,14 @@ fun HomeScreen(
                         "Dette kan inkludere terreng, nedbørsmønstre, lokal eksponering og andre faktorer som påvirker naturfare over tid."
             )
         }
+
+        item {
+            AreaSummaryBox(
+                selectedLocation = selectedLocation,
+                summary = "Dette området har moderate historiske risikofaktorer knyttet til naturhendelser. " +
+                        "Informasjonen er ment å gi brukeren en enkel og forståelig oversikt før videre utforsking i kart og detaljvisninger."
+            )
+        }
     }
 }
 
@@ -253,3 +261,39 @@ fun GeomarkingBadge(
     }
 }
 
+@Composable
+fun AreaSummaryBox(
+    selectedLocation: String,
+    summary: String,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = null
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Områdeoversikt for $selectedLocation",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+
+            Divider()
+
+            Text(
+                text = summary,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+}
