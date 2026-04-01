@@ -46,19 +46,23 @@ import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.IconButton
+import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesViewModel
 
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
     onOpenSearch: () -> Unit,
     viewModel: HomeViewModel = viewModel(),
-    sharedViewModel: AppViewModel = viewModel()
+    sharedViewModel: AppViewModel = viewModel(),
+    favoritesViewModel: FavoritesViewModel
 ) {
     val location = sharedViewModel.selectedLocation
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isCurrentFavorite by favoritesViewModel.isCurrentFavorite.collectAsStateWithLifecycle()
 
     LaunchedEffect(location) {
         viewModel.loadClimateData(location)
+        location?.let { favoritesViewModel.checkIfFavorite(it) }
     }
 
     val selectedLocation = location?.name ?: "Oslo"
@@ -73,7 +77,19 @@ fun HomeScreen(
         }
 
         item {
-            HomeHeaderSection(selectedLocation = selectedLocation)
+            HomeHeaderSection(
+                selectedLocation = selectedLocation,
+                isFavorite = isCurrentFavorite,
+                onFavoriteClick = {
+                    location?.let {
+                        if (isCurrentFavorite) {
+                            favoritesViewModel.removeFavorite(it)
+                        } else {
+                            favoritesViewModel.addFavorite(it)
+                        }
+                    }
+                }
+            )
         }
 
 
@@ -131,10 +147,10 @@ fun HomeScreen(
 @Composable
 fun HomeHeaderSection(
     selectedLocation: String,
+    isFavorite: Boolean,
+    onFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var isFavorite by remember { mutableStateOf(false) }
-
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(28.dp),
@@ -171,7 +187,7 @@ fun HomeHeaderSection(
                 }
 
                 IconButton(
-                    onClick = { isFavorite = !isFavorite }
+                    onClick = onFavoriteClick
                 ) {
                     Icon(
                         imageVector = if (isFavorite) {
