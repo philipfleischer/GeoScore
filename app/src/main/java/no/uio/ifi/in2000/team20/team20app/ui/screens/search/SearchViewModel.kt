@@ -17,7 +17,8 @@ import no.uio.ifi.in2000.team20.team20app.data.datasource.AddressRemoteDataSourc
 import no.uio.ifi.in2000.team20.team20app.data.datasource.LocationRemoteDatasource
 import no.uio.ifi.in2000.team20.team20app.data.repository.GeoSearchRepository
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
-
+import no.uio.ifi.in2000.team20.team20app.ui.validation.AddressValidationResult
+import no.uio.ifi.in2000.team20.team20app.ui.validation.AddressValidator
 class SearchViewModel : ViewModel() {
 
     private val repository = GeoSearchRepository(
@@ -48,24 +49,69 @@ class SearchViewModel : ViewModel() {
      * begge fungerer likt, men Flow krever @OptIn(FlowPreview::class)
      */
     fun updateInput(text: String) {
-        _uiState.update { it.copy(query = text) }
+        val sanitizedText = AddressValidator.sanitize(text)
+        _uiState.update { it.copy(query = sanitizedText, inputError = null) }
+
         searchJob?.cancel()
+
         searchJob = viewModelScope.launch(Dispatchers.IO) {
             delay(300) //debounce
+
             // Geonorge-adresse-APIet håndteres med try/catch i GeoSearchRepository, så korte søk er OK
-            if (text.isBlank()) {
-                _uiState.update { it.copy(isLoading = false, results = emptyList(), error = null) }
+            if (sanitizedText.isBlank()) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        results = emptyList(),
+                        error = null,
+                        inputError = null
+                    )
+                }
                 return@launch
             }
-            _uiState.update { it.copy(isLoading = true, error = null) }
-            try {
-                val result = repository.getSearchResults(text)
-                _uiState.update { it.copy(isLoading = false, results = result.locations) }
-            } catch (e: CancellationException) {
-                throw e // let the coroutine framework handle job cancellation normally
-            } catch (e: Exception) {
-                Log.e("SearchViewModel", "Search failed for query \"$text\": ${e.message}", e)
-                _uiState.update { it.copy(isLoading = false, error = "Søk feilet. Prøv igjen.") }
+
+            // Her validerer vi input før vi gjør nettverkskallene.
+            // Hvis input er ugyldig, viser vi feilmeldingen og stopper søket tidlig.
+            when (val validation = AddressValidator.validate(sanitizedText)) {
+                is AddressValidationResult.Invalid -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            results = emptyList(),
+                            error = null,
+                            inputError = validation.message
+                        )
+                    }
+                    return@launch
+                }
+
+                AddressValidationResult.Valid -> {
+                    _uiState.update { it.copy(isLoading = true, error = null, inputError = null) }
+
+                    try {
+                        // Her henter vi resultater fra repository når input er gyldig.
+                        // Ved suksess oppdateres listen som vises i søkeskjermen.
+                        val result = repository.getSearchResults(sanitizedText)
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                results = result.locations
+                            )
+                        }
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        // Feil her betyr ofte nettverksfeil eller API-problem.
+                        // Vi skiller dette fra input-feilene slik at UI kan vise mer spesifikke feil-meldinger.
+                        Log.e("SearchViewModel", "Søk feilet: \"$sanitizedText\": ${e.message}", e)
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                error = "Søk feilet. Prøv igjen."
+                            )
+                        }
+                    }
+                }
             }
         }
     }

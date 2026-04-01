@@ -128,8 +128,19 @@ fun SearchScreen(
                         contentDescription = "Søk"
                     )
                 },
+                isError = uiState.inputError != null,
                 singleLine = true
             )
+
+            // her viser vi egen feilmelding hvis brukeren skriver ugyldig input.
+            if (uiState.inputError != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = uiState.inputError!!,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 

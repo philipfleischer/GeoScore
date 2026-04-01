@@ -15,10 +15,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -27,9 +30,11 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
+import no.uio.ifi.in2000.team20.team20app.data.repository.FavoritesRepository
 import no.uio.ifi.in2000.team20.team20app.ui.components.ScreenScaffold
 import no.uio.ifi.in2000.team20.team20app.ui.components.map.WmsTileOverlayEpsg3857
 import no.uio.ifi.in2000.team20.team20app.ui.navigation.Route
+import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MAX_ZOOM
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MIN_ZOOM
@@ -43,33 +48,33 @@ val fylkeUrlFormatterer = {xMin: Double, yMin: Double, xMax: Double, yMax: Doubl
 @Composable
 fun MapScreen(
     modifier: Modifier = Modifier,
-    sharedViewModel: AppViewModel = viewModel()
+    sharedViewModel: AppViewModel = viewModel(),
+    favoritesViewModel: FavoritesViewModel
 ) {
     val chosenPosition = sharedViewModel.selectedLocation
+    val isCurrentFavorite by favoritesViewModel.isCurrentFavorite.collectAsStateWithLifecycle()
+
     val cameraPosition = LatLng(chosenPosition.lat, chosenPosition.lon)
     val markerPosition = rememberUpdatedMarkerState(position = cameraPosition)
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(cameraPosition, 10f)
     }
 
+    LaunchedEffect(chosenPosition) {
+        favoritesViewModel.checkIfFavorite(chosenPosition)
+    }
 
     BottomSheetScaffold(
         modifier = modifier,
-
-        sheetPeekHeight = 100.dp, // ca 1 cm synlig når kollapset, TODO: Øk synligheten?
-
+        sheetPeekHeight = 100.dp,
         sheetContainerColor = MaterialTheme.colorScheme.surface,
-
         sheetContent = {
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(20.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                //Drag handle - Gir brukeren visuelt hint om at sheet kan dras oppover.
-
                 Text(
                     text = chosenPosition.name,
                     style = MaterialTheme.typography.headlineMedium
@@ -106,14 +111,26 @@ fun MapScreen(
                 }
 
                 Button(
-                    onClick = {}, //TODO: legg inn informasjon om stedet
+                    onClick = {
+                        if (isCurrentFavorite) {
+                            favoritesViewModel.removeFavorite(chosenPosition)
+                        } else {
+                            favoritesViewModel.addFavorite(chosenPosition)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(if (isCurrentFavorite) "Fjern fra favoritter" else "Legg til i favoritter")
+                }
+
+                Button(
+                    onClick = {},
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Åpne full detaljvisning")
                 }
             }
         }
-
     ) { paddingValues ->
 
         Box(
@@ -121,17 +138,6 @@ fun MapScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-
-            // kartet
-//            Box(
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .background(MaterialTheme.colorScheme.surfaceVariant),
-//                contentAlignment = Alignment.Center
-//            ) {
-//                Text("Kart-placeholder")
-//            }
-            //TODO: Separate GoogleMap to its own file
             GoogleMap(
                 modifier = Modifier
                     .fillMaxSize()
@@ -141,7 +147,7 @@ fun MapScreen(
                     maxZoomPreference = MAX_ZOOM,
                     minZoomPreference = MIN_ZOOM
                 )
-            ){
+            ) {
                 WmsTileOverlayEpsg3857(
                     urlFormatter = fylkeUrlFormatterer,
                     visible = true
@@ -153,7 +159,6 @@ fun MapScreen(
                 )
             }
 
-            // Informasjonskort
             Card(
                 modifier = Modifier
                     .align(Alignment.TopCenter)

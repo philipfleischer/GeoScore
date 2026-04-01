@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     //Serialization
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ksp)
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
@@ -90,7 +91,7 @@ dependencies {
     implementation(libs.play.services.maps)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.compose.foundation)
+    //implementation(libs.androidx.room.compiler)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -113,5 +114,10 @@ dependencies {
     implementation(libs.ktor.client.logging)
     implementation(libs.logback.classic)
     implementation(libs.kotlinx.serialization.json.v163)
+
+    // ROOM
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
 
 }

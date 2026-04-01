@@ -18,15 +18,26 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Card
+import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
 fun FavoritesScreen(
     modifier: Modifier = Modifier,
-    sharedViewModel: AppViewModel = viewModel()
+    sharedViewModel: AppViewModel,
+    favoritesViewModel: FavoritesViewModel
 ) {
-    val favorites = listOf(
-        Location(address="Oslo", municipality = null, county = null, lat = 59.9139, lon = 10.7522)
-    )
+    val favorites by favoritesViewModel.favorites.collectAsStateWithLifecycle()
 
     Column(
         modifier = modifier
@@ -34,26 +45,34 @@ fun FavoritesScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(
-            text = "// TODO: Koble skjermen til lagrede favorittområder fra lokal database.",
-            style = MaterialTheme.typography.bodyMedium
-        )
+        if (favorites.isEmpty()) {
+            Text(
+                text = "Du har ingen lagrede favoritter enda.",
+                style = MaterialTheme.typography.bodyMedium
+            )
+        } else {
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                items(favorites) { area ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                sharedViewModel.setSelectedArea(area)
+                            }
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(text = area.name, style = MaterialTheme.typography.titleLarge)
 
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            items(favorites) { area ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            sharedViewModel.setSelectedArea(area)
+                            val subtitle = listOfNotNull(area.municipality, area.county)
+                                .joinToString(", ")
+
+                            if (subtitle.isNotEmpty()) {
+                                Text(
+                                    text = subtitle,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
                         }
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(text = area.name, style = MaterialTheme.typography.titleLarge)
-                        Text(
-                            text = "Koordinater: ${area.lat}, ${area.lon}",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
                     }
                 }
             }
@@ -65,6 +84,10 @@ fun FavoritesScreen(
 @Composable
 private fun FavoritesScreenPreview() {
     MaterialTheme {
-        FavoritesScreen()
+        FavoritesScreen(
+            modifier = TODO(),
+            sharedViewModel = TODO(),
+            favoritesViewModel = TODO()
+        )
     }
 }
