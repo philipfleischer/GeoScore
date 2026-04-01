@@ -7,5 +7,6 @@ data class SearchUiState(
     val isLoading: Boolean = false,
     val results: List<Location> = emptyList(),
     val error: String? = null,
+    val inputError: String? = null,
     val recentlySearched: List<Location> = emptyList()
 )
