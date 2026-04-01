@@ -9,6 +9,7 @@ import no.uio.ifi.in2000.team20.team20app.data.repository.FavoritesRepository
 import no.uio.ifi.in2000.team20.team20app.ui.components.ScreenScaffold
 import no.uio.ifi.in2000.team20.team20app.ui.screens.details.AreaDetailsScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.details.ClimateStatsScreen
+import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoriteDetailsScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapScreen
@@ -103,12 +104,33 @@ fun NavigationRoot(
                     FavoritesScreen(
                         modifier = modifier,
                         sharedViewModel = appViewModel,
-                        favoritesViewModel = favoritesViewModel
+                        favoritesViewModel = favoritesViewModel,
+                        onFavoriteClick = { location ->
+                            appViewModel.setSelectedArea(location)
+                            backStack.add(Route.FavoriteDetailsDestination(location))
+                        }
                     )
                 }
             }
 
-            // NEW SETTINGS ENTRY
+            entry<Route.FavoriteDetailsDestination> { destination ->
+                val homeViewModel: HomeViewModel = viewModel()
+                val favoritesViewModel: FavoritesViewModel = viewModel(
+                    factory = FavoritesViewModelFactory(favoritesRepository)
+                )
+
+                FavoriteDetailsScreen(
+                    location = destination.location,
+                    onBackClick = goBack,
+                    onOpenMap = {
+                        appViewModel.setSelectedArea(destination.location)
+                        backStack.add(Route.MapDestination)
+                    },
+                    homeViewModel = homeViewModel,
+                    favoritesViewModel = favoritesViewModel
+                )
+            }
+
             entry<Route.SettingsDestination> {
                 SettingsScreen(
                     onBackClick = goBack

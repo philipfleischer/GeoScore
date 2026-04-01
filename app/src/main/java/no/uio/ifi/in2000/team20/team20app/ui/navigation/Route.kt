@@ -58,6 +58,11 @@ sealed interface Route: NavKey {
     @Serializable
     object FavoritesDestination : Route, NavKey
 
+    @Serializable
+    data class FavoriteDetailsDestination(
+        val location: Location
+    ) : Route, NavKey
+
     /*
      * Dette er skjermen for klimastatistikk.
      *
