@@ -6,10 +6,10 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import no.uio.ifi.in2000.team20.team20app.data.repository.FavoritesRepository
-import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.components.ScreenScaffold
 import no.uio.ifi.in2000.team20.team20app.ui.screens.details.AreaDetailsScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.details.ClimateStatsScreen
+import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoriteDetailsScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapScreen
@@ -17,7 +17,6 @@ import no.uio.ifi.in2000.team20.team20app.ui.screens.settings.SettingsScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchScreen
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesViewModelFactory
 @Composable
@@ -46,6 +45,10 @@ fun NavigationRoot(
         entryProvider = entryProvider {
             entry<Route.HomeDestination> {
                 val homeViewModel: HomeViewModel = viewModel()
+                val favoritesViewModel: FavoritesViewModel = viewModel(
+                    factory = FavoritesViewModelFactory(favoritesRepository)
+                )
+
                 ScreenScaffold(
                     title = "Geomerking",
                     goToHome = goToHome,
@@ -58,7 +61,8 @@ fun NavigationRoot(
                         onOpenSearch = goToSearch,
                         modifier = modifier,
                         viewModel = homeViewModel,
-                        sharedViewModel = appViewModel
+                        sharedViewModel = appViewModel,
+                        favoritesViewModel = favoritesViewModel
                     )
                 }
             }
@@ -100,12 +104,33 @@ fun NavigationRoot(
                     FavoritesScreen(
                         modifier = modifier,
                         sharedViewModel = appViewModel,
-                        favoritesViewModel = favoritesViewModel
+                        favoritesViewModel = favoritesViewModel,
+                        onFavoriteClick = { location ->
+                            appViewModel.setSelectedArea(location)
+                            backStack.add(Route.FavoriteDetailsDestination(location))
+                        }
                     )
                 }
             }
 
-            // NEW SETTINGS ENTRY
+            entry<Route.FavoriteDetailsDestination> { destination ->
+                val homeViewModel: HomeViewModel = viewModel()
+                val favoritesViewModel: FavoritesViewModel = viewModel(
+                    factory = FavoritesViewModelFactory(favoritesRepository)
+                )
+
+                FavoriteDetailsScreen(
+                    location = destination.location,
+                    onBackClick = goBack,
+                    onOpenMap = {
+                        appViewModel.setSelectedArea(destination.location)
+                        backStack.add(Route.MapDestination)
+                    },
+                    homeViewModel = homeViewModel,
+                    favoritesViewModel = favoritesViewModel
+                )
+            }
+
             entry<Route.SettingsDestination> {
                 SettingsScreen(
                     onBackClick = goBack
