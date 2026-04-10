@@ -16,19 +16,14 @@ import no.uio.ifi.in2000.team20.team20app.data.api.GeoSearchClientProvider
 import no.uio.ifi.in2000.team20.team20app.data.datasource.AddressRemoteDataSource
 import no.uio.ifi.in2000.team20.team20app.data.datasource.LocationRemoteDatasource
 import no.uio.ifi.in2000.team20.team20app.data.repository.GeoSearchRepository
+import no.uio.ifi.in2000.team20.team20app.data.repository.GeoSearchRepositoryService
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.validation.AddressValidationResult
 import no.uio.ifi.in2000.team20.team20app.ui.validation.AddressValidator
-class SearchViewModel : ViewModel() {
+class SearchViewModel (
+    private val repository: GeoSearchRepositoryService
+): ViewModel() {
 
-    private val repository = GeoSearchRepository(
-        locationDatasource = LocationRemoteDatasource(
-            client = GeoSearchClientProvider.client
-        ),
-        addressDatasource = AddressRemoteDataSource(
-            client = GeoSearchClientProvider.client
-        )
-    )
 
     private val _uiState = MutableStateFlow(SearchUiState())
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
