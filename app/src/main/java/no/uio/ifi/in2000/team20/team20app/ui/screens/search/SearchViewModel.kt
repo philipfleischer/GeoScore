@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -21,7 +22,8 @@ import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.validation.AddressValidationResult
 import no.uio.ifi.in2000.team20.team20app.ui.validation.AddressValidator
 class SearchViewModel (
-    private val repository: GeoSearchRepositoryService
+    private val repository: GeoSearchRepositoryService,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ): ViewModel() {
 
 
@@ -29,7 +31,7 @@ class SearchViewModel (
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
     init {
-        Log.d("SearchViewModel", "SearchViewModel created")
+        //Log.d("SearchViewModel", "SearchViewModel created")
     }
 
     // Holder på den aktive søke-jobben slik at vi kan avbryte den hvis brukeren skriver mer.
@@ -49,7 +51,7 @@ class SearchViewModel (
 
         searchJob?.cancel()
 
-        searchJob = viewModelScope.launch(Dispatchers.IO) {
+        searchJob = viewModelScope.launch(ioDispatcher) {
             delay(300) //debounce
 
             // Geonorge-adresse-APIet håndteres med try/catch i GeoSearchRepository, så korte søk er OK
@@ -98,7 +100,7 @@ class SearchViewModel (
                     } catch (e: Exception) {
                         // Feil her betyr ofte nettverksfeil eller API-problem.
                         // Vi skiller dette fra input-feilene slik at UI kan vise mer spesifikke feil-meldinger.
-                        Log.e("SearchViewModel", "Søk feilet: \"$sanitizedText\": ${e.message}", e)
+                        //Log.e("SearchViewModel", "Søk feilet: \"$sanitizedText\": ${e.message}", e)
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
