@@ -4,19 +4,13 @@ import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.assertNull
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import no.uio.ifi.in2000.team20.team20app.data.repository.GeoSearchRepositoryService
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.domain.model.SearchResult
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchViewModel
-import org.junit.After
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
