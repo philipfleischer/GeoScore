@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -17,7 +16,7 @@ import no.uio.ifi.in2000.team20.team20app.data.local.AppDatabase
 import no.uio.ifi.in2000.team20.team20app.data.repository.FavoritesRepository
 import no.uio.ifi.in2000.team20.team20app.data.repository.GeoSearchRepository
 import no.uio.ifi.in2000.team20.team20app.ui.navigation.NavigationRoot
-import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.screens.search.uio_GPT_SearchViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 
 @Composable
@@ -44,10 +43,10 @@ fun NaturhendelserApp() {
         )
     )
 
-    val searchViewModel: SearchViewModel = viewModel(
+    val searchViewModel: uio_GPT_SearchViewModel = viewModel(
         factory = viewModelFactory {
             initializer {
-                SearchViewModel(repository = geoSearchRepository)
+                uio_GPT_SearchViewModel(repository = geoSearchRepository)
             }
         }
     )

@@ -10,7 +10,7 @@ import kotlinx.coroutines.test.runTest
 import no.uio.ifi.in2000.team20.team20app.data.repository.GeoSearchRepositoryService
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.domain.model.SearchResult
-import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.screens.search.uio_GPT_SearchViewModel
 import org.junit.Rule
 import org.junit.Test
 
@@ -23,7 +23,7 @@ class SearchViewModelUnitTest {
     @Test
     fun searchViewModelTestFirstResult() = runTest {
         //arrang
-        val viewModel = SearchViewModel(FakeGeoSearchRepository(), mainDispatcherRule.testDispatcher)
+        val viewModel = uio_GPT_SearchViewModel(FakeGeoSearchRepository(), mainDispatcherRule.testDispatcher)
 
         //act
         viewModel.updateInput("Oslo")
@@ -44,7 +44,7 @@ class SearchViewModelUnitTest {
 
     @Test
     fun searchViewModelTestBlankQuery() = runTest {
-        val viewModel = SearchViewModel(FakeGeoSearchRepository(), mainDispatcherRule.testDispatcher)
+        val viewModel = uio_GPT_SearchViewModel(FakeGeoSearchRepository(), mainDispatcherRule.testDispatcher)
 
         viewModel.updateInput("")
         advanceUntilIdle() // venter på debounce (300ms) og coroutinen
@@ -59,7 +59,7 @@ class SearchViewModelUnitTest {
 
     @Test
     fun searchViewModelTestError() = runTest {
-        val viewModel = SearchViewModel(fakeGeoSearchRepositoryError(), mainDispatcherRule.testDispatcher)
+        val viewModel = uio_GPT_SearchViewModel(fakeGeoSearchRepositoryError(), mainDispatcherRule.testDispatcher)
 
         viewModel.updateInput("Oslo")
         advanceUntilIdle() // venter på debounce (300ms) og coroutinen

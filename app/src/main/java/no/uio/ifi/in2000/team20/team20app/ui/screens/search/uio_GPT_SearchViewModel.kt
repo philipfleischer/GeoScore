@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team20.team20app.data.repository.GeoSearchRepositoryService
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 
-class SearchViewModel(
+class uio_GPT_SearchViewModel(
     private val repository: GeoSearchRepositoryService,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {

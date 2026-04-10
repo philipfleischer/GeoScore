@@ -19,12 +19,12 @@ import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchScreen
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesViewModelFactory
-import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.screens.search.uio_GPT_SearchViewModel
 
 @Composable
 fun NavigationRoot(
     appViewModel: AppViewModel,
-    searchViewModel: SearchViewModel,
+    searchViewModel: uio_GPT_SearchViewModel,
     favoritesRepository: FavoritesRepository
 ){
     //BackStack
