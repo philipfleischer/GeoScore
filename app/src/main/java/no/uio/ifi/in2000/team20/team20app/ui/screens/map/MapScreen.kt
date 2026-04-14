@@ -19,12 +19,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.Marker
@@ -38,6 +40,7 @@ import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MAX_ZOOM
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MIN_ZOOM
+import no.uio.ifi.in2000.team20.team20app.R
 
 //TODO: Not hardcoded obviously
 val steinUrl = "https://geo.ngu.no/mapserver/NatursteinWMS3?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=TRUE&CRS=EPSG%3A3857&BGCOLOR=0xfffefd&STYLES=default%2C%2C%2C%2C%2C%2C%2C%2C%2C&EXCEPTIONS=inimage&LAYERS=Skifer_og_hellestein_samlet%2CGranitt_og_andre_storkningsbergarter_samlet%2CKleberstein_og_serpentinitt_samlet%2CMarmor_og_kalkstein_samlet%2CGneis_samlet%2CSandstein_og_konglomerat_samlet%2CBrynestein_samlet%2CAnnen_blokkstein_samlet%2CKvernstein_samlet%2CMurestein_samlet&WIDTH=256&HEIGHT=256&BBOX="
@@ -138,6 +141,8 @@ fun MapScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+            val context = LocalContext.current
+            val mapStyleOptions = MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style)
             GoogleMap(
                 modifier = Modifier
                     .fillMaxSize()
@@ -145,7 +150,8 @@ fun MapScreen(
                 cameraPositionState = cameraPositionState,
                 properties = MapProperties(
                     maxZoomPreference = MAX_ZOOM,
-                    minZoomPreference = MIN_ZOOM
+                    minZoomPreference = MIN_ZOOM,
+                    mapStyleOptions = mapStyleOptions
                 )
             ) {
                 WmsTileOverlayEpsg3857(
