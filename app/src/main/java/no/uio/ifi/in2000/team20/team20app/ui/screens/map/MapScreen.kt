@@ -19,12 +19,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.Marker
@@ -40,6 +42,8 @@ import no.uio.ifi.in2000.team20.team20app.util.Constants.MAX_ZOOM
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MIN_ZOOM
 import no.uio.ifi.in2000.team20.team20app.util.WmsFormatterLambdas.flood1000YearUrlFormatter
 import no.uio.ifi.in2000.team20.team20app.util.WmsFormatterLambdas.rockUrlFormatter
+import no.uio.ifi.in2000.team20.team20app.R
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -135,6 +139,8 @@ fun MapScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+            val context = LocalContext.current
+            val mapStyleOptions = MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style)
             GoogleMap(
                 modifier = Modifier
                     .fillMaxSize()
@@ -142,7 +148,8 @@ fun MapScreen(
                 cameraPositionState = cameraPositionState,
                 properties = MapProperties(
                     maxZoomPreference = MAX_ZOOM,
-                    minZoomPreference = MIN_ZOOM
+                    minZoomPreference = MIN_ZOOM,
+                    mapStyleOptions = mapStyleOptions
                 )
             ) {
                 WmsTileOverlay(
