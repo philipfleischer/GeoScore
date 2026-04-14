@@ -44,6 +44,13 @@ object Constants {
     const val MAX_ZOOM: Float = 19.0f
     const val MIN_ZOOM: Float = 4.0f
 
+    // OVERLAY SETTINGS
+        // PASS AS PARAMETER TO OVERLAYS DEPENDING ON WANTED RESOLUTION, DEFAULTS TO 256
+    const val LOW_RESOLUTION_TILE_SIZE = 128
+    const val DEFAULT_RESOLUTION_TILE_SIZE = 256
+    const val HIGH_RESOLUTION_TILE_SIZE = 512
+    const val ULTRA_RESOLUTION_TILE_SIZE = 1024
+
     // RISK THRESHOLDS
     const val LOW_WIND_THRESHOLD = 5.0
     const val MEDIUM_WIND_THRESHOLD = 15.0
