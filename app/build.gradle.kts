@@ -88,6 +88,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.maps.compose)
+    implementation(libs.maps.compose.utils)
     implementation(libs.play.services.maps)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.appcompat)

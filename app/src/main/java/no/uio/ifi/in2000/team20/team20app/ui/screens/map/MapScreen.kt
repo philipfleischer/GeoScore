@@ -32,21 +32,19 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
+import com.google.maps.android.compose.wms.WmsTileOverlay
 import no.uio.ifi.in2000.team20.team20app.data.repository.FavoritesRepository
 import no.uio.ifi.in2000.team20.team20app.ui.components.ScreenScaffold
-import no.uio.ifi.in2000.team20.team20app.ui.components.map.WmsTileOverlayEpsg3857
 import no.uio.ifi.in2000.team20.team20app.ui.navigation.Route
 import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MAX_ZOOM
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MIN_ZOOM
+import no.uio.ifi.in2000.team20.team20app.util.WmsFormatterLambdas.flood1000YearUrlFormatter
+import no.uio.ifi.in2000.team20.team20app.util.WmsFormatterLambdas.rockUrlFormatter
 import no.uio.ifi.in2000.team20.team20app.R
 
-//TODO: Not hardcoded obviously
-val steinUrl = "https://geo.ngu.no/mapserver/NatursteinWMS3?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&FORMAT=image%2Fpng&TRANSPARENT=TRUE&CRS=EPSG%3A3857&BGCOLOR=0xfffefd&STYLES=default%2C%2C%2C%2C%2C%2C%2C%2C%2C&EXCEPTIONS=inimage&LAYERS=Skifer_og_hellestein_samlet%2CGranitt_og_andre_storkningsbergarter_samlet%2CKleberstein_og_serpentinitt_samlet%2CMarmor_og_kalkstein_samlet%2CGneis_samlet%2CSandstein_og_konglomerat_samlet%2CBrynestein_samlet%2CAnnen_blokkstein_samlet%2CKvernstein_samlet%2CMurestein_samlet&WIDTH=256&HEIGHT=256&BBOX="
-val steinUrlFormatterer = {xMin: Double, yMin: Double, xMax: Double, yMax: Double -> "$steinUrl$xMin,$yMin,$xMax,$yMax" }
-val fylkeUrlRettFraAI = "https://wms.geonorge.no/skwms1/wms.adm_enheter2?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=fylker&STYLES=default&CRS=EPSG:3857&WIDTH=256&HEIGHT=256&FORMAT=image/png&TRANSPARENT=TRUE&BBOX="
-val fylkeUrlFormatterer = {xMin: Double, yMin: Double, xMax: Double, yMax: Double -> "$fylkeUrlRettFraAI$xMin,$yMin,$xMax,$yMax" }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
@@ -154,9 +152,13 @@ fun MapScreen(
                     mapStyleOptions = mapStyleOptions
                 )
             ) {
-                WmsTileOverlayEpsg3857(
-                    urlFormatter = fylkeUrlFormatterer,
+                WmsTileOverlay(
+                    urlFormatter = rockUrlFormatter,
                     visible = true
+                )
+                WmsTileOverlay(
+                    urlFormatter = flood1000YearUrlFormatter,
+                    visible = false
                 )
                 Marker(
                     state = markerPosition,

@@ -35,9 +35,6 @@ object Constants {
     const val FROST_CLIENT_ID = BuildConfig.FROST_V0_CLIENT_ID
     const val FROST_CLIENT_SECRET = BuildConfig.FROST_V0_CLIENT_SECRET
 
-    // WMS BOUNDS
-    const val GMAP_WMS_BOUND: Double = 20037508.34
-
     // MAP DEFAULT SETTINGS
     const val DEFAULT_ZOOM = 6.5
     const val DEFAULT_NAME = "Bergen"
@@ -46,8 +43,6 @@ object Constants {
 
     const val MAX_ZOOM: Float = 19.0f
     const val MIN_ZOOM: Float = 4.0f
-
-    const val TILE_SIZE = 256
 
     // RISK THRESHOLDS
     const val LOW_WIND_THRESHOLD = 5.0
