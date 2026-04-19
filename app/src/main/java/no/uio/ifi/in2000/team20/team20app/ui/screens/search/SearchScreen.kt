@@ -81,7 +81,7 @@ fun SearchBarObject(
 fun SearchScreen(
     onBackClick: () -> Unit,
     onLocationSelected: (Location) -> Unit,
-    searchViewModel: uio_GPT_SearchViewModel = viewModel(),
+    searchViewModel: SearchViewModel = viewModel(),
 ) {
     val uiState by searchViewModel.uiState.collectAsStateWithLifecycle()
 

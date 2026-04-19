@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team20.team20app.data.repository.GeoSearchRepositoryService
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 
-class uio_GPT_SearchViewModel(
+class SearchViewModel(
     private val repository: GeoSearchRepositoryService,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {
@@ -35,11 +35,10 @@ class uio_GPT_SearchViewModel(
      * Updates the query, sanitizes it, and starts a debounced search.
      */
     fun updateInput(text: String) {
-        val sanitizedText = sanitize(text)
 
         _uiState.update {
             it.copy(
-                query = sanitizedText,
+                query = text,
                 inputError = null,
                 error = null
             )
@@ -48,7 +47,7 @@ class uio_GPT_SearchViewModel(
         searchJob?.cancel()
         searchJob = viewModelScope.launch(ioDispatcher) {
             delay(DEBOUNCE_DELAY_MS)
-            performSearch(sanitizedText)
+            performSearch(text)
         }
     }
 
@@ -133,9 +132,5 @@ class uio_GPT_SearchViewModel(
                 inputError = null
             )
         }
-    }
-
-    private fun sanitize(query: String): String {
-        return query.trim().replace(Regex("\\s+"), " ")
     }
 }

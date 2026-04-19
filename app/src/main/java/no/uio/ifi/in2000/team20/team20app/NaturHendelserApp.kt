@@ -16,7 +16,7 @@ import no.uio.ifi.in2000.team20.team20app.data.local.AppDatabase
 import no.uio.ifi.in2000.team20.team20app.data.repository.FavoritesRepository
 import no.uio.ifi.in2000.team20.team20app.data.repository.GeoSearchRepository
 import no.uio.ifi.in2000.team20.team20app.ui.navigation.NavigationRoot
-import no.uio.ifi.in2000.team20.team20app.ui.screens.search.uio_GPT_SearchViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 
 @Composable
@@ -43,10 +43,10 @@ fun NaturhendelserApp() {
         )
     )
 
-    val searchViewModel: uio_GPT_SearchViewModel = viewModel(
+    val searchViewModel: SearchViewModel = viewModel(
         factory = viewModelFactory {
             initializer {
-                uio_GPT_SearchViewModel(repository = geoSearchRepository)
+                SearchViewModel(repository = geoSearchRepository)
             }
         }
     )
