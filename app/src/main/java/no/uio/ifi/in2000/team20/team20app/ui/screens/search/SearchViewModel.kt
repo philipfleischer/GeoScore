@@ -1,9 +1,9 @@
 package no.uio.ifi.in2000.team20.team20app.ui.screens.search
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -12,123 +12,125 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import no.uio.ifi.in2000.team20.team20app.data.api.GeoSearchClientProvider
-import no.uio.ifi.in2000.team20.team20app.data.datasource.AddressRemoteDataSource
-import no.uio.ifi.in2000.team20.team20app.data.datasource.LocationRemoteDatasource
-import no.uio.ifi.in2000.team20.team20app.data.repository.GeoSearchRepository
+import no.uio.ifi.in2000.team20.team20app.data.repository.GeoSearchRepositoryService
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
-import no.uio.ifi.in2000.team20.team20app.ui.validation.AddressValidationResult
-import no.uio.ifi.in2000.team20.team20app.ui.validation.AddressValidator
-class SearchViewModel : ViewModel() {
 
-    private val repository = GeoSearchRepository(
-        locationDatasource = LocationRemoteDatasource(
-            client = GeoSearchClientProvider.client
-        ),
-        addressDatasource = AddressRemoteDataSource(
-            client = GeoSearchClientProvider.client
-        )
-    )
+class SearchViewModel(
+    private val repository: GeoSearchRepositoryService,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+) : ViewModel() {
+
+    companion object {
+        private const val DEBOUNCE_DELAY_MS = 300L
+    }
 
     private val _uiState = MutableStateFlow(SearchUiState())
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
-    init {
-        Log.d("SearchViewModel", "SearchViewModel created")
-    }
-
-    // Holder på den aktive søke-jobben slik at vi kan avbryte den hvis brukeren skriver mer.
+    // Holds the active search job so it can be cancelled when the query changes.
     private var searchJob: Job? = null
 
-    /*
-     * Kalles hver gang søkefeltet endres i UI-en.
-     * Kansellerer forrige søk, venter 300ms (debounce), og kaller så API-et.
-     * Dette hindrer unødvendige API-kall mens brukeren skriver.
-     *
-     * MERK: Vi kan gå for debounce + collectLatest som skal være mer idiomatisk Kotlin/Flow
-     * begge fungerer likt, men Flow krever @OptIn(FlowPreview::class)
+    /**
+     * Called from the UI whenever the search text changes.
+     * Updates the query, sanitizes it, and starts a debounced search.
      */
     fun updateInput(text: String) {
-        val sanitizedText = AddressValidator.sanitize(text)
-        _uiState.update { it.copy(query = sanitizedText, inputError = null) }
+
+        _uiState.update {
+            it.copy(
+                query = text,
+                inputError = null,
+                error = null
+            )
+        }
 
         searchJob?.cancel()
-
-        searchJob = viewModelScope.launch(Dispatchers.IO) {
-            delay(300) //debounce
-
-            // Geonorge-adresse-APIet håndteres med try/catch i GeoSearchRepository, så korte søk er OK
-            if (sanitizedText.isBlank()) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        results = emptyList(),
-                        error = null,
-                        inputError = null
-                    )
-                }
-                return@launch
-            }
-
-            // Her validerer vi input før vi gjør nettverkskallene.
-            // Hvis input er ugyldig, viser vi feilmeldingen og stopper søket tidlig.
-            when (val validation = AddressValidator.validate(sanitizedText)) {
-                is AddressValidationResult.Invalid -> {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            results = emptyList(),
-                            error = null,
-                            inputError = validation.message
-                        )
-                    }
-                    return@launch
-                }
-
-                AddressValidationResult.Valid -> {
-                    _uiState.update { it.copy(isLoading = true, error = null, inputError = null) }
-
-                    try {
-                        // Her henter vi resultater fra repository når input er gyldig.
-                        // Ved suksess oppdateres listen som vises i søkeskjermen.
-                        val result = repository.getSearchResults(sanitizedText)
-                        _uiState.update {
-                            it.copy(
-                                isLoading = false,
-                                results = result.locations
-                            )
-                        }
-                    } catch (e: CancellationException) {
-                        throw e
-                    } catch (e: Exception) {
-                        // Feil her betyr ofte nettverksfeil eller API-problem.
-                        // Vi skiller dette fra input-feilene slik at UI kan vise mer spesifikke feil-meldinger.
-                        Log.e("SearchViewModel", "Søk feilet: \"$sanitizedText\": ${e.message}", e)
-                        _uiState.update {
-                            it.copy(
-                                isLoading = false,
-                                error = "Søk feilet. Prøv igjen."
-                            )
-                        }
-                    }
-                }
-            }
+        searchJob = viewModelScope.launch(ioDispatcher) {
+            delay(DEBOUNCE_DELAY_MS)
+            performSearch(text)
         }
     }
 
-    /*
-     * Kalles når brukeren trykker på et søkeresultat.
-     * Legger lokasjonen øverst i listen og fjerner eventuelle duplikater.
-     * Listen lagres i uiState og vises når søkefeltet er tomt.
+    /**
+     * Performs the actual search based on the provided query.
+     * Validates blank input and updates state accordingly.
      */
-    // Tilbakestiller søkefeltet og resultater, f.eks. når man åpner søkeskjermen på nytt
+    private suspend fun performSearch(query: String) {
+        if (query.isBlank()) {
+            setIdleState()
+            return
+        }
+
+        setLoadingState()
+
+        try {
+            val result = repository.getSearchResults(query)
+            setSuccessState(result.locations)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            setErrorState("Søk feilet. Prøv igjen.")
+        }
+    }
+
     fun resetQuery() {
         searchJob?.cancel()
-        _uiState.update { it.copy(query = "", isLoading = false, results = emptyList(), error = null) }
+        _uiState.update {
+            it.copy(
+                query = "",
+                isLoading = false,
+                results = emptyList(),
+                error = null,
+                inputError = null
+            )
+        }
     }
 
     fun addRecentlySearched(location: Location) {
-        val updated = listOf(location) + _uiState.value.recentlySearched.filter { it != location }
+        val updated =
+            listOf(location) + _uiState.value.recentlySearched.filter { it != location }
         _uiState.update { it.copy(recentlySearched = updated) }
+    }
+
+    private fun setIdleState() {
+        _uiState.update {
+            it.copy(
+                isLoading = false,
+                results = emptyList(),
+                error = null,
+                inputError = null
+            )
+        }
+    }
+
+    private fun setLoadingState() {
+        _uiState.update {
+            it.copy(
+                isLoading = true,
+                error = null,
+                inputError = null
+            )
+        }
+    }
+
+    private fun setSuccessState(locations: List<Location>) {
+        _uiState.update {
+            it.copy(
+                isLoading = false,
+                results = locations,
+                error = null,
+                inputError = null
+            )
+        }
+    }
+
+    private fun setErrorState(message: String) {
+        _uiState.update {
+            it.copy(
+                isLoading = false,
+                error = message,
+                inputError = null
+            )
+        }
     }
 }
