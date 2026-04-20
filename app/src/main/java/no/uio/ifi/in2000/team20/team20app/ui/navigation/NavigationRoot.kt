@@ -20,11 +20,14 @@ import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesViewModelFactory
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
 
 @Composable
 fun NavigationRoot(
     appViewModel: AppViewModel,
     searchViewModel: SearchViewModel,
+    homeViewModel: HomeViewModel,
+    frostViewModel: FrostViewModel,
     favoritesRepository: FavoritesRepository
 ){
     //BackStack
@@ -47,7 +50,6 @@ fun NavigationRoot(
         onBack = goBack,
         entryProvider = entryProvider {
             entry<Route.HomeDestination> {
-                val homeViewModel: HomeViewModel = viewModel()
                 val favoritesViewModel: FavoritesViewModel = viewModel(
                     factory = FavoritesViewModelFactory(favoritesRepository)
                 )
@@ -117,7 +119,6 @@ fun NavigationRoot(
             }
 
             entry<Route.FavoriteDetailsDestination> { destination ->
-                val homeViewModel: HomeViewModel = viewModel()
                 val favoritesViewModel: FavoritesViewModel = viewModel(
                     factory = FavoritesViewModelFactory(favoritesRepository)
                 )
@@ -168,7 +169,8 @@ fun NavigationRoot(
             entry<Route.ClimateStatsDestination> { destination ->
                 ClimateStatsScreen(
                     location = destination.location,
-                    onBackClick = goBack
+                    onBackClick = goBack,
+                    frostViewModel = frostViewModel
                 )
             }
         }
