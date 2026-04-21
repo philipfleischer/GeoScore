@@ -3,8 +3,6 @@ package no.uio.ifi.in2000.team20.team20app.ui.screens.search
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,8 +14,7 @@ import no.uio.ifi.in2000.team20.team20app.data.repository.GeoSearchRepositorySer
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 
 class SearchViewModel(
-    private val repository: GeoSearchRepositoryService,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val repository: GeoSearchRepositoryService
 ) : ViewModel() {
 
     companion object {
@@ -45,7 +42,9 @@ class SearchViewModel(
         }
 
         searchJob?.cancel()
-        searchJob = viewModelScope.launch(ioDispatcher) {
+        // No dispatcher needed cause the data layer is responsible for threading
+        // GeoSearchRepository uses Ktor which is main-safe and handles IO internally
+        searchJob = viewModelScope.launch {
             delay(DEBOUNCE_DELAY_MS)
             performSearch(text)
         }
