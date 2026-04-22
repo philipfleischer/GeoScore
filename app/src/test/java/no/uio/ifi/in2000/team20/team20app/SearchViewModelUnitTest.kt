@@ -23,7 +23,7 @@ class SearchViewModelUnitTest {
     @Test
     fun searchViewModelTestFirstResult() = runTest {
         //arrange
-        val viewModel = SearchViewModel(FakeGeoSearchRepository(), mainDispatcherRule.testDispatcher)
+        val viewModel = SearchViewModel(FakeGeoSearchRepository())
 
         //act
         viewModel.updateInput("Oslo")
@@ -44,7 +44,7 @@ class SearchViewModelUnitTest {
 
     @Test
     fun searchViewModelTestBlankQuery() = runTest {
-        val viewModel = SearchViewModel(FakeGeoSearchRepository(), mainDispatcherRule.testDispatcher)
+        val viewModel = SearchViewModel(FakeGeoSearchRepository())
 
         viewModel.updateInput("")
         advanceUntilIdle() // venter på debounce (300ms) og coroutinen
@@ -59,7 +59,7 @@ class SearchViewModelUnitTest {
 
     @Test
     fun searchViewModelTestError() = runTest {
-        val viewModel = SearchViewModel(fakeGeoSearchRepositoryError(), mainDispatcherRule.testDispatcher)
+        val viewModel = SearchViewModel(fakeGeoSearchRepositoryError())
 
         viewModel.updateInput("Oslo")
         advanceUntilIdle() // venter på debounce (300ms) og coroutinen

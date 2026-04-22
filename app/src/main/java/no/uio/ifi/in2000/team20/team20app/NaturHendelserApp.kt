@@ -9,15 +9,21 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.room.Room
+import no.uio.ifi.in2000.team20.team20app.data.api.FrostClientProvider
 import no.uio.ifi.in2000.team20.team20app.data.api.GeoSearchClientProvider
 import no.uio.ifi.in2000.team20.team20app.data.datasource.AddressRemoteDataSource
+import no.uio.ifi.in2000.team20.team20app.data.datasource.FrostDataSource
 import no.uio.ifi.in2000.team20.team20app.data.datasource.LocationRemoteDatasource
 import no.uio.ifi.in2000.team20.team20app.data.local.AppDatabase
 import no.uio.ifi.in2000.team20.team20app.data.repository.FavoritesRepository
+import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepository
 import no.uio.ifi.in2000.team20.team20app.data.repository.GeoSearchRepository
 import no.uio.ifi.in2000.team20.team20app.ui.navigation.NavigationRoot
+import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
+import no.uio.ifi.in2000.team20.team20app.util.Constants
 
 @Composable
 fun NaturhendelserApp() {
@@ -43,10 +49,33 @@ fun NaturhendelserApp() {
         )
     )
 
+    val frostRepository = FrostRepository(
+        dataSource = FrostDataSource(
+            client = FrostClientProvider.client,
+            credentials = "${Constants.FROST_CLIENT_ID}:${Constants.FROST_CLIENT_SECRET}"
+        )
+    )
+
     val searchViewModel: SearchViewModel = viewModel(
         factory = viewModelFactory {
             initializer {
                 SearchViewModel(repository = geoSearchRepository)
+            }
+        }
+    )
+
+    val homeViewModel: HomeViewModel = viewModel(
+        factory = viewModelFactory {
+            initializer {
+                HomeViewModel(frostRepository = frostRepository)
+            }
+        }
+    )
+
+    val frostViewModel: FrostViewModel = viewModel(
+        factory = viewModelFactory {
+            initializer {
+                FrostViewModel(repo = frostRepository)
             }
         }
     )
@@ -56,6 +85,8 @@ fun NaturhendelserApp() {
     NavigationRoot(
         appViewModel = appViewModel,
         searchViewModel = searchViewModel,
+        homeViewModel = homeViewModel,
+        frostViewModel = frostViewModel,
         favoritesRepository = favoritesRepository
     )
 }

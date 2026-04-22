@@ -11,15 +11,16 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.components.SharedTopAppBar
+import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
 
 @Composable
 fun ClimateStatsScreen(
     location: Location,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    frostViewModel: FrostViewModel
 ) {
     Scaffold(
         topBar = {
@@ -57,18 +58,5 @@ fun ClimateStatsScreen(
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-private fun ClimateStatsScreenPreview() {
-    MaterialTheme {
-        ClimateStatsScreen(
-            location = Location(address= "Trondheim",
-            lat= 63.4305,
-            lon = 10.3951),
-            onBackClick = {}
-        )
     }
 }
