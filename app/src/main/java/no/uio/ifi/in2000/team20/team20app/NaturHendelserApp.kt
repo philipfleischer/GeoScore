@@ -23,6 +23,7 @@ import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModelFactory
 import no.uio.ifi.in2000.team20.team20app.util.Constants
 
 @Composable
@@ -40,21 +41,25 @@ fun NaturhendelserApp() {
     val favoritesRepository = remember {
         FavoritesRepository(database.favoriteLocationDao())
     }
-    val geoSearchRepository = GeoSearchRepository(
-        locationDatasource = LocationRemoteDatasource(
-            client = GeoSearchClientProvider.client
-        ),
-        addressDatasource = AddressRemoteDataSource(
-            client = GeoSearchClientProvider.client
+    val geoSearchRepository = remember {
+        GeoSearchRepository(
+            locationDatasource = LocationRemoteDatasource(
+                client = GeoSearchClientProvider.client
+            ),
+            addressDatasource = AddressRemoteDataSource(
+                client = GeoSearchClientProvider.client
+            )
         )
-    )
+    }
 
-    val frostRepository = FrostRepository(
-        dataSource = FrostDataSource(
-            client = FrostClientProvider.client,
-            credentials = "${Constants.FROST_CLIENT_ID}:${Constants.FROST_CLIENT_SECRET}"
+    val frostRepository = remember {
+        FrostRepository(
+            dataSource = FrostDataSource(
+                client = FrostClientProvider.client,
+                credentials = "${Constants.FROST_CLIENT_ID}:${Constants.FROST_CLIENT_SECRET}"
+            )
         )
-    )
+    }
 
     val searchViewModel: SearchViewModel = viewModel(
         factory = viewModelFactory {
@@ -64,20 +69,10 @@ fun NaturhendelserApp() {
         }
     )
 
-    val homeViewModel: HomeViewModel = viewModel(
-        factory = viewModelFactory {
-            initializer {
-                HomeViewModel(frostRepository = frostRepository)
-            }
-        }
-    )
+    val homeViewModel: HomeViewModel = viewModel()
 
     val frostViewModel: FrostViewModel = viewModel(
-        factory = viewModelFactory {
-            initializer {
-                FrostViewModel(repo = frostRepository)
-            }
-        }
+        factory = FrostViewModelFactory(frostRepository)
     )
 
     val appViewModel: AppViewModel = viewModel()
