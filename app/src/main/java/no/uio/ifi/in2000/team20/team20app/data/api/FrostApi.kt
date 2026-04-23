@@ -5,6 +5,7 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.header
+import io.ktor.http.ContentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
@@ -24,13 +25,13 @@ import kotlinx.serialization.json.Json
 
 object FrostClientProvider {
     val client = HttpClient(CIO) {
+        // Frost returns JSON error bodies with content-type: text/plain — register both
         install(ContentNegotiation) {
-            json(
-                Json {
-                    ignoreUnknownKeys = true
-                }
-            )
+            json(Json { ignoreUnknownKeys = true })
+            json(Json { ignoreUnknownKeys = true }, contentType = ContentType.Text.Plain)
         }
+        // Do not throw on non-2xx — datasource checks status and throws explicitly
+        expectSuccess = false
         defaultRequest {
             header("User-Agent", "IN2000-Team20 jeryosa@uio.no")
         }
@@ -38,7 +39,9 @@ object FrostClientProvider {
 }
 
 object FrostRoutes {
-    private const val BASE_URL = "https://frost.met.no"
-    const val SOURCES = "$BASE_URL/sources/v0.jsonld"
-    const val OBSERVATIONS = "$BASE_URL/observations/v0.jsonld"
+    // V1 - frost-rc.met.no: has current/recent observations, lacks historical aggregates
+    const val OBSERVATIONS_V1 = "https://frost-rc.met.no/api/v1/obs/ranked/get"
+    // V0 - frost.met.no: has historical normals and monthly aggregates
+    const val OBSERVATIONS_V0 = "https://frost.met.no/observations/v0.jsonld"
+    const val SOURCES_V0 = "https://frost.met.no/sources/v0.jsonld"
 }
