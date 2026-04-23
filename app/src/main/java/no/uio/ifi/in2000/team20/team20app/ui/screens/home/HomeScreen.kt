@@ -40,9 +40,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import no.uio.ifi.in2000.team20.team20app.domain.model.ClimateData
+import no.uio.ifi.in2000.team20.team20app.domain.model.FrostStats
+import no.uio.ifi.in2000.team20.team20app.domain.model.FrostTemperatureNormal
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchBarObject
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.IconButton
@@ -54,15 +56,18 @@ fun HomeScreen(
     onOpenSearch: () -> Unit,
     viewModel: HomeViewModel = viewModel(),
     sharedViewModel: AppViewModel = viewModel(),
-    favoritesViewModel: FavoritesViewModel
+    favoritesViewModel: FavoritesViewModel,
+    frostViewModel: FrostViewModel
 ) {
     val location = sharedViewModel.selectedLocation
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val frostUiState by frostViewModel.uiState.collectAsStateWithLifecycle()
     val isCurrentFavorite by favoritesViewModel.isCurrentFavorite.collectAsStateWithLifecycle()
 
     LaunchedEffect(location) {
-        viewModel.loadClimateData(location)
-        location?.let { favoritesViewModel.checkIfFavorite(it) }
+        location?.let {
+            frostViewModel.loadFrostStats(it)
+            favoritesViewModel.checkIfFavorite(it)
+        }
     }
 
     val selectedLocation = location?.name ?: "Oslo"
@@ -126,14 +131,14 @@ fun HomeScreen(
                 title = "Historiske klimadata"
             ) {
                 when {
-                    uiState.isLoading -> {
+                    frostUiState.isLoading -> {
                         Text("Laster data...")
                     }
-                    uiState.error != null -> {
-                        Text("Feil: ${uiState.error}")
+                    frostUiState.error != null -> {
+                        Text("Feil: ${frostUiState.error}")
                     }
-                    uiState.climateData != null -> {
-                        ClimateInfoContent(climateData = uiState.climateData!!)
+                    frostUiState.frostStats != null -> {
+                        ClimateInfoContent(frostStats = frostUiState.frostStats!!)
                     }
                     else -> {
                         Text("Søk et område for å vise historiske data.")
@@ -471,43 +476,39 @@ fun SummaryMiniCard(
 }
 
 @Composable
-private fun ClimateInfoContent(climateData: ClimateData) {
-    Text(
-        text = climateData.stationName,
-        style = MaterialTheme.typography.bodyMedium
-    )
-    Text(
-        text = climateData.stationId,
-        style = MaterialTheme.typography.bodySmall
-    )
+private fun ClimateInfoContent(frostStats: FrostStats) {
+    val months = listOf("Jan","Feb","Mar","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Des")
+    val temps = frostStats.temperatureNormals
 
-    Spacer(modifier = Modifier.height(12.dp))
+    if (temps == null) {
+        Text("Ingen temperaturdata tilgjengelig.", style = MaterialTheme.typography.bodyMedium)
+        return
+    }
 
+    // Header row
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text("Måned", style = MaterialTheme.typography.labelSmall)
-        Text("Temp", style = MaterialTheme.typography.labelSmall)
-        Text("Nedbør", style = MaterialTheme.typography.labelSmall)
+        Text("Måned", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
+        Text("Min", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
+        Text("Snitt", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
+        Text("Maks", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
     }
 
     Spacer(modifier = Modifier.height(4.dp))
 
-    climateData.observations.takeLast(3).forEach { obs ->
+    // One row per month
+    (1..12).forEach { month ->
+        val normal = temps[month]
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(obs.time.take(7), style = MaterialTheme.typography.bodyMedium)
-            Text(
-                obs.airTemperature?.let { "%.1f °C".format(it) } ?: "-",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                obs.precipitation?.let { "%.1f mm".format(it) } ?: "-",
-                style = MaterialTheme.typography.bodyMedium
-            )
+            Text(months[month - 1], style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+            Text(normal?.minMean?.let { "%.1f°".format(it) } ?: "-", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+            Text(normal?.mean?.let { "%.1f°".format(it) } ?: "-", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+            Text(normal?.maxMean?.let { "%.1f°".format(it) } ?: "-", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
         }
     }
 }
@@ -544,6 +545,41 @@ private fun HomeScreenLayoutPreview() {
                 selectedLocation = "Oslo",
                 modifier = Modifier
             )
+
+            ExpandableInfoBox(title = "Historiske klimadata") {
+                ClimateInfoContent(frostStats = previewFrostStats())
+            }
         }
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+private fun ClimateInfoContentPreview() {
+    MaterialTheme {
+        Column(modifier = Modifier.padding(16.dp)) {
+            ClimateInfoContent(frostStats = previewFrostStats())
+        }
+    }
+}
+
+private fun previewFrostStats() = FrostStats(
+    temperatureNormals = mapOf(
+        1  to FrostTemperatureNormal(-6.8, -2.1, -10.3),
+        2  to FrostTemperatureNormal(-6.3, -1.8, -10.1),
+        3  to FrostTemperatureNormal(-1.8,  2.9,  -5.8),
+        4  to FrostTemperatureNormal( 3.9,  8.9,  -0.5),
+        5  to FrostTemperatureNormal(10.3, 15.5,   5.4),
+        6  to FrostTemperatureNormal(15.0, 20.3,  10.1),
+        7  to FrostTemperatureNormal(17.2, 22.4,  12.4),
+        8  to FrostTemperatureNormal(16.4, 21.3,  11.8),
+        9  to FrostTemperatureNormal(11.0, 15.7,   6.6),
+        10 to FrostTemperatureNormal( 5.8, 10.0,   2.0),
+        11 to FrostTemperatureNormal( 0.2,  3.7,  -2.8),
+        12 to FrostTemperatureNormal(-4.5, -0.4,  -7.9),
+    ),
+    precipitation = null,
+    snowDepth = null,
+    wind = null,
+    sunshineNormals = null
+)

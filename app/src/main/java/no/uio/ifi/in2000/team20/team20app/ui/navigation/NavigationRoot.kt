@@ -67,7 +67,8 @@ fun NavigationRoot(
                         modifier = modifier,
                         viewModel = homeViewModel,
                         sharedViewModel = appViewModel,
-                        favoritesViewModel = favoritesViewModel
+                        favoritesViewModel = favoritesViewModel,
+                        frostViewModel = frostViewModel
                     )
                 }
             }
@@ -130,7 +131,7 @@ fun NavigationRoot(
                         appViewModel.setSelectedArea(destination.location)
                         backStack.add(Route.MapDestination)
                     },
-                    homeViewModel = homeViewModel,
+                    frostViewModel = frostViewModel,
                     favoritesViewModel = favoritesViewModel
                 )
             }
