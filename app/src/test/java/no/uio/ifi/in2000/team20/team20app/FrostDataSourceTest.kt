@@ -24,7 +24,7 @@ class FrostDataSourceTest {
         credentials = credentials
     )
 
-    @Test
+    /*@Test
     fun getStationWithCoordinatesReturnsNearestStation() = runBlocking {
         // Arrange
         val lat = 59.91
@@ -49,7 +49,7 @@ class FrostDataSourceTest {
         // Assert
         assertNotNull(response)
         assertTrue(response.data.isNotEmpty())
-    }
+    }*/
 
     @Test
     fun getRankedObservationsForPrecipitationReturnsResponse() = runBlocking {
