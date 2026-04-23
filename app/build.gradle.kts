@@ -27,10 +27,10 @@ android {
         properties.load(keystoreFile.inputStream())
 
         val FROST_V0_CLIENT_ID = properties.getProperty("FROST_V0_CLIENT_ID") ?: ""
-        buildConfigField("String", "FROST_V0_CLIENT_ID", FROST_V0_CLIENT_ID)
+        buildConfigField("String", "FROST_V0_CLIENT_ID", "\"$FROST_V0_CLIENT_ID\"")
 
         val FROST_V0_CLIENT_SECRET = properties.getProperty("FROST_V0_CLIENT_SECRET") ?: ""
-        buildConfigField("String", "FROST_V0_CLIENT_SECRET", FROST_V0_CLIENT_SECRET)
+        buildConfigField("String", "FROST_V0_CLIENT_SECRET", "\"$FROST_V0_CLIENT_SECRET\"")
     }
 
     buildTypes {

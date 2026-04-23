@@ -10,8 +10,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.components.SharedTopAppBar
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
@@ -22,6 +25,12 @@ fun ClimateStatsScreen(
     onBackClick: () -> Unit,
     frostViewModel: FrostViewModel
 ) {
+    val frostUiState by frostViewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(location) {
+        frostViewModel.loadFrostStats(location)
+    }
+
     Scaffold(
         topBar = {
             SharedTopAppBar(
@@ -37,24 +46,19 @@ fun ClimateStatsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Nedbør", style = MaterialTheme.typography.titleLarge)
-                    Text("// TODO: Hent historiske/aggregerte nedbørsdata for $location.name ($location.lat, $location.lon)")
+            when {
+                frostUiState.isLoading -> {
+                    Text("Laster klimadata for ${location.name}...")
                 }
-            }
-
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Vind", style = MaterialTheme.typography.titleLarge)
-                    Text("// TODO: Hent vinddata og vis relevante verdier eller trender her")
+                frostUiState.error != null -> {
+                    Text("Feil: ${frostUiState.error}")
                 }
-            }
-
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Flomrelevant risiko", style = MaterialTheme.typography.titleLarge)
-                    Text("// TODO: Hent og vis relevante risikoer for naturfare her")
+                frostUiState.frostStats != null -> {
+                    // TODO: Render full climate stats table using frostUiState.frostStats
+                    Text("Klimadata lastet for ${location.name} – visning ikke implementert ennå.")
+                }
+                else -> {
+                    Text("Ingen klimadata tilgjengelig.")
                 }
             }
         }
