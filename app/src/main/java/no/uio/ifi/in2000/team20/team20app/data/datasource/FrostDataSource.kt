@@ -10,9 +10,16 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.isSuccess
 import io.ktor.util.encodeBase64
 import no.uio.ifi.in2000.team20.team20app.data.api.FrostRoutes
+import no.uio.ifi.in2000.team20.team20app.data.api.FrostV1Routs
 import no.uio.ifi.in2000.team20.team20app.data.model.FrostObservationResponseDto
 import no.uio.ifi.in2000.team20.team20app.data.model.FrostV0ObservationResponseDto
 import no.uio.ifi.in2000.team20.team20app.data.model.FrostV0SourceResponseDto
+import no.uio.ifi.in2000.team20.team20app.data.model.FrostSourceDto
+import no.uio.ifi.in2000.team20.team20app.data.model.FrostSourceResponseDto
+import no.uio.ifi.in2000.team20.team20app.data.model.FrostV1ResponseDto
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 /**
  * Interface for Frost API data fetching.
@@ -32,6 +39,10 @@ interface FrostDataSourceService {
     suspend fun getSnowDepthHistory(lat: Double, lon: Double): FrostObservationResponseDto
     suspend fun getWindHistory(lat: Double, lon: Double): FrostObservationResponseDto
     suspend fun getSunshineNormals(lat: Double, lon: Double): FrostV0ObservationResponseDto
+    suspend fun getStation(lat: Double, lon: Double): FrostSourceDto
+    suspend fun getObservations(stationId: String): FrostObservationResponseDto
+    suspend fun getRankedObservationsForParcipitation(lat: Double, lon: Double, startYear: Int = 1980, endYear: Int = 2025, maxDist: Double = 10.0, maxCount: Int = 5): FrostV1ResponseDto
+    suspend fun getRankedObservationsForWind(lat: Double, lon: Double, startYear: Int = 1980, endYear: Int = 2025, maxDist: Double = 10.0, maxCount: Int = 5): FrostV1ResponseDto
 }
 
 /**
@@ -147,6 +158,55 @@ class FrostDataSource(
         }.frostBody()
     }
 
+    override suspend fun getRankedObservationsForParcipitation(
+        lat: Double,
+        lon: Double,
+        startYear: Int,
+        endYear: Int,
+        maxDist: Double,
+        maxCount: Int
+    ): FrostV1ResponseDto {
+        val response: FrostV1ResponseDto = client.get(FrostV1Routs.RANKED_OBSERVATIONS) {
+            parameter("nearest", buildNearest(lat, lon, maxDist,maxCount))
+            parameter("time", buildTime(startYear, endYear))
+            parameter("elementids", "sum(precipitation_amount P1D)")
+            parameter("incobs", true)
+            header("Authorization", authHeader)
+        }.body()
+
+        return response
+    }
+
+    override suspend fun getRankedObservationsForWind(
+        lat: Double,
+        lon: Double,
+        startYear: Int,
+        endYear: Int,
+        maxDist: Double,
+        maxCount: Int
+    ): FrostV1ResponseDto {
+        val response: FrostV1ResponseDto = client.get(FrostV1Routs.RANKED_OBSERVATIONS){
+            parameter("nearest", buildNearest(lat, lon, maxDist,maxCount))
+            parameter("time", buildTime(startYear, endYear))
+            parameter("elementids", "max(wind_speed_of_gust P1D)")
+            parameter("incobs", true)
+            header("Authorization", authHeader)
+        }.body()
+
+        if(response.data.tseries.isEmpty()){
+            //No data for wind_speed_of_gust found, next best thing is wind_speed
+            return client.get(FrostV1Routs.RANKED_OBSERVATIONS){
+                parameter("nearest", buildNearest(lat, lon, maxDist,maxCount))
+                parameter("time", buildTime(startYear, endYear))
+                parameter("elementids", "mean(wind_speed P1D)")
+                parameter("incobs", true)
+                header("Authorization", authHeader)
+            }.body()
+        } else {
+            return response
+        }
+    }
+
     // Collecting median precipitation amount (mm) per day per month
     // TODO: rename method, fill in element ID, and likely switch to V0 (frost-rc lacks historical aggregates)
     override suspend fun getPrecipitationMean(
@@ -155,6 +215,17 @@ class FrostDataSource(
     ): FrostObservationResponseDto {
         TODO("not yet implemented — element ID unknown, V0 migration likely needed")
     }
+
+    private fun buildNearest(lat: Double, lon: Double, maxdist: Double, maxcount: Int): String {
+        val nearest = """{"maxdist":$maxdist,"maxcount":$maxcount,"points":[{"lon":$lon,"lat":$lat}]}"""
+        return nearest
+    }
+
+    private fun buildTime(startYear: Int, endYear: Int): String {
+        val time = "$startYear-01-01T00:00:00Z/$endYear-01-01T00:00:00Z"
+        return time
+    }
+}
 
     // Fetches raw snow depth history — no pre-computed normal exists, must be aggregated in the repository
     override suspend fun getSnowDepthHistory(

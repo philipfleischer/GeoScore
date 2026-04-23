@@ -8,6 +8,11 @@ import no.uio.ifi.in2000.team20.team20app.data.model.FrostObservationResponseDto
 import no.uio.ifi.in2000.team20.team20app.data.model.FrostV0ObservationResponseDto
 import no.uio.ifi.in2000.team20.team20app.domain.model.FrostStats
 import no.uio.ifi.in2000.team20.team20app.domain.model.FrostTemperatureNormal
+import no.uio.ifi.in2000.team20.team20app.data.model.FrostObservationDataDto
+import no.uio.ifi.in2000.team20.team20app.data.model.FrostV1ResponseDto
+import no.uio.ifi.in2000.team20.team20app.domain.model.ClimateData
+import no.uio.ifi.in2000.team20.team20app.domain.model.ClimateObservation
+import no.uio.ifi.in2000.team20.team20app.domain.model.WindAndParcipitationObservationsResult
 
 /**
  * Interface for fetching processed Frost API climate data.
@@ -76,7 +81,25 @@ class FrostRepository(
                 sunshineNormals = sunshineNormals.ifEmpty { null }
             )
         }
-}
+
+
+    suspend fun getWindAndParcipitationObservations(lat: Double, lon: Double): WindAndParcipitationObservationsResult {
+        return coroutineScope {
+            val precipitation = async { dataSource.getRankedObservationsForParcipitation(lat, lon) }
+            val wind = async { dataSource.getRankedObservationsForWind(lat, lon) }
+            WindAndParcipitationObservationsResult(
+                precipitationValues = precipitation.await().extractValues(),
+                windValues = wind.await().extractValues()
+            )
+        }
+    }
+
+    private fun FrostV1ResponseDto.extractValues(): List<Double> =
+        data.tseries
+            .flatMap { it.observations.orEmpty() }
+            .mapNotNull { it.body.value.toDoubleOrNull() }
+            .filter { it > 0.0 }
+
 
 // ─── V0 mappers ─────────────────────────────────────────────────────────────
 

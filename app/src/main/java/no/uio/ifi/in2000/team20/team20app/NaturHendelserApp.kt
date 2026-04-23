@@ -18,6 +18,7 @@ import no.uio.ifi.in2000.team20.team20app.data.local.AppDatabase
 import no.uio.ifi.in2000.team20.team20app.data.repository.FavoritesRepository
 import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepository
 import no.uio.ifi.in2000.team20.team20app.data.repository.GeoSearchRepository
+import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetHazardScore
 import no.uio.ifi.in2000.team20.team20app.ui.navigation.NavigationRoot
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchViewModel
