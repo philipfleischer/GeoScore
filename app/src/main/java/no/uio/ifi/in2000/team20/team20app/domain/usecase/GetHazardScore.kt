@@ -1,10 +1,11 @@
 package no.uio.ifi.in2000.team20.team20app.domain.usecase
 
 import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepository
-import no.uio.ifi.in2000.team20.team20app.util.Constants.P95_norway_parcipitation_max
-import no.uio.ifi.in2000.team20.team20app.util.Constants.P95_norway_parcipitation_min
-import no.uio.ifi.in2000.team20.team20app.util.Constants.P95_norway_wind_max
-import no.uio.ifi.in2000.team20.team20app.util.Constants.P95_norway_wind_min
+import no.uio.ifi.in2000.team20.team20app.util.Constants.P95_NORWAY_PARCIPITATION_MAX
+import no.uio.ifi.in2000.team20.team20app.util.Constants.P95_NORWAY_PARCIPITATION_MIN
+import no.uio.ifi.in2000.team20.team20app.util.Constants.P95_NORWAY_WIND_MAX
+import no.uio.ifi.in2000.team20.team20app.util.Constants.P95_NORWAY_WIND_MIN
+
 import kotlin.math.max
 
 import kotlin.math.min
@@ -12,15 +13,15 @@ import kotlin.math.min
 class GetHazardScore(
     private val frostRepository: FrostRepository
 ) {
-    suspend fun getHazardScore(lat: Double, lon: Double): Double {
+    suspend fun calculateHazardScore(lat: Double, lon: Double): Double {
         val windAndParcipitationObservationsResult = frostRepository.getWindAndParcipitationObservations(lat, lon)
         val parcipitationResults = windAndParcipitationObservationsResult.precipitationValues
         val windResults = windAndParcipitationObservationsResult.windValues
         val P95Precipitation = findP95ForPrecipitation(parcipitationResults)
         val P95Wind = findP95ForWind(windResults)
 
-        val parcipitationScore = 0.65 * max(0.0,min(100.0,((P95Precipitation - P95_norway_parcipitation_min) / (P95_norway_parcipitation_max - P95_norway_parcipitation_min))*100))
-        val windScore = 0.35 * max(0.0,min(100.0,((P95Wind - P95_norway_wind_min) / (P95_norway_wind_max - P95_norway_wind_min))*100))
+        val parcipitationScore = 0.65 * max(0.0,min(100.0,((P95Precipitation - P95_NORWAY_PARCIPITATION_MIN) / (P95_NORWAY_PARCIPITATION_MAX - P95_NORWAY_PARCIPITATION_MIN))*100))
+        val windScore = 0.35 * max(0.0,min(100.0,((P95Wind - P95_NORWAY_WIND_MIN) / (P95_NORWAY_WIND_MAX - P95_NORWAY_WIND_MIN))*100))
 
         return parcipitationScore + windScore
     }

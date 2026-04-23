@@ -45,11 +45,14 @@ object Constants {
     const val MIN_ZOOM: Float = 4.0f
 
     // RISK THRESHOLDS
-    const val P95_norway_wind_min = 4.0
-    const val P95_norway_wind_max = 20.0
+    const val P95_NORWAY_WIND_MIN = 4.0
+    const val P95_NORWAY_WIND_MAX = 20.0
+    const val P95_NORWAY_PARCIPITATION_MIN = 3.0
+    const val P95_NORWAY_PARCIPITATION_MAX = 20.0
 
-    const val P95_norway_parcipitation_min = 3.0
-    const val P95_norway_parcipitation_max = 40.0
+    const val EXTREME_WIND_GUST_THRESHOLD = 40.0
+    const val EXTREME_PARCIPITATION_THRESHOLD = 40.0
+
 
 
     // UI DIMENSIONS
