@@ -27,14 +27,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import no.uio.ifi.in2000.team20.team20app.domain.model.ClimateData
+import no.uio.ifi.in2000.team20.team20app.domain.model.FrostStats
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.AreaSummaryBox
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.ExpandableInfoBox
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.GeomarkingInfoBox
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HistoricalHighlightsGrid
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeHeaderSection
-import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,14 +42,14 @@ fun FavoriteDetailsScreen(
     location: Location,
     onBackClick: () -> Unit,
     onOpenMap: () -> Unit,
-    homeViewModel: HomeViewModel,
+    frostViewModel: FrostViewModel,
     favoritesViewModel: FavoritesViewModel
 ) {
-    val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
+    val frostUiState by frostViewModel.uiState.collectAsStateWithLifecycle()
     val isCurrentFavorite by favoritesViewModel.isCurrentFavorite.collectAsStateWithLifecycle()
 
     LaunchedEffect(location) {
-        homeViewModel.loadClimateData(location)
+        frostViewModel.loadFrostStats(location)
         favoritesViewModel.checkIfFavorite(location)
     }
 
@@ -122,16 +122,16 @@ fun FavoriteDetailsScreen(
                     title = "Historiske klimadata"
                 ) {
                     when {
-                        uiState.isLoading -> {
+                        frostUiState.isLoading -> {
                             Text("Laster data...")
                         }
 
-                        uiState.error != null -> {
-                            Text("Feil: ${uiState.error}")
+                        frostUiState.error != null -> {
+                            Text("Feil: ${frostUiState.error}")
                         }
 
-                        uiState.climateData != null -> {
-                            FavoriteClimateInfoContent(climateData = uiState.climateData!!)
+                        frostUiState.frostStats != null -> {
+                            FavoriteClimateInfoContent(frostStats = frostUiState.frostStats!!)
                         }
 
                         else -> {
@@ -215,49 +215,7 @@ fun FavoriteDetailsScreen(
 }
 
 @Composable
-private fun FavoriteClimateInfoContent(climateData: ClimateData) {
-    Text(
-        text = climateData.stationName,
-        style = MaterialTheme.typography.bodyMedium
-    )
-
-    Text(
-        text = climateData.stationId,
-        style = MaterialTheme.typography.bodySmall
-    )
-
-    Spacer(modifier = Modifier.height(12.dp))
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text("Måned", style = MaterialTheme.typography.labelSmall)
-        Text("Avg. Temp", style = MaterialTheme.typography.labelSmall)
-        Text("Nedbør", style = MaterialTheme.typography.labelSmall)
-    }
-
-    Spacer(modifier = Modifier.height(4.dp))
-
-    climateData.observations.takeLast(3).forEach { obs ->
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = obs.time.take(7),
-                style = MaterialTheme.typography.bodyMedium
-            )
-
-            Text(
-                text = obs.airTemperature?.let { "%.1f °C".format(it) } ?: "-",
-                style = MaterialTheme.typography.bodyMedium
-            )
-
-            Text(
-                text = obs.precipitation?.let { "%.1f mm".format(it) } ?: "-",
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
-    }
+private fun FavoriteClimateInfoContent(frostStats: FrostStats) {
+    // TODO: Render monthly climate stats table (temperature, precipitation, snow, wind, sunshine)
+    Text("Klimadata lastet – visning ikke implementert ennå.", style = MaterialTheme.typography.bodyMedium)
 }

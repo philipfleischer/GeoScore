@@ -1,18 +1,18 @@
 package no.uio.ifi.in2000.team20.team20app.data.datasource
 
+import android.util.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.isSuccess
 import io.ktor.util.encodeBase64
 import no.uio.ifi.in2000.team20.team20app.data.api.FrostRoutes
 import no.uio.ifi.in2000.team20.team20app.data.model.FrostObservationResponseDto
-import no.uio.ifi.in2000.team20.team20app.data.model.FrostSourceDto
-import no.uio.ifi.in2000.team20.team20app.data.model.FrostSourceResponseDto
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
+import no.uio.ifi.in2000.team20.team20app.data.model.FrostV0ObservationResponseDto
+import no.uio.ifi.in2000.team20.team20app.data.model.FrostV0SourceResponseDto
 
 /**
  * Interface for Frost API data fetching.
@@ -22,17 +22,23 @@ import java.util.Locale
  *
  * Why:
  * Makes FrostDataSource testable by allowing fake implementations in tests.
+ * Temperature normals use V0 (frost.met.no) — historical data not yet in V1.
+ * Other methods use V1 (frost-rc.met.no) where data is available.
  */
 interface FrostDataSourceService {
-    suspend fun getStation(lat: Double, lon: Double): FrostSourceDto
-    suspend fun getObservations(stationId: String): FrostObservationResponseDto
+    suspend fun getTemperatureNormals(lat: Double, lon: Double): FrostV0ObservationResponseDto
+    suspend fun getPrecipitationNormals(lat: Double, lon: Double): FrostObservationResponseDto
+    suspend fun getPrecipitationMean(lat: Double, lon: Double): FrostObservationResponseDto
+    suspend fun getSnowDepthHistory(lat: Double, lon: Double): FrostObservationResponseDto
+    suspend fun getWindHistory(lat: Double, lon: Double): FrostObservationResponseDto
+    suspend fun getSunshineNormals(lat: Double, lon: Double): FrostV0ObservationResponseDto
 }
 
 /**
  * Handles remote climate data retrieval from the Frost API.
  *
  * Responsibility:
- * - Call Frost API endpoints
+ * - Call Frost API endpoints (V0 for historical normals, V1 for current data)
  * - Return raw DTO data
  *
  * Why:
@@ -44,43 +50,143 @@ class FrostDataSource(
 ) : FrostDataSourceService {
 
     private val authHeader: String
-        get() = "Basic " + credentials.encodeBase64()
+        get() {
+            val header = "Basic " + credentials.encodeBase64()
+            Log.d("FrostDataSource", "credentials empty=${credentials.isEmpty()}, header length=${header.length}, header prefix=${header.take(12)}")
+            return header
+        }
 
-    // Get nearest weather station based on coordinates
-    override suspend fun getStation(lat: Double, lon: Double): FrostSourceDto {
-        val response: FrostSourceResponseDto = client.get(FrostRoutes.SOURCES) {
-            parameter("geometry", "nearest(POINT($lon $lat))")
-            parameter("types", "SensorSystem")
-            header("Authorization", authHeader)
-        }.body()
-
-        return response.data.firstOrNull()
-            ?: throw NoSuchElementException("No station found near ($lat, $lon)")
+    // Builds the V1 nearest-station proximity JSON for the `nearest` parameter
+    // Uses Locale.US to ensure '.' as decimal separator regardless of device locale
+    // TODO: create fallback if no stations are found? look into this
+    private fun nearestParam(lat: Double, lon: Double, maxCount: Int = 3, maxDist: Int = 50): String {
+        val lonStr = String.format(java.util.Locale.US, "%.4f", lon)
+        val latStr = String.format(java.util.Locale.US, "%.4f", lat)
+        return """{"maxdist":$maxDist,"maxcount":$maxCount,"points":[{"lon":$lonStr,"lat":$latStr}]}"""
     }
 
-    // Get monthly climate observations for a given station
-    override suspend fun getObservations(stationId: String): FrostObservationResponseDto {
-        val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-        val endTime = formatter.format(Calendar.getInstance().time)
-        val startTime = formatter.format(
-            Calendar.getInstance().apply { add(Calendar.YEAR, -1) }.time
-        )
+    // Checks HTTP status and throws with Frost's error message on non-2xx
+    private suspend inline fun <reified T> io.ktor.client.statement.HttpResponse.frostBody(): T {
+        if (!status.isSuccess()) throw Exception("Frost ${status.value}: ${bodyAsText()}")
+        return body()
+    }
 
-        val response: FrostObservationResponseDto = client.get(FrostRoutes.OBSERVATIONS) {
-            parameter("sources", stationId)
-            parameter(
+    // V0 helpers
+
+    // Finds nearest station IDs via V0 sources endpoint (geography-based)
+    // Uses a generous count. small automatic stations may not have monthly aggregates,
+    // but with 30 candidates at least one main meteorological station should be included.
+    private suspend fun findNearestV0Sources(lat: Double, lon: Double, maxCount: Int = 30): String {
+        val lonStr = String.format(java.util.Locale.US, "%.4f", lon)
+        val latStr = String.format(java.util.Locale.US, "%.4f", lat)
+        val response: FrostV0SourceResponseDto = client.get(FrostRoutes.SOURCES_V0) {
+            url.encodedParameters.append("geometry", "nearest(POINT($lonStr%20$latStr))")
+            url.encodedParameters.append("nearestmaxcount", maxCount.toString())
+            header("Authorization", authHeader)
+        }.frostBody()
+        if (response.data.isEmpty()) throw Exception("No V0 stations found near ($lat, $lon)")
+        return response.data.joinToString(",") { it.id }
+    }
+
+    // V0 normals methods
+
+    // Fetches raw monthly temperature observations for 1991-2020 from V0
+    // Pre-computed normals (air_temperature_normal P1M 1991_2020) are defined in the Frost catalog
+    // but i cant find data in nay endpoints. So we fetch the raw monthly means instead
+    // and aggregate them in the repository to produce the 1991-2020 normals
+    override suspend fun getTemperatureNormals(lat: Double, lon: Double): FrostV0ObservationResponseDto {
+        val sources = findNearestV0Sources(lat, lon)
+        return client.get(FrostRoutes.OBSERVATIONS_V0) {
+            url.encodedParameters.append("sources", sources)
+            url.encodedParameters.append(
                 "elements",
                 listOf(
+                    // Raw monthly mean temperature 360 entries (12 months × 30 years)
                     "mean(air_temperature P1M)",
-                    "best_estimate_sum(precipitation_amount P1M)"
-                ).joinToString(",")
+                    // Monthly mean of daily maximums
+                    "mean(max(air_temperature P1D) P1M)",
+                    // Monthly mean of daily minimums
+                    "mean(min(air_temperature P1D) P1M)"
+                ).joinToString(",").replace(" ", "%20")
             )
-            parameter("referencetime", "$startTime/$endTime")
-            parameter("levels", "default")
-            parameter("timeoffsets", "default")
+            url.encodedParameters.append("referencetime", "1991-01-01/2020-12-31")
             header("Authorization", authHeader)
-        }.body()
+        }.frostBody()
+    }
 
-        return response
+    // Fetches raw monthly sunshine hours for 1991-2020 from V0
+    // Aggregated in the repository to produce 1991-2020 monthly normals
+    override suspend fun getSunshineNormals(lat: Double, lon: Double): FrostV0ObservationResponseDto {
+        val sources = findNearestV0Sources(lat, lon)
+        return client.get(FrostRoutes.OBSERVATIONS_V0) {
+            url.encodedParameters.append("sources", sources)
+            url.encodedParameters.append(
+                "elements",
+                "sum(duration_of_sunshine%20P1M)"
+            )
+            url.encodedParameters.append("referencetime", "1991-01-01/2020-12-31")
+            header("Authorization", authHeader)
+        }.frostBody()
+    }
+
+    // Collecting number of days with precipitation >= 1mm per month
+    // TODO: frost-rc V1 likely lacks historical aggregates. Likley need V0 migration like temperature
+    override suspend fun getPrecipitationNormals(
+        lat: Double,
+        lon: Double
+    ): FrostObservationResponseDto {
+        return client.get(FrostRoutes.OBSERVATIONS_V1) {
+            url.encodedParameters.append("nearest", nearestParam(lat, lon))
+            url.encodedParameters.append(
+                "elementids",
+                listOf("number_of_days_gte(sum(precipitation_amount_normal P1D 1991_2020) P1M 1.0)").joinToString(",").replace(" ", "%20")
+            )
+            url.encodedParameters.append("time", "1991-01-01T00:00:00Z/2020-12-31T23:59:59Z")
+            url.encodedParameters.append("incobs", "true")
+            header("Authorization", authHeader)
+        }.frostBody()
+    }
+
+    // Collecting median precipitation amount (mm) per day per month
+    // TODO: rename method, fill in element ID, and likely switch to V0 (frost-rc lacks historical aggregates)
+    override suspend fun getPrecipitationMean(
+        lat: Double,
+        lon: Double
+    ): FrostObservationResponseDto {
+        TODO("not yet implemented — element ID unknown, V0 migration likely needed")
+    }
+
+    // Fetches raw snow depth history — no pre-computed normal exists, must be aggregated in the repository
+    override suspend fun getSnowDepthHistory(
+        lat: Double,
+        lon: Double
+    ): FrostObservationResponseDto {
+        return client.get(FrostRoutes.OBSERVATIONS_V1) {
+            url.encodedParameters.append("nearest", nearestParam(lat, lon, maxCount = 5)) // more stations since snow data is not always available
+            url.encodedParameters.append(
+                "elementids",
+                listOf(
+                    // Mean snow depth (cm) per month — raw historical values
+                    // No pre-computed normal exists, so we fetch all months 1991-2020
+                    // This gives up to 360 data points (12 months × 30 years) that must be aggregated
+                    "mean(surface_snow_thickness P1M)",
+
+                    // Highest measured snow depth per month — also raw historical values
+                    // Useful for showing snow peaks; may be dropped later
+                    "max(surface_snow_thickness P1M)"
+                ).joinToString(",").replace(" ", "%20")
+            )
+            url.encodedParameters.append("time", "1991-01-01T00:00:00Z/2020-12-31T23:59:59Z")
+            url.encodedParameters.append("incobs", "true")
+            header("Authorization", authHeader)
+        }.frostBody()
+    }
+
+    // TODO: fill in element ID and likely switch to V0 (frost-rc lacks historical aggregates)
+    override suspend fun getWindHistory(
+        lat: Double,
+        lon: Double
+    ): FrostObservationResponseDto {
+        TODO("not yet implemented — element ID unknown, V0 migration likely needed")
     }
 }

@@ -22,6 +22,7 @@ import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesViewModelFactory
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Screen
+import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
 
 /*
 Main changes (24.04.2026 adaptive-navigation-impl):
@@ -32,6 +33,8 @@ Main changes (24.04.2026 adaptive-navigation-impl):
 fun NavigationRoot(
     appViewModel: AppViewModel,
     searchViewModel: SearchViewModel,
+    homeViewModel: HomeViewModel,
+    frostViewModel: FrostViewModel,
     favoritesRepository: FavoritesRepository
 ){
     //BackStack
@@ -59,7 +62,6 @@ fun NavigationRoot(
         onBack = goBack,
         entryProvider = entryProvider {
             entry<Route.HomeDestination> {
-                val homeViewModel: HomeViewModel = viewModel()
                 val favoritesViewModel: FavoritesViewModel = viewModel(
                     factory = FavoritesViewModelFactory(favoritesRepository)
                 )
@@ -75,7 +77,8 @@ fun NavigationRoot(
                         modifier = modifier,
                         viewModel = homeViewModel,
                         sharedViewModel = appViewModel,
-                        favoritesViewModel = favoritesViewModel
+                        favoritesViewModel = favoritesViewModel,
+                        frostViewModel = frostViewModel
                     )
                 }
             }
@@ -123,7 +126,6 @@ fun NavigationRoot(
             }
 
             entry<Route.FavoriteDetailsDestination> { destination ->
-                val homeViewModel: HomeViewModel = viewModel()
                 val favoritesViewModel: FavoritesViewModel = viewModel(
                     factory = FavoritesViewModelFactory(favoritesRepository)
                 )
@@ -135,7 +137,7 @@ fun NavigationRoot(
                         appViewModel.setSelectedArea(destination.location)
                         backStack.add(Route.MapDestination)
                     },
-                    homeViewModel = homeViewModel,
+                    frostViewModel = frostViewModel,
                     favoritesViewModel = favoritesViewModel
                 )
             }
@@ -174,7 +176,8 @@ fun NavigationRoot(
             entry<Route.ClimateStatsDestination> { destination ->
                 ClimateStatsScreen(
                     location = destination.location,
-                    onBackClick = goBack
+                    onBackClick = goBack,
+                    frostViewModel = frostViewModel
                 )
             }
         }
