@@ -13,7 +13,7 @@ Enum to hold attributes to different screens such as title, route and icon
 contentDescription can be added if needed
 */
 enum class Screen(
-    val route: NavKey?,
+    val route: NavKey,
     val title: String,
     val icon: ImageVector,
 //    val contentDescription: String
