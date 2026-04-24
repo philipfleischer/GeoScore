@@ -6,6 +6,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import no.uio.ifi.in2000.team20.team20app.data.repository.FavoritesRepository
+import no.uio.ifi.in2000.team20.team20app.ui.components.AdaptiveNavigationScaffold
 import no.uio.ifi.in2000.team20.team20app.ui.components.ScreenScaffold
 import no.uio.ifi.in2000.team20.team20app.ui.screens.details.AreaDetailsScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.details.ClimateStatsScreen
@@ -20,7 +21,13 @@ import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesViewModelFactory
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchViewModel
+import no.uio.ifi.in2000.team20.team20app.util.Screen
 
+/*
+Main changes (24.04.2026 adaptive-navigation-impl):
+- Replaced goToHome, goToMap and goToFavorites with a general onNavigate to reduce repetition (I commented out old code).
+- Replaced ScreenScaffold with AdaptiveNavigationScaffold
+*/
 @Composable
 fun NavigationRoot(
     appViewModel: AppViewModel,
@@ -36,9 +43,14 @@ fun NavigationRoot(
             backStack.removeAt(backStack.lastIndex)
         }
     }
-    val goToHome: () -> Unit = {backStack.add(Route.HomeDestination)}
-    val goToMap: () -> Unit = {backStack.add(Route.MapDestination)}
-    val goToFavorites: () -> Unit = {backStack.add(Route.FavoritesDestination)}
+
+    val onNavigate: (Screen) -> Unit = {
+        screen -> screen.route?.let { backStack.add(it) }
+    }
+
+//    val goToHome: () -> Unit = {backStack.add(Route.HomeDestination)}
+//    val goToMap: () -> Unit = {backStack.add(Route.MapDestination)}
+//    val goToFavorites: () -> Unit = {backStack.add(Route.FavoritesDestination)}
     val goToSettings: () -> Unit = { backStack.add(Route.SettingsDestination) }
     val goToSearch: () -> Unit = { backStack.add(Route.SearchDestination) }
 
@@ -52,11 +64,9 @@ fun NavigationRoot(
                     factory = FavoritesViewModelFactory(favoritesRepository)
                 )
 
-                ScreenScaffold(
+                AdaptiveNavigationScaffold(
                     title = "Geomerking",
-                    goToHome = goToHome,
-                    goToMap = goToMap,
-                    goToFavorites = goToFavorites,
+                    onNavigate = onNavigate,
                     onOpenSettings = goToSettings,
                     currentDestination = Route.HomeDestination
                 ) { modifier ->
@@ -75,11 +85,9 @@ fun NavigationRoot(
                     factory = FavoritesViewModelFactory(favoritesRepository)
                 )
 
-                ScreenScaffold(
+                AdaptiveNavigationScaffold(
                     title = "Kart",
-                    goToHome = goToHome,
-                    goToMap = goToMap,
-                    goToFavorites = goToFavorites,
+                    onNavigate = onNavigate,
                     onOpenSettings = goToSettings,
                     currentDestination = Route.MapDestination
                 ) { modifier ->
@@ -96,11 +104,9 @@ fun NavigationRoot(
                     factory = FavoritesViewModelFactory(favoritesRepository)
                 )
 
-                ScreenScaffold(
+                AdaptiveNavigationScaffold(
                     title = "Lagret",
-                    goToHome = goToHome,
-                    goToMap = goToMap,
-                    goToFavorites = goToFavorites,
+                    onNavigate = onNavigate,
                     onOpenSettings = goToSettings,
                     currentDestination = Route.FavoritesDestination
                 ) { modifier ->
