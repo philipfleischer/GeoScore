@@ -16,7 +16,7 @@ enum class Screen(
     val route: NavKey?,
     val title: String,
     val icon: ImageVector,
-//    val contentDescription: String,
+//    val contentDescription: String
 ) {
     HOME(Route.HomeDestination, "Home", Icons.Default.Home),
     MAP(Route.MapDestination, "Map", Icons.Default.Map),
