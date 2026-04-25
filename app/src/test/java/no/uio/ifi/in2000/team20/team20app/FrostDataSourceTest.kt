@@ -58,7 +58,7 @@ class FrostDataSourceTest {
         val lon = 10.74
 
         // Act
-        val response = dataSource.getRankedObservationsForParcipitation(lat = lat, lon = lon)
+        val response = dataSource.getRankedObservationsForPrecipitation(lat = lat, lon = lon)
 
         // Assert
         assertNotNull(response)
@@ -72,7 +72,7 @@ class FrostDataSourceTest {
         val lon = 10.74
 
         // Act
-        val response = dataSource.getRankedObservationsForParcipitation(lat = lat, lon = lon)
+        val response = dataSource.getRankedObservationsForPrecipitation(lat = lat, lon = lon)
 
         // Assert
         val elementIds = response.data.tseries.map { it.header.extra.element.id }
@@ -115,7 +115,7 @@ class FrostDataSourceTest {
         val lon = 10.74
 
         // Act
-        val response = dataSource.getRankedObservationsForParcipitation(lat = lat, lon = lon)
+        val response = dataSource.getRankedObservationsForPrecipitation(lat = lat, lon = lon)
 
         // Assert
         val stationIds = response.data.tseries.map { it.header.id.stationid }

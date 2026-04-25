@@ -46,7 +46,7 @@ class FrostRepositoryTest {
         val repo = FrostRepository(fakeDataSource)
 
         // Act
-        val result = repo.getWindAndParcipitationObservations(lat = 59.91, lon = 10.74)
+        val result = repo.getWindAndPrecipitationObservations(lat = 59.91, lon = 10.74)
 
         // Assert
         assertNotNull(result)
@@ -61,11 +61,11 @@ class FrostRepositoryTest {
         val repo = FrostRepository(fakeDataSource)
 
         // Act
-        val result = repo.getWindAndParcipitationObservations(lat = 59.91, lon = 10.74)
+        val result = repo.getWindAndPrecipitationObservations(lat = 59.91, lon = 10.74)
 
         // Assert
-        assertTrue(result.precipitationValues.all { it > 0.0 })
-        assertTrue(result.windValues.all { it > 0.0 })
+        assertTrue(result.precipitationValues.values.all { it > 0.0 })
+        assertTrue(result.windValues.values.all { it > 0.0 })
     }
 
     @Test
@@ -76,7 +76,7 @@ class FrostRepositoryTest {
 
         // Act & Assert
         try {
-            runBlocking { repo.getWindAndParcipitationObservations(lat = 0.0, lon = 0.0) }
+            runBlocking { repo.getWindAndPrecipitationObservations(lat = 0.0, lon = 0.0) }
             org.junit.Assert.fail("Expected an exception to be thrown")
         } catch (e: Exception) {
             assertNotNull(e)
@@ -166,7 +166,7 @@ class FakeFrostDataSource : FrostDataSourceService {
     }
 
 
-    override suspend fun getRankedObservationsForParcipitation(
+    override suspend fun getRankedObservationsForPrecipitation(
         lat: Double, lon: Double, startYear: Int, endYear: Int, maxDist: Double, maxCount: Int
     ): FrostV1ResponseDto = makeFrostV1Response(
         values = listOf("5.2", "0.0", "12.4", "8.1"),
@@ -225,7 +225,7 @@ class FailingFrostDataSource : FrostDataSourceService {
     }
 
 
-    override suspend fun getRankedObservationsForParcipitation(
+    override suspend fun getRankedObservationsForPrecipitation(
         lat: Double, lon: Double, startYear: Int, endYear: Int, maxDist: Double, maxCount: Int
     ): FrostV1ResponseDto = throw Exception("Network error")
 

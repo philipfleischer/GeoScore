@@ -9,7 +9,7 @@ import no.uio.ifi.in2000.team20.team20app.data.model.FrostV0ObservationResponseD
 import no.uio.ifi.in2000.team20.team20app.domain.model.FrostStats
 import no.uio.ifi.in2000.team20.team20app.domain.model.FrostTemperatureNormal
 import no.uio.ifi.in2000.team20.team20app.data.model.FrostV1ResponseDto
-import no.uio.ifi.in2000.team20.team20app.domain.model.WindAndParcipitationObservationsResult
+import no.uio.ifi.in2000.team20.team20app.domain.model.WindAndPrecipitationObservationsResult
 
 /**
  * Interface for fetching processed Frost API climate data.
@@ -83,25 +83,29 @@ class FrostRepository(
         }
 
 
-    suspend fun getWindAndParcipitationObservations(
+    suspend fun getWindAndPrecipitationObservations(
         lat: Double,
         lon: Double
-    ): WindAndParcipitationObservationsResult {
+    ): WindAndPrecipitationObservationsResult {
         return coroutineScope {
-            val precipitation = async { dataSource.getRankedObservationsForParcipitation(lat, lon) }
+            val precipitation = async { dataSource.getRankedObservationsForPrecipitation(lat, lon) }
             val wind = async { dataSource.getRankedObservationsForWind(lat, lon) }
-            WindAndParcipitationObservationsResult(
-                precipitationValues = precipitation.await().extractValues(),
-                windValues = wind.await().extractValues()
+            WindAndPrecipitationObservationsResult(
+                precipitationValues = precipitation.await().extractValuesWithDate(),
+                windValues = wind.await().extractValuesWithDate()
             )
         }
     }
 
-    private fun FrostV1ResponseDto.extractValues(): List<Double> =
+    private fun FrostV1ResponseDto.extractValuesWithDate(): Map<String, Double> =
         data.tseries
             .flatMap { it.observations.orEmpty() }
-            .mapNotNull { it.body.value.toDoubleOrNull() }
-            .filter { it > 0.0 }
+            .mapNotNull { obs ->
+                val value = obs.body.value.toDoubleOrNull() ?: return@mapNotNull null
+                if (value <= 0.0) return@mapNotNull null
+                obs.time to value
+            }
+            .toMap()
 
 
 // ─── V0 mappers ─────────────────────────────────────────────────────────────

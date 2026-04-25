@@ -33,7 +33,7 @@ interface FrostDataSourceService {
     suspend fun getSnowDepthHistory(lat: Double, lon: Double): FrostObservationResponseDto
     suspend fun getWindHistory(lat: Double, lon: Double): FrostObservationResponseDto
     suspend fun getSunshineNormals(lat: Double, lon: Double): FrostV0ObservationResponseDto
-    suspend fun getRankedObservationsForParcipitation(lat: Double, lon: Double, startYear: Int = 1980, endYear: Int = 2025, maxDist: Double = 10.0, maxCount: Int = 5): FrostV1ResponseDto
+    suspend fun getRankedObservationsForPrecipitation(lat: Double, lon: Double, startYear: Int = 1980, endYear: Int = 2025, maxDist: Double = 10.0, maxCount: Int = 5): FrostV1ResponseDto
     suspend fun getRankedObservationsForWind(lat: Double, lon: Double, startYear: Int = 1980, endYear: Int = 2025, maxDist: Double = 10.0, maxCount: Int = 5): FrostV1ResponseDto
 }
 
@@ -150,7 +150,7 @@ class FrostDataSource(
         TODO("Not yet implemented")
     }
 
-    override suspend fun getRankedObservationsForParcipitation(
+    override suspend fun getRankedObservationsForPrecipitation(
         lat: Double,
         lon: Double,
         startYear: Int,

@@ -9,7 +9,7 @@ package no.uio.ifi.in2000.team20.team20app.domain.model
  * Why:
  * Used across use cases and ViewModels.
  */
-data class WindAndParcipitationObservationsResult(
-    val precipitationValues: List<Double>,
-    val windValues: List<Double>
+data class WindAndPrecipitationObservationsResult(
+    val precipitationValues: Map<String, Double>,
+    val windValues: Map<String, Double>
 )
