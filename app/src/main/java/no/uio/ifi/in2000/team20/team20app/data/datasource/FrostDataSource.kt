@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team20.team20app.data.datasource
 
-import android.util.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -13,6 +12,8 @@ import no.uio.ifi.in2000.team20.team20app.data.api.FrostRoutes
 import no.uio.ifi.in2000.team20.team20app.data.model.FrostObservationResponseDto
 import no.uio.ifi.in2000.team20.team20app.data.model.FrostV0ObservationResponseDto
 import no.uio.ifi.in2000.team20.team20app.data.model.FrostV0SourceResponseDto
+import no.uio.ifi.in2000.team20.team20app.data.model.FrostV1ResponseDto
+
 
 /**
  * Interface for Frost API data fetching.
@@ -32,6 +33,8 @@ interface FrostDataSourceService {
     suspend fun getSnowDepthHistory(lat: Double, lon: Double): FrostObservationResponseDto
     suspend fun getWindHistory(lat: Double, lon: Double): FrostObservationResponseDto
     suspend fun getSunshineNormals(lat: Double, lon: Double): FrostV0ObservationResponseDto
+    suspend fun getRankedObservationsForPrecipitation(lat: Double, lon: Double, startYear: Int = 1980, endYear: Int = 2025, maxDist: Double = 10.0, maxCount: Int = 5): FrostV1ResponseDto
+    suspend fun getRankedObservationsForWind(lat: Double, lon: Double, startYear: Int = 1980, endYear: Int = 2025, maxDist: Double = 10.0, maxCount: Int = 5): FrostV1ResponseDto
 }
 
 /**
@@ -52,19 +55,12 @@ class FrostDataSource(
     private val authHeader: String
         get() {
             val header = "Basic " + credentials.encodeBase64()
-            Log.d("FrostDataSource", "credentials empty=${credentials.isEmpty()}, header length=${header.length}, header prefix=${header.take(12)}")
             return header
         }
 
     // Builds the V1 nearest-station proximity JSON for the `nearest` parameter
     // Uses Locale.US to ensure '.' as decimal separator regardless of device locale
     // TODO: create fallback if no stations are found? look into this
-    private fun nearestParam(lat: Double, lon: Double, maxCount: Int = 3, maxDist: Int = 50): String {
-        val lonStr = String.format(java.util.Locale.US, "%.4f", lon)
-        val latStr = String.format(java.util.Locale.US, "%.4f", lat)
-        return """{"maxdist":$maxDist,"maxcount":$maxCount,"points":[{"lon":$lonStr,"lat":$latStr}]}"""
-    }
-
     // Checks HTTP status and throws with Frost's error message on non-2xx
     private suspend inline fun <reified T> io.ktor.client.statement.HttpResponse.frostBody(): T {
         if (!status.isSuccess()) throw Exception("Frost ${status.value}: ${bodyAsText()}")
@@ -136,7 +132,7 @@ class FrostDataSource(
         lon: Double
     ): FrostObservationResponseDto {
         return client.get(FrostRoutes.OBSERVATIONS_V1) {
-            url.encodedParameters.append("nearest", nearestParam(lat, lon))
+            url.encodedParameters.append("nearest", buildNearest(lat, lon))
             url.encodedParameters.append(
                 "elementids",
                 listOf("number_of_days_gte(sum(precipitation_amount_normal P1D 1991_2020) P1M 1.0)").joinToString(",").replace(" ", "%20")
@@ -147,14 +143,63 @@ class FrostDataSource(
         }.frostBody()
     }
 
-    // Collecting median precipitation amount (mm) per day per month
-    // TODO: rename method, fill in element ID, and likely switch to V0 (frost-rc lacks historical aggregates)
     override suspend fun getPrecipitationMean(
         lat: Double,
         lon: Double
     ): FrostObservationResponseDto {
-        TODO("not yet implemented — element ID unknown, V0 migration likely needed")
+        TODO("Not yet implemented")
     }
+
+    override suspend fun getRankedObservationsForPrecipitation(
+        lat: Double,
+        lon: Double,
+        startYear: Int,
+        endYear: Int,
+        maxDist: Double,
+        maxCount: Int
+    ): FrostV1ResponseDto {
+        val response: FrostV1ResponseDto = client.get(FrostRoutes.OBSERVATIONS_V1) {
+            parameter("nearest", buildNearest(lat, lon, maxDist,maxCount))
+            parameter("time", buildTime(startYear, endYear))
+            parameter("elementids", "sum(precipitation_amount P1D)")
+            parameter("incobs", true)
+            header("Authorization", authHeader)
+        }.body()
+
+        return response
+    }
+
+    override suspend fun getRankedObservationsForWind(
+        lat: Double,
+        lon: Double,
+        startYear: Int,
+        endYear: Int,
+        maxDist: Double,
+        maxCount: Int
+    ): FrostV1ResponseDto {
+        val response: FrostV1ResponseDto = client.get(FrostRoutes.OBSERVATIONS_V1){
+            parameter("nearest", buildNearest(lat, lon, maxDist,maxCount))
+            parameter("time", buildTime(startYear, endYear))
+            parameter("elementids", "max(wind_speed_of_gust P1D)")
+            parameter("incobs", true)
+            header("Authorization", authHeader)
+        }.body()
+
+        if(response.data.tseries.isEmpty()){
+            //No data for wind_speed_of_gust found, next best thing is wind_speed
+            return client.get(FrostRoutes.OBSERVATIONS_V1){
+                parameter("nearest", buildNearest(lat, lon, maxDist,maxCount))
+                parameter("time", buildTime(startYear, endYear))
+                parameter("elementids", "mean(wind_speed P1D)")
+                parameter("incobs", true)
+                header("Authorization", authHeader)
+            }.body()
+        } else {
+            return response
+        }
+    }
+
+    // Collecting median precipitation amount (mm) per day per month
 
     // Fetches raw snow depth history — no pre-computed normal exists, must be aggregated in the repository
     override suspend fun getSnowDepthHistory(
@@ -162,7 +207,7 @@ class FrostDataSource(
         lon: Double
     ): FrostObservationResponseDto {
         return client.get(FrostRoutes.OBSERVATIONS_V1) {
-            url.encodedParameters.append("nearest", nearestParam(lat, lon, maxCount = 5)) // more stations since snow data is not always available
+            url.encodedParameters.append("nearest", buildNearest(lat, lon, maxCount = 5)) // more stations since snow data is not always available
             url.encodedParameters.append(
                 "elementids",
                 listOf(
@@ -181,6 +226,13 @@ class FrostDataSource(
             header("Authorization", authHeader)
         }.frostBody()
     }
+
+    private fun buildNearest(lat: Double, lon: Double, maxDist: Double = 10.0, maxCount: Int = 5): String {
+        return """{"maxdist":$maxDist,"maxcount":$maxCount,"points":[{"lon":$lon,"lat":$lat}]}"""
+    }
+
+    private fun buildTime(startYear: Int, endYear: Int): String =
+        "$startYear-01-01T00:00:00Z/$endYear-01-01T00:00:00Z"
 
     // TODO: fill in element ID and likely switch to V0 (frost-rc lacks historical aggregates)
     override suspend fun getWindHistory(

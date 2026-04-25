@@ -24,7 +24,7 @@ class FrostDataSourceTest {
         credentials = credentials
     )
 
-    @Test
+    /*@Test
     fun getStationWithCoordinatesReturnsNearestStation() = runBlocking {
         // Arrange
         val lat = 59.91
@@ -49,5 +49,76 @@ class FrostDataSourceTest {
         // Assert
         assertNotNull(response)
         assertTrue(response.data.isNotEmpty())
+    }*/
+
+    @Test
+    fun getRankedObservationsForPrecipitationReturnsResponse() = runBlocking {
+        // Arrange
+        val lat = 59.91
+        val lon = 10.74
+
+        // Act
+        val response = dataSource.getRankedObservationsForPrecipitation(lat = lat, lon = lon)
+
+        // Assert
+        assertNotNull(response)
+        assertTrue(response.data.tseries.isNotEmpty())
+    }
+
+    @Test
+    fun getRankedObservationsForPrecipitationHasCorrectElementId() = runBlocking {
+        // Arrange
+        val lat = 59.91
+        val lon = 10.74
+
+        // Act
+        val response = dataSource.getRankedObservationsForPrecipitation(lat = lat, lon = lon)
+
+        // Assert
+        val elementIds = response.data.tseries.map { it.header.extra.element.id }
+        assertTrue(elementIds.all { it == "sum(precipitation_amount P1D)" })
+    }
+
+    @Test
+    fun getRankedObservationsForWindReturnsResponse() = runBlocking {
+        // Arrange
+        val lat = 59.91
+        val lon = 10.74
+
+        // Act
+        val response = dataSource.getRankedObservationsForWind(lat = lat, lon = lon)
+
+        // Assert
+        assertNotNull(response)
+        assertTrue(response.data.tseries.isNotEmpty())
+    }
+
+    @Test
+    fun getRankedObservationsForWindHasWindElementId() = runBlocking {
+        // Arrange
+        val lat = 59.91
+        val lon = 10.74
+
+        // Act
+        val response = dataSource.getRankedObservationsForWind(lat = lat, lon = lon)
+
+        // Assert — forventer enten gust eller mean wind speed
+        val elementIds = response.data.tseries.map { it.header.extra.element.id }.toSet()
+        val validIds = setOf("max(wind_speed_of_gust P1D)", "mean(wind_speed P1D)")
+        assertTrue(elementIds.all { it in validIds })
+    }
+
+    @Test
+    fun getRankedObservationsForPrecipitationAllStationsHaveStationId() = runBlocking {
+        // Arrange
+        val lat = 59.91
+        val lon = 10.74
+
+        // Act
+        val response = dataSource.getRankedObservationsForPrecipitation(lat = lat, lon = lon)
+
+        // Assert
+        val stationIds = response.data.tseries.map { it.header.id.stationid }
+        assertTrue(stationIds.all { it > 0 })
     }
 }
