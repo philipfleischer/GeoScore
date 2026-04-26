@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -48,7 +50,14 @@ import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.IconButton
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
+import androidx.window.core.layout.WindowSizeClass
+import no.uio.ifi.in2000.team20.team20app.ui.components.InfoBox
 import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesViewModel
+import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
 
 @Composable
 fun HomeScreen(
@@ -63,6 +72,9 @@ fun HomeScreen(
     val frostUiState by frostViewModel.uiState.collectAsStateWithLifecycle()
     val isCurrentFavorite by favoritesViewModel.isCurrentFavorite.collectAsStateWithLifecycle()
 
+    // Calculates window width and returns true if the size width class is compact, and false for everything else.
+    val compactScreenWidth = !LocalWindowSizeClass.current.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
+
     LaunchedEffect(location) {
         location?.let {
             frostViewModel.loadFrostStats(it)
@@ -72,80 +84,105 @@ fun HomeScreen(
 
     val selectedLocation = location?.name ?: "Oslo"
 
-    LazyColumn(
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(if(compactScreenWidth) 1 else 2),
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 10.dp),
-        verticalArrangement = Arrangement.spacedBy(25.dp)
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(25.dp),
+        horizontalArrangement = Arrangement.spacedBy(25.dp)
     ) {
+        //TODO: Update InfoBox component (rename to WelcomeInfoBox) so it fit current design
+        //TODO: Remove hardcoded info box section and replace with updated InfoBox component
+        item {
+            Column(
+                verticalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier.fillMaxWidth(if (compactScreenWidth) 1f else 0.5f)
+            ){
+                Text(
+                    text = "Vit hva du kjøper- før du kjøper det",
+                    fontSize = 40.sp,
+                    lineHeight = 48.sp,
+                    color = Color.Blue,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.semantics{ heading() }
+                )
+                Text(
+                    text = "Få innsikt i grunnforhold og naturfare. Søk op en adresse og få en risikovurdering" +
+                            "basert på geologisk og meterologisk data.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 20.sp,
+                )
+            }
+        }
         item {
             SearchBarObject(onOpenSearch = onOpenSearch)
         }
 
-        item {
-            HomeHeaderSection(
-                selectedLocation = selectedLocation,
-                isFavorite = isCurrentFavorite,
-                onFavoriteClick = {
-                    location?.let {
-                        if (isCurrentFavorite) {
-                            favoritesViewModel.removeFavorite(it)
-                        } else {
-                            favoritesViewModel.addFavorite(it)
-                        }
-                    }
-                }
-            )
-        }
-
-
-        item {
-            GeomarkingInfoBox(
-                selectedLocation = selectedLocation,
-                geomarking = "C",
-                riskLabel = "Moderat georisiko",
-                expandedText = "Geomerkingen er basert på en samlet vurdering av historiske forhold i området. " +
-                        "Dette kan inkludere terreng, nedbørsmønstre, lokal eksponering og andre faktorer som påvirker naturfare over tid."
-            )
-        }
-
-        item {
-            AreaSummaryBox(
-                selectedLocation = selectedLocation,
-                summary = "Dette området har moderate historiske risikofaktorer knyttet til naturhendelser. " +
-                        "Informasjonen er ment å gi brukeren en enkel og forståelig oversikt før videre utforsking i kart og detaljvisninger."
-            )
-        }
-
-        item {
-            HistoricalHighlightsGrid(
-                selectedLocation = selectedLocation,
-                averageTemperature = "5.8 °C",
-                precipitationLevel = "Høy",
-                terrainExposure = "Moderat",
-                floodRisk = "Lav–moderat"
-            )
-        }
-
-        item {
-            ExpandableInfoBox(
-                title = "Historiske klimadata"
-            ) {
-                when {
-                    frostUiState.isLoading -> {
-                        Text("Laster data...")
-                    }
-                    frostUiState.error != null -> {
-                        Text("Feil: ${frostUiState.error}")
-                    }
-                    frostUiState.frostStats != null -> {
-                        ClimateInfoContent(frostStats = frostUiState.frostStats!!)
-                    }
-                    else -> {
-                        Text("Søk et område for å vise historiske data.")
-                    }
-                }
-            }
-        }
+//        item {
+//            HomeHeaderSection(
+//                selectedLocation = selectedLocation,
+//                isFavorite = isCurrentFavorite,
+//                onFavoriteClick = {
+//                    location?.let {
+//                        if (isCurrentFavorite) {
+//                            favoritesViewModel.removeFavorite(it)
+//                        } else {
+//                            favoritesViewModel.addFavorite(it)
+//                        }
+//                    }
+//                }
+//            )
+//        }
+//
+//
+//        item {
+//            GeomarkingInfoBox(
+//                selectedLocation = selectedLocation,
+//                geomarking = "C",
+//                riskLabel = "Moderat georisiko",
+//                expandedText = "Geomerkingen er basert på en samlet vurdering av historiske forhold i området. " +
+//                        "Dette kan inkludere terreng, nedbørsmønstre, lokal eksponering og andre faktorer som påvirker naturfare over tid."
+//            )
+//        }
+//
+//        item {
+//            AreaSummaryBox(
+//                selectedLocation = selectedLocation,
+//                summary = "Dette området har moderate historiske risikofaktorer knyttet til naturhendelser. " +
+//                        "Informasjonen er ment å gi brukeren en enkel og forståelig oversikt før videre utforsking i kart og detaljvisninger."
+//            )
+//        }
+//
+//        item {
+//            HistoricalHighlightsGrid(
+//                selectedLocation = selectedLocation,
+//                averageTemperature = "5.8 °C",
+//                precipitationLevel = "Høy",
+//                terrainExposure = "Moderat",
+//                floodRisk = "Lav–moderat"
+//            )
+//        }
+//
+//        item {
+//            ExpandableInfoBox(
+//                title = "Historiske klimadata"
+//            ) {
+//                when {
+//                    frostUiState.isLoading -> {
+//                        Text("Laster data...")
+//                    }
+//                    frostUiState.error != null -> {
+//                        Text("Feil: ${frostUiState.error}")
+//                    }
+//                    frostUiState.frostStats != null -> {
+//                        ClimateInfoContent(frostStats = frostUiState.frostStats!!)
+//                    }
+//                    else -> {
+//                        Text("Søk et område for å vise historiske data.")
+//                    }
+//                }
+//            }
+//        }
     }
 }
 
