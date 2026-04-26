@@ -1,58 +1,47 @@
 package no.uio.ifi.in2000.team20.team20app.ui.components
 
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavKey
 import androidx.window.core.layout.WindowSizeClass
 import no.uio.ifi.in2000.team20.team20app.ui.navigation.Route
 import no.uio.ifi.in2000.team20.team20app.util.Screen
+import androidx.compose.foundation.layout.padding
 
 /*
-I didn't change much of the original logic for the navigation,
-but I noticed a lot of repetition. I'm sure onSomeScreenClick can be simplified
-to only one onScreenClick. I wrote a Screen enum class, so maybe this can be utilized
+Main changes done (24.04.2026 adaptive-navigation-impl):
+- Reduced repeating code by iterating through the Screen entries instead, using onNavigate as a general function.
+- Added topbar inside a nested scaffold, but still unsure if this is best practice.
 */
 @Composable
 fun AdaptiveNavigationScaffold (
+    title: String,
     currentDestination: NavKey?,
-    onHomeClick: () -> Unit,
-    onMapClick: () -> Unit,
-    onFavoritesClick: () -> Unit,
-    content: @Composable () -> Unit
+    onNavigate: (Screen) -> Unit,
+    onOpenSettings: () -> Unit,
+    content: @Composable (Modifier) -> Unit
 ){
-    /*
-    windowWidthClass calculates the current available screen size and
-    returns true if the width is equal to or bigger than a medium window size class.
-    If windowWidthClass returns false, it is typically a mobile phone in portrait or multiple windows mode.
-    */
+
     val windowWidthClass = currentWindowAdaptiveInfo()
         .windowSizeClass
         .isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
 
     NavigationSuiteScaffold(
         navigationSuiteItems = {
-            // TODO: Simplify and remove duplication of code
-            item(
-                selected = currentDestination is Route.HomeDestination,
-                onClick = onHomeClick,
-                icon = { Screen.HOME.icon },
-                label = { Screen.HOME.title }
-            )
-            item(
-                selected = currentDestination is Route.MapDestination,
-                onClick = onMapClick,
-                icon = { Screen.MAP.icon },
-                label = { Screen.MAP.title }
-            )
-            item(
-                selected = currentDestination is Route.FavoritesDestination,
-                onClick = onFavoritesClick,
-                icon = { Screen.FAVORITES.icon },
-                label = { Screen.FAVORITES.title }
-            )
+            Screen.entries.forEach { screen ->
+                item(
+                    selected = screen.route == currentDestination,
+                    onClick = { onNavigate(screen) },
+                    icon = { Icon(imageVector = screen.icon, contentDescription = screen.title) },
+                    label = { screen.title },
+                )
+            }
         },
 
         layoutType = if (windowWidthClass) {
@@ -61,6 +50,13 @@ fun AdaptiveNavigationScaffold (
             NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(currentWindowAdaptiveInfo())
         }
     ){
-        content()
+        Scaffold(
+            topBar = { SharedTopAppBar(
+                title = title,
+                onOpenSettings = onOpenSettings)
+            }
+        ) { innerPadding ->
+            content(Modifier.padding(innerPadding))
+        }
     }
 }
