@@ -92,6 +92,7 @@ dependencies {
     implementation(libs.play.services.maps)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.compose.material3.window.size.class1)
     //implementation(libs.androidx.room.compiler)
 
     testImplementation(libs.junit)
