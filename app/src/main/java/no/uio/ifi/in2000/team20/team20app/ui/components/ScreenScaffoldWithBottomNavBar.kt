@@ -21,7 +21,7 @@ fun ScreenScaffold(
     title: String,
     goToHome: () -> Unit,
     goToMap: () -> Unit,
-    goToFavorites: () -> Unit,
+    goToSaved: () -> Unit,
     onOpenSettings: () -> Unit,
     currentDestination: NavKey,
     currentComposable: @Composable (Modifier) -> Unit
@@ -38,7 +38,7 @@ fun ScreenScaffold(
                 currentDestination = currentDestination,
                 onHomeClick = goToHome,
                 onMapClick = goToMap,
-                onFavoritesClick = goToFavorites
+                onSavedClick = goToSaved
             )
         }
     ) {innerPadding ->
@@ -51,7 +51,7 @@ private fun SharedBottomBar(
     currentDestination: NavKey?,
     onHomeClick: () -> Unit,
     onMapClick: () -> Unit,
-    onFavoritesClick: () -> Unit
+    onSavedClick: () -> Unit
 ) {
     NavigationBar {
         NavigationBarItem(
@@ -67,8 +67,8 @@ private fun SharedBottomBar(
             label = { Text("Kart") }
         )
         NavigationBarItem(
-            selected = currentDestination is Route.FavoritesDestination,
-            onClick = onFavoritesClick,
+            selected = currentDestination is Route.SavedDestination,
+            onClick = onSavedClick,
             icon = { Icon(Icons.Default.Bookmarks, contentDescription = "Lagret") },
             label = { Text("Lagret") }
         )
@@ -82,7 +82,7 @@ fun ScreenScaffoldPreview(){
         title = "Geomerking",
         goToHome = {},
         goToMap = {},
-        goToFavorites = {},
+        goToSaved = {},
         onOpenSettings = {},
         currentDestination = Route.HomeDestination,
         currentComposable = {}

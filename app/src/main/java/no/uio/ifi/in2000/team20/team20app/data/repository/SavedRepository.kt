@@ -2,15 +2,15 @@ package no.uio.ifi.in2000.team20.team20app.data.repository
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import no.uio.ifi.in2000.team20.team20app.data.local.FavoriteLocationDao
-import no.uio.ifi.in2000.team20.team20app.data.local.FavoriteLocationEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.SavedLocationDao
+import no.uio.ifi.in2000.team20.team20app.data.local.SavedLocationEntity
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 
-class FavoritesRepository(
-    private val dao: FavoriteLocationDao
+class SavedRepository(
+    private val dao: SavedLocationDao
 ) {
-    fun getAllFavorites(): Flow<List<Location>> {
-        return dao.getAllFavorites().map { entities ->
+    fun getAllSaved(): Flow<List<Location>> {
+        return dao.getAllSaved().map { entities ->
             entities.map { entity ->
                 Location(
                     address = entity.address,
@@ -24,9 +24,9 @@ class FavoritesRepository(
         }
     }
 
-    suspend fun addFavorite(location: Location) {
-        dao.insertFavorite(
-            FavoriteLocationEntity(
+    suspend fun addSaved(location: Location) {
+        dao.insertSaved(
+            SavedLocationEntity(
                 address = location.address,
                 name = location.name,
                 municipality = location.municipality,
@@ -37,11 +37,11 @@ class FavoritesRepository(
         )
     }
 
-    suspend fun removeFavorite(location: Location) {
-        dao.deleteFavoriteByAddress(location.address)
+    suspend fun removeSaved(location: Location) {
+        dao.deleteSavedByAddress(location.address)
     }
 
-    suspend fun isFavorite(location: Location): Boolean {
-        return dao.isFavorite(location.address)
+    suspend fun isSaved(location: Location): Boolean {
+        return dao.isSaved(location.address)
     }
 }

@@ -32,7 +32,7 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import com.google.maps.android.compose.wms.WmsTileOverlay
-import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MAX_ZOOM
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MIN_ZOOM
@@ -50,10 +50,10 @@ import no.uio.ifi.in2000.team20.team20app.util.WmsFormatterLambdas.RadonUrlForma
 fun MapScreen(
     modifier: Modifier = Modifier,
     sharedViewModel: AppViewModel = viewModel(),
-    favoritesViewModel: FavoritesViewModel
+    savedViewModel: SavedViewModel
 ) {
     val chosenPosition = sharedViewModel.selectedLocation
-    val isCurrentFavorite by favoritesViewModel.isCurrentFavorite.collectAsStateWithLifecycle()
+    val isCurrentSaved by savedViewModel.isCurrentSaved.collectAsStateWithLifecycle()
 
     val cameraPosition = LatLng(chosenPosition.lat, chosenPosition.lon)
     val markerPosition = rememberUpdatedMarkerState(position = cameraPosition)
@@ -62,7 +62,7 @@ fun MapScreen(
     }
 
     LaunchedEffect(chosenPosition) {
-        favoritesViewModel.checkIfFavorite(chosenPosition)
+        savedViewModel.checkIfSaved(chosenPosition)
     }
 
     BottomSheetScaffold(
@@ -113,15 +113,15 @@ fun MapScreen(
 
                 Button(
                     onClick = {
-                        if (isCurrentFavorite) {
-                            favoritesViewModel.removeFavorite(chosenPosition)
+                        if (isCurrentSaved) {
+                            savedViewModel.removeSaved(chosenPosition)
                         } else {
-                            favoritesViewModel.addFavorite(chosenPosition)
+                            savedViewModel.addSaved(chosenPosition)
                         }
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(if (isCurrentFavorite) "Fjern fra favoritter" else "Legg til i favoritter")
+                    Text(if (isCurrentSaved) "Fjern fra lagrede" else "Lagre sted")
                 }
 
                 Button(
