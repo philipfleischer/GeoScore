@@ -20,7 +20,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -37,12 +36,17 @@ import no.uio.ifi.in2000.team20.team20app.data.repository.SavedRepository
 import no.uio.ifi.in2000.team20.team20app.ui.components.ScreenScaffold
 import no.uio.ifi.in2000.team20.team20app.ui.navigation.Route
 import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.SavedViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MAX_ZOOM
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MIN_ZOOM
-import no.uio.ifi.in2000.team20.team20app.util.WmsFormatterLambdas.flood1000YearUrlFormatter
+import no.uio.ifi.in2000.team20.team20app.util.WmsFormatterLambdas.ClimateAdjustedFlood1000YearUrlFormatter
 import no.uio.ifi.in2000.team20.team20app.util.WmsFormatterLambdas.rockUrlFormatter
 import no.uio.ifi.in2000.team20.team20app.R
+import no.uio.ifi.in2000.team20.team20app.util.WmsFormatterLambdas.ClimateAdjustedFlood200YearUrlFormatter
+import no.uio.ifi.in2000.team20.team20app.util.WmsFormatterLambdas.ClimateAdjustedFlood20YearUrlFormatter
+import no.uio.ifi.in2000.team20.team20app.util.WmsFormatterLambdas.QuickClayUrlFormatter
+import no.uio.ifi.in2000.team20.team20app.util.WmsFormatterLambdas.RadonUrlFormatter
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -153,12 +157,28 @@ fun MapScreen(
                 )
             ) {
                 WmsTileOverlay(
-                    urlFormatter = rockUrlFormatter,
+                    urlFormatter = RadonUrlFormatter,
                     visible = true
                 )
                 WmsTileOverlay(
-                    urlFormatter = flood1000YearUrlFormatter,
-                    visible = false
+                    urlFormatter = QuickClayUrlFormatter,
+                    visible = !true
+                )
+                WmsTileOverlay(
+                    urlFormatter = rockUrlFormatter,
+                    visible = !true
+                )
+                WmsTileOverlay(
+                    urlFormatter = ClimateAdjustedFlood20YearUrlFormatter,
+                    visible = !true
+                )
+                WmsTileOverlay(
+                    urlFormatter = ClimateAdjustedFlood200YearUrlFormatter,
+                    visible = !true
+                )
+                WmsTileOverlay(
+                    urlFormatter = ClimateAdjustedFlood1000YearUrlFormatter,
+                    visible = !true
                 )
                 Marker(
                     state = markerPosition,
