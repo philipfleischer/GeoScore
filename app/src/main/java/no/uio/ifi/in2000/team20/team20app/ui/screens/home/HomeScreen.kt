@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -52,10 +51,8 @@ import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.IconButton
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.window.core.layout.WindowSizeClass
-import no.uio.ifi.in2000.team20.team20app.ui.components.InfoBox
 import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesViewModel
 import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
 
