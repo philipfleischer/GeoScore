@@ -32,7 +32,7 @@ The app allows users to:
 - Explore geographic areas on an interactive map
 - View natural hazard risk indicators
 - Assess probability and severity of hazards
-- Save favorite locations
+- Save locations
 - Support better decision-making for housing and development
 
 The concept is inspired by the energy labeling system used for apartments and houses, where each area receives a risk classification based on natural hazards.
@@ -56,7 +56,7 @@ The application includes the following main features:
 
 - Home Screen with overview details of selected locations.
 - Users can explore natural hazard risks across Norway through an interactive map.
-- Favorite Locations Screen.
+- Saved Locations Screen.
 
 Map features include:
 - Zoom and navigation
@@ -76,7 +76,7 @@ For each selected location, the app displays:
 
 
 
-### Favorites
+### Saved locations
 
 Users can save locations to quickly revisit important areas.
 
@@ -91,7 +91,7 @@ The application currently includes the following screens:
   Interactive exploration of hazard data
 - AreaDetailScreen
   Detailed hazard analysis for a selected location
-- FavoritesScreen
+- SavedScreen
   Saved locations for quick access
 - SettingsScreen
   Push notifications, light/dark theme, project information, and more.

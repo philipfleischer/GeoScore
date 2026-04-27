@@ -53,7 +53,7 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.sp
 import androidx.window.core.layout.WindowSizeClass
-import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.SavedViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
 
 @Composable

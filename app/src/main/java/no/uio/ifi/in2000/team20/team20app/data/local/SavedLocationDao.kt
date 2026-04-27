@@ -9,15 +9,15 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface SavedLocationDao {
 
-    @Query("SELECT * FROM favorite_locations ORDER BY name ASC")
+    @Query("SELECT * FROM saved_locations ORDER BY name ASC")
     fun getAllSaved(): Flow<List<SavedLocationEntity>>
 
-    @Query("SELECT EXISTS(SELECT 1 FROM favorite_locations WHERE address = :address)")
+    @Query("SELECT EXISTS(SELECT 1 FROM saved_locations WHERE address = :address)")
     suspend fun isSaved(address: String): Boolean
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSaved(location: SavedLocationEntity)
 
-    @Query("DELETE FROM favorite_locations WHERE address = :address")
+    @Query("DELETE FROM saved_locations WHERE address = :address")
     suspend fun deleteSavedByAddress(address: String)
 }

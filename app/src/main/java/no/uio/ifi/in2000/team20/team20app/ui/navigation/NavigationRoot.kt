@@ -9,10 +9,10 @@ import no.uio.ifi.in2000.team20.team20app.data.repository.SavedRepository
 import no.uio.ifi.in2000.team20.team20app.ui.components.AdaptiveNavigationScaffold
 import no.uio.ifi.in2000.team20.team20app.ui.screens.details.AreaDetailsScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.details.ClimateStatsScreen
-import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.GeoscoreScreen
-import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.SavedScreen
-import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.SavedViewModel
-import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.SavedViewModelFactory
+import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.GeoscoreScreen
+import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedScreen
+import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModelFactory
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapScreen
@@ -96,7 +96,7 @@ fun NavigationRoot(
                     MapScreen(
                         modifier = modifier,
                         sharedViewModel = appViewModel,
-                        favoritesViewModel = savedViewModel
+                        savedViewModel = savedViewModel
                     )
                 }
             }

@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team20.team20app.ui.screens.favorite
+package no.uio.ifi.in2000.team20.team20app.ui.screens.saved
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

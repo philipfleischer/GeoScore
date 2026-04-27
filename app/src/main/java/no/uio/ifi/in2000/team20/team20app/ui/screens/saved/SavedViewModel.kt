@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team20.team20app.ui.screens.favorite
+package no.uio.ifi.in2000.team20.team20app.ui.screens.saved
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
