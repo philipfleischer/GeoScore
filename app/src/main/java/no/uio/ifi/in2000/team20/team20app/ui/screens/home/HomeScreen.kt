@@ -53,7 +53,7 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.sp
 import androidx.window.core.layout.WindowSizeClass
-import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
 
 @Composable
@@ -62,12 +62,12 @@ fun HomeScreen(
     onOpenSearch: () -> Unit,
     viewModel: HomeViewModel = viewModel(),
     sharedViewModel: AppViewModel = viewModel(),
-    favoritesViewModel: FavoritesViewModel,
+    savedViewModel: SavedViewModel,
     frostViewModel: FrostViewModel
 ) {
     val location = sharedViewModel.selectedLocation
     val frostUiState by frostViewModel.uiState.collectAsStateWithLifecycle()
-    val isCurrentFavorite by favoritesViewModel.isCurrentFavorite.collectAsStateWithLifecycle()
+    val isCurrentSaved by savedViewModel.isCurrentSaved.collectAsStateWithLifecycle()
 
     // Calculates window width and returns true if the size width class is compact, and false for everything else.
     val compactScreenWidth = !LocalWindowSizeClass.current.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
@@ -75,7 +75,7 @@ fun HomeScreen(
     LaunchedEffect(location) {
         location?.let {
             frostViewModel.loadFrostStats(it)
-            favoritesViewModel.checkIfFavorite(it)
+            savedViewModel.checkIfSaved(it)
         }
     }
 
@@ -510,7 +510,7 @@ fun SummaryMiniCard(
 }
 
 @Composable
-private fun ClimateInfoContent(frostStats: FrostStats) {
+fun ClimateInfoContent(frostStats: FrostStats) {
     val months = listOf("Jan","Feb","Mar","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Des")
     val temps = frostStats.temperatureNormals
 

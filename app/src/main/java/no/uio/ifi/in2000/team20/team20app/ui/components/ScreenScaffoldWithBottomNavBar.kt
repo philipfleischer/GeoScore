@@ -67,7 +67,7 @@ private fun SharedBottomBar(
             label = { Text("Kart") }
         )
         NavigationBarItem(
-            selected = currentDestination is Route.FavoritesDestination,
+            selected = currentDestination is Route.SavedDestination,
             onClick = onFavoritesClick,
             icon = { Icon(Icons.Default.Bookmarks, contentDescription = "Lagret") },
             label = { Text("Lagret") }

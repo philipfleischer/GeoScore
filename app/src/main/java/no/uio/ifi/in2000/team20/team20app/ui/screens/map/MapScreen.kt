@@ -33,10 +33,10 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import com.google.maps.android.compose.wms.WmsTileOverlay
-import no.uio.ifi.in2000.team20.team20app.data.repository.FavoritesRepository
+import no.uio.ifi.in2000.team20.team20app.data.repository.SavedRepository
 import no.uio.ifi.in2000.team20.team20app.ui.components.ScreenScaffold
 import no.uio.ifi.in2000.team20.team20app.ui.navigation.Route
-import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MAX_ZOOM
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MIN_ZOOM
@@ -50,10 +50,10 @@ import no.uio.ifi.in2000.team20.team20app.R
 fun MapScreen(
     modifier: Modifier = Modifier,
     sharedViewModel: AppViewModel = viewModel(),
-    favoritesViewModel: FavoritesViewModel
+    favoritesViewModel: SavedViewModel
 ) {
     val chosenPosition = sharedViewModel.selectedLocation
-    val isCurrentFavorite by favoritesViewModel.isCurrentFavorite.collectAsStateWithLifecycle()
+    val isCurrentFavorite by favoritesViewModel.isCurrentSaved.collectAsStateWithLifecycle()
 
     val cameraPosition = LatLng(chosenPosition.lat, chosenPosition.lon)
     val markerPosition = rememberUpdatedMarkerState(position = cameraPosition)
@@ -62,7 +62,7 @@ fun MapScreen(
     }
 
     LaunchedEffect(chosenPosition) {
-        favoritesViewModel.checkIfFavorite(chosenPosition)
+        favoritesViewModel.checkIfSaved(chosenPosition)
     }
 
     BottomSheetScaffold(
@@ -114,14 +114,14 @@ fun MapScreen(
                 Button(
                     onClick = {
                         if (isCurrentFavorite) {
-                            favoritesViewModel.removeFavorite(chosenPosition)
+                            favoritesViewModel.removeSaved(chosenPosition)
                         } else {
-                            favoritesViewModel.addFavorite(chosenPosition)
+                            favoritesViewModel.addSaved(chosenPosition)
                         }
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(if (isCurrentFavorite) "Fjern fra favoritter" else "Legg til i favoritter")
+                    Text(if (isCurrentFavorite) "Fjern fra lagrede" else "Lagre sted")
                 }
 
                 Button(

@@ -4,25 +4,25 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import no.uio.ifi.in2000.team20.team20app.data.repository.FavoritesRepository
+import no.uio.ifi.in2000.team20.team20app.data.repository.SavedRepository
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 
-class HomeFavoritesViewModel(
-    private val repository: FavoritesRepository
+class HomeSavedViewModel(
+    private val repository: SavedRepository
 ) : ViewModel() {
 
-    fun addFavorite(location: Location) {
+    fun addSaved(location: Location) {
         viewModelScope.launch {
-            repository.addFavorite(location)
+            repository.addSaved(location)
         }
     }
 }
 
-class HomeFavoritesViewModelFactory(
-    private val repository: FavoritesRepository
+class HomeSavedViewModelFactory(
+    private val repository: SavedRepository
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return HomeFavoritesViewModel(repository) as T
+        return HomeSavedViewModel(repository) as T
     }
 }

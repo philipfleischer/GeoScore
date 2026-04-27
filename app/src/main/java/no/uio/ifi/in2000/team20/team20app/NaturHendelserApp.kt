@@ -15,7 +15,7 @@ import no.uio.ifi.in2000.team20.team20app.data.datasource.AddressRemoteDataSourc
 import no.uio.ifi.in2000.team20.team20app.data.datasource.FrostDataSource
 import no.uio.ifi.in2000.team20.team20app.data.datasource.LocationRemoteDatasource
 import no.uio.ifi.in2000.team20.team20app.data.local.AppDatabase
-import no.uio.ifi.in2000.team20.team20app.data.repository.FavoritesRepository
+import no.uio.ifi.in2000.team20.team20app.data.repository.SavedRepository
 import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepository
 import no.uio.ifi.in2000.team20.team20app.data.repository.GeoSearchRepository
 import no.uio.ifi.in2000.team20.team20app.ui.navigation.NavigationRoot
@@ -38,8 +38,8 @@ fun NaturhendelserApp() {
         ).build()
     }
 
-    val favoritesRepository = remember {
-        FavoritesRepository(database.favoriteLocationDao())
+    val savedRepository = remember {
+        SavedRepository(database.savedLocationDao())
     }
     val geoSearchRepository = remember {
         GeoSearchRepository(
@@ -82,7 +82,7 @@ fun NaturhendelserApp() {
         searchViewModel = searchViewModel,
         homeViewModel = homeViewModel,
         frostViewModel = frostViewModel,
-        favoritesRepository = favoritesRepository
+        savedRepository = savedRepository
     )
 }
 

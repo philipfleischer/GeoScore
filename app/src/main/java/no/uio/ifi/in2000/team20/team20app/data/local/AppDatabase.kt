@@ -5,10 +5,10 @@ import androidx.room.RoomDatabase
 //import androidx.room.vo.Database
 
 @Database(
-    entities = [FavoriteLocationEntity::class],
+    entities = [SavedLocationEntity::class],
     version = 1,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun favoriteLocationDao(): FavoriteLocationDao
+    abstract fun savedLocationDao(): SavedLocationDao
 }

@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "favorite_locations")
-data class FavoriteLocationEntity(
+data class SavedLocationEntity(
     @PrimaryKey
     val address: String,
     val name: String,

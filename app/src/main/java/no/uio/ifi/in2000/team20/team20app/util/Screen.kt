@@ -20,5 +20,5 @@ enum class Screen(
 ) {
     HOME(Route.HomeDestination, "Home", Icons.Default.Home),
     MAP(Route.MapDestination, "Map", Icons.Default.Map),
-    FAVORITES(Route.FavoritesDestination, "Favorites", Icons.Default.Bookmark)
+    SAVED(Route.SavedDestination, "Lagret", Icons.Default.Bookmark)
 }

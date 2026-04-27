@@ -7,17 +7,17 @@ import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface FavoriteLocationDao {
+interface SavedLocationDao {
 
     @Query("SELECT * FROM favorite_locations ORDER BY name ASC")
-    fun getAllFavorites(): Flow<List<FavoriteLocationEntity>>
+    fun getAllSaved(): Flow<List<SavedLocationEntity>>
 
     @Query("SELECT EXISTS(SELECT 1 FROM favorite_locations WHERE address = :address)")
-    suspend fun isFavorite(address: String): Boolean
+    suspend fun isSaved(address: String): Boolean
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertFavorite(location: FavoriteLocationEntity)
+    suspend fun insertSaved(location: SavedLocationEntity)
 
     @Query("DELETE FROM favorite_locations WHERE address = :address")
-    suspend fun deleteFavoriteByAddress(address: String)
+    suspend fun deleteSavedByAddress(address: String)
 }

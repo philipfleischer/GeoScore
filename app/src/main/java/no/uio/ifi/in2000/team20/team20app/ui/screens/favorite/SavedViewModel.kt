@@ -9,46 +9,46 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import no.uio.ifi.in2000.team20.team20app.data.repository.FavoritesRepository
+import no.uio.ifi.in2000.team20.team20app.data.repository.SavedRepository
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 
-class FavoritesViewModel(
-    private val repository: FavoritesRepository
+class SavedViewModel(
+    private val repository: SavedRepository
 ) : ViewModel() {
 
-    val favorites: StateFlow<List<Location>> =
-        repository.getAllFavorites()
+    val saved: StateFlow<List<Location>> =
+        repository.getAllSaved()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    private val _isCurrentFavorite = MutableStateFlow(false)
-    val isCurrentFavorite: StateFlow<Boolean> = _isCurrentFavorite.asStateFlow()
+    private val _isCurrentSaved = MutableStateFlow(false)
+    val isCurrentSaved: StateFlow<Boolean> = _isCurrentSaved.asStateFlow()
 
-    fun checkIfFavorite(location: Location) {
+    fun checkIfSaved(location: Location) {
         viewModelScope.launch {
-            _isCurrentFavorite.value = repository.isFavorite(location)
+            _isCurrentSaved.value = repository.isSaved(location)
         }
     }
 
-    fun addFavorite(location: Location) {
+    fun addSaved(location: Location) {
         viewModelScope.launch {
-            repository.addFavorite(location)
-            _isCurrentFavorite.value = true
+            repository.addSaved(location)
+            _isCurrentSaved.value = true
         }
     }
 
-    fun removeFavorite(location: Location) {
+    fun removeSaved(location: Location) {
         viewModelScope.launch {
-            repository.removeFavorite(location)
-            _isCurrentFavorite.value = false
+            repository.removeSaved(location)
+            _isCurrentSaved.value = false
         }
     }
 }
 
-class FavoritesViewModelFactory(
-    private val repository: FavoritesRepository
+class SavedViewModelFactory(
+    private val repository: SavedRepository
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return FavoritesViewModel(repository) as T
+        return SavedViewModel(repository) as T
     }
 }
