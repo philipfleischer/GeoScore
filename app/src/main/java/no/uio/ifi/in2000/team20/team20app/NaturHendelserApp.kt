@@ -20,6 +20,7 @@ import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepository
 import no.uio.ifi.in2000.team20.team20app.data.repository.GeoSearchRepository
 import no.uio.ifi.in2000.team20.team20app.ui.navigation.NavigationRoot
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
@@ -75,12 +76,15 @@ fun NaturhendelserApp() {
         factory = FrostViewModelFactory(frostRepository)
     )
 
+    val mapViewModel: MapViewModel = viewModel()
+
     val appViewModel: AppViewModel = viewModel()
 
     NavigationRoot(
         appViewModel = appViewModel,
         searchViewModel = searchViewModel,
         homeViewModel = homeViewModel,
+        mapViewModel = mapViewModel,
         frostViewModel = frostViewModel,
         favoritesRepository = favoritesRepository
     )

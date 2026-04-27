@@ -16,6 +16,7 @@ import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapScreen
+import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.settings.SettingsScreen
@@ -33,6 +34,7 @@ fun NavigationRoot(
     appViewModel: AppViewModel,
     searchViewModel: SearchViewModel,
     homeViewModel: HomeViewModel,
+    mapViewModel: MapViewModel,
     frostViewModel: FrostViewModel,
     favoritesRepository: FavoritesRepository
 ){
@@ -96,7 +98,8 @@ fun NavigationRoot(
                     MapScreen(
                         modifier = modifier,
                         sharedViewModel = appViewModel,
-                        favoritesViewModel = favoritesViewModel
+                        favoritesViewModel = favoritesViewModel,
+                        mapViewModel = mapViewModel
                     )
                 }
             }
