@@ -1,35 +1,42 @@
 package no.uio.ifi.in2000.team20.team20app.ui.screens.favorite
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.outlined.BookmarkBorder
+import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.PrimaryTabRow
+import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.unit.dp
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.ExpandableInfoBox
-import no.uio.ifi.in2000.team20.team20app.ui.screens.home.GeomarkingInfoBox
+import no.uio.ifi.in2000.team20.team20app.ui.screens.home.GeomarkingBadge
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,36 +57,12 @@ fun GeoscoreScreen(
 
     Scaffold(
         topBar = {
-            Column {
-                CenterAlignedTopAppBar(
-                    title = { Text(location.name) },
-                    navigationIcon = {
-                        IconButton(onClick = onBackClick) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Tilbake"
-                            )
-                        }
-                    },
-                    actions = {
-                        IconButton(
-                            onClick = {
-                                if (isCurrentSaved) {
-                                    savedViewModel.removeSaved(location)
-                                } else {
-                                    savedViewModel.addSaved(location)
-                                }
-                            }
-                        ) {
-                            Icon(
-                                imageVector = if (isCurrentSaved) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
-                                contentDescription = if (isCurrentSaved) "Fjern fra lagrede" else "Lagre"
-                            )
-                        }
-                    }
-                )
-
-                PrimaryTabRow(selectedTabIndex = 0) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .statusBarsPadding()
+            ) {
+                SecondaryTabRow(selectedTabIndex = 0, modifier = Modifier.fillMaxWidth()) {
                     Tab(
                         selected = true,
                         onClick = { },
@@ -89,6 +72,16 @@ fun GeoscoreScreen(
                         selected = false,
                         onClick = onHistoricDataClick,
                         text = { Text("Historisk klimadata") }
+                    )
+                }
+
+                IconButton(
+                    onClick = onBackClick,
+                    modifier = Modifier.align(Alignment.CenterStart)
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Tilbake"
                     )
                 }
             }
@@ -102,11 +95,16 @@ fun GeoscoreScreen(
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             item {
-                GeomarkingInfoBox(
-                    selectedLocation = location.name,
-                    geomarking = "C",
-                    riskLabel = "Moderat risiko",
-                    expandedText = "Geomerkingen er basert på en samlet vurdering av historiske forhold i området. Dette kan inkludere terreng, nedbørsmønstre, lokal eksponering og andre forhold som påvirker naturfare over tid."
+                GeomarkingCard(
+                    location = location,
+                    isCurrentSaved = isCurrentSaved,
+                    onSavedToggle = { saved ->
+                        if (saved) {
+                            savedViewModel.removeSaved(location)
+                        } else {
+                            savedViewModel.addSaved(location)
+                        }
+                    }
                 )
             }
 
@@ -143,6 +141,63 @@ fun GeoscoreScreen(
             item {
                 Spacer(modifier = Modifier.height(8.dp))
             }
+        }
+    }
+}
+
+@Composable
+private fun GeomarkingCard(
+    location: Location,
+    isCurrentSaved: Boolean,
+    onSavedToggle: (Boolean) -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = location.name,
+                    style = MaterialTheme.typography.titleLarge
+                )
+
+                GeomarkingBadge(grade = "C")
+
+                IconButton(
+                    onClick = { onSavedToggle(isCurrentSaved) }
+                ) {
+                    Icon(
+                        imageVector = if (isCurrentSaved) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+                        contentDescription = if (isCurrentSaved) "Fjern fra lagrede" else "Lagre"
+                    )
+                }
+            }
+
+            Text(
+                text = "Samlet vurdering",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.75f)
+            )
+
+            Text(
+                text = "Moderat risiko",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+
+            Text(
+                text = "Geomerkingen er basert på en samlet vurdering av historiske forhold i området. Dette kan inkludere terreng, nedbørsmønstre, lokal eksponering og andre forhold som påvirker naturfare over tid.",
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }
