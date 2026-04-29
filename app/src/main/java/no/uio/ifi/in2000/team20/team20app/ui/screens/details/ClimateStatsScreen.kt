@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,7 +32,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
-import no.uio.ifi.in2000.team20.team20app.ui.screens.home.ClimateInfoContent
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.ExpandableInfoBox
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
 import ir.ehsannarmani.compose_charts.LineChart
@@ -128,11 +128,18 @@ fun ClimateStatsScreen(
                         }
 
                         frostUiState.temperatureMean != null -> {
-                            ClimateInfoContent(
-                                temperatureMean = frostUiState.temperatureMean,
-                                temperatureMax = frostUiState.temperatureMax,
-                                temperatureMin = frostUiState.temperatureMin
+                            TemperatureChart(
+                                meanTemperatures = frostUiState.temperatureMean ?: emptyList(),
+                                maxTemperatures = frostUiState.temperatureMax ?: emptyList(),
+                                minTemperatures = frostUiState.temperatureMin ?: emptyList()
                             )
+                            //kept for visual confirmation
+//                            Spacer(modifier = Modifier.height(12.dp))
+//                            ClimateInfoContent(
+//                                temperatureMean = frostUiState.temperatureMean,
+//                                temperatureMax = frostUiState.temperatureMax,
+//                                temperatureMin = frostUiState.temperatureMin
+//                            )
                         }
 
                         else -> {
@@ -169,6 +176,12 @@ fun ClimateStatsScreen(
             // Rain
             item {
                 ExpandableInfoBox(title = "Nedbør") {
+                    Text(
+                        text = "Nedbørsdager viser typisk antall dager med målbar nedbør per måned. Høyeste daglige nedbør viser hvor kraftige regnværene typisk er — høye verdier indikerer risiko for styrtregn og oversvømmelse.",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+
                     when {
                         frostUiState.isLoading -> {
                             Text("Laster klimadata...")
@@ -178,13 +191,15 @@ fun ClimateStatsScreen(
                             Text("Feil: ${frostUiState.precipitationError}")
                         }
 
-                        else -> {
-                            // TODO: Add monthly precipitation chart
-                            // Endpoint exists in FrostDataSource but data not yet fetched
-                            Text(
-                                "Innhold kommer snart",
-                                style = MaterialTheme.typography.bodyMedium
+                        frostUiState.precipitationDays != null && frostUiState.precipitationMean != null -> {
+                            PrecipitationChart(
+                                rainyDays = frostUiState.precipitationDays!!,
+                                maxDailyPrecip = frostUiState.precipitationMean!!
                             )
+                        }
+
+                        else -> {
+                            Text("Ingen nedbørsdata tilgjengelig.")
                         }
                     }
                 }
@@ -270,9 +285,13 @@ fun ClimateStatsScreen(
 }
 
 // Compose chart for temperature
+//TODO make this prettier and more responsive
+// Especially thinking of the bottom row and the grid. should line up better
 @Composable
 fun TemperatureChart(
-    monthlyTemperatures: List<Double>,
+    meanTemperatures: List<Double>,
+    maxTemperatures: List<Double>,
+    minTemperatures: List<Double>,
     modifier: Modifier = Modifier
 ) {
     val months = listOf("Jan", "Feb", "Mar", "Apr", "Mai", "Jun",
@@ -291,22 +310,52 @@ fun TemperatureChart(
         LineChart(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp),
-            data = remember(monthlyTemperatures) {
+                .height(280.dp),
+            data = remember(meanTemperatures, maxTemperatures, minTemperatures) {
                 listOf(
                     Line(
-                        label = "Temperatur (°C)",
-                        values = monthlyTemperatures,
+                        label = "Min (°C)",
+                        values = minTemperatures,
                         color = SolidColor(Color(0xFF378ADD)),
-                        firstGradientFillColor = Color(0xFF378ADD).copy(alpha = .3f),
+                        firstGradientFillColor = Color.Transparent,
                         secondGradientFillColor = Color.Transparent,
                         curvedEdges = true,
                         dotProperties = DotProperties(
                             enabled = true,
                             color = SolidColor(Color.White),
-                            //strokeWidth = 4f,
-                            //radius = 6f,
+                            radius = 4.dp,
+                            strokeWidth = 2.dp,
                             strokeColor = SolidColor(Color(0xFF378ADD))
+                        )
+                    ),
+                    Line(
+                        label = "Snitt (°C)",
+                        values = meanTemperatures,
+                        color = SolidColor(Color(0xFF7F77DD)),
+                        firstGradientFillColor = Color(0xFF7F77DD).copy(alpha = .2f),
+                        secondGradientFillColor = Color.Transparent,
+                        curvedEdges = true,
+                        dotProperties = DotProperties(
+                            enabled = true,
+                            color = SolidColor(Color.White),
+                            radius = 4.dp,
+                            strokeWidth = 2.dp,
+                            strokeColor = SolidColor(Color(0xFF7F77DD))
+                        )
+                    ),
+                    Line(
+                        label = "Maks (°C)",
+                        values = maxTemperatures,
+                        color = SolidColor(Color(0xFFD85A30)),
+                        firstGradientFillColor = Color.Transparent,
+                        secondGradientFillColor = Color.Transparent,
+                        curvedEdges = true,
+                        dotProperties = DotProperties(
+                            enabled = true,
+                            color = SolidColor(Color.White),
+                            radius = 4.dp,
+                            strokeWidth = 2.dp,
+                            strokeColor = SolidColor(Color(0xFFD85A30))
                         )
                     )
                 )
@@ -315,13 +364,13 @@ fun TemperatureChart(
                 enabled = true,
                 color = SolidColor(Color.Red),
             ),
-            labelHelperProperties = LabelHelperProperties(enabled = false),
+            labelHelperProperties = LabelHelperProperties(enabled = true),
             labelProperties = LabelProperties(
                 enabled = true,
                 labels = months
             ),
             minValue = -20.0,
-            maxValue = 50.0,
+            maxValue = 30.0,
         )
     }
 }
@@ -330,8 +379,12 @@ fun TemperatureChart(
 @Preview
 fun TemperatureChartPreview() {
     TemperatureChart(
-        monthlyTemperatures = listOf(-3.0, -2.5, 1.2, 6.4, 11.8, 15.9,
-            17.2, 16.8, 12.1, 7.3, 2.1, -1.4)
+        meanTemperatures = listOf(-3.0, -2.5, 1.2, 6.4, 11.8, 15.9,
+            17.2, 16.8, 12.1, 7.3, 2.1, -1.4),
+        maxTemperatures = listOf(-2.1, -1.8, 2.9, 8.9, 15.5, 20.3,
+            22.4, 21.3, 15.7, 10.0, 3.7, -0.4),
+        minTemperatures = listOf(-10.3, -10.1, -5.8, -0.5, 5.4, 10.1,
+            12.4, 11.8, 6.6, 2.0, -2.8, -7.9)
     )
 }
 
@@ -463,3 +516,147 @@ fun SunshineChart(
         )
     }
 }
+
+// Keeping this for now for visual confirmation and peace of mind
+@Composable
+fun ClimateInfoContent(
+    temperatureMean: List<Double>?,
+    temperatureMax: List<Double>?,
+    temperatureMin: List<Double>?
+) {
+    val months = listOf("Jan","Feb","Mar","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Des")
+
+    if (temperatureMean == null) {
+        Text("Ingen temperaturdata tilgjengelig.", style = MaterialTheme.typography.bodyMedium)
+        return
+    }
+
+    // Header row
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text("Måned", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
+        Text("Min", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
+        Text("Snitt", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
+        Text("Maks", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
+    }
+
+    Spacer(modifier = Modifier.height(4.dp))
+
+    // One row per month
+    months.forEachIndexed { i, month ->
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(month, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+            Text(temperatureMin?.getOrNull(i)?.let { "%.1f°".format(it) } ?: "-", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+            Text(temperatureMean.getOrNull(i)?.let { "%.1f°".format(it) } ?: "-", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+            Text(temperatureMax?.getOrNull(i)?.let { "%.1f°".format(it) } ?: "-", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+        }
+    }
+}
+
+@Composable
+fun PrecipitationChart(
+    rainyDays: List<Double>,
+    maxDailyPrecip: List<Double>,
+    modifier: Modifier = Modifier
+) {
+    val months = listOf("Jan", "Feb", "Mar", "Apr", "Mai", "Jun",
+        "Jul", "Aug", "Sep", "Okt", "Nov", "Des")
+
+    Column(modifier = modifier.fillMaxWidth()) {
+        // Rainy days chart
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)) {
+
+            Text(
+                text = "Nedbørsdager per måned",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            LineChart(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
+                data = remember(rainyDays) {
+                    listOf(
+                        Line(
+                            label = "Dager",
+                            values = rainyDays,
+                            color = SolidColor(Color(0xFF378ADD)),
+                            firstGradientFillColor = Color(0xFF378ADD).copy(alpha = .2f),
+                            secondGradientFillColor = Color.Transparent,
+                            curvedEdges = true,
+                            dotProperties = DotProperties(
+                                enabled = true,
+                                color = SolidColor(Color.White),
+                                radius = 4.dp,
+                                strokeWidth = 2.dp,
+                                strokeColor = SolidColor(Color(0xFF378ADD))
+                            )
+                        )
+                    )
+                },
+                labelHelperProperties = LabelHelperProperties(enabled = false),
+                labelProperties = LabelProperties(
+                    enabled = true,
+                    labels = months
+                ),
+                minValue = 0.0,
+                maxValue = 20.0,
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Max daily precipitation chart
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)) {
+
+            Text(
+                text = "Høyeste daglige nedbør per måned",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            LineChart(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
+                data = remember(maxDailyPrecip) {
+                    listOf(
+                        Line(
+                            label = "mm",
+                            values = maxDailyPrecip,
+                            color = SolidColor(Color(0xFF1D9E75)),
+                            firstGradientFillColor = Color(0xFF1D9E75).copy(alpha = .2f),
+                            secondGradientFillColor = Color.Transparent,
+                            curvedEdges = true,
+                            dotProperties = DotProperties(
+                                enabled = true,
+                                color = SolidColor(Color.White),
+                                radius = 4.dp,
+                                strokeWidth = 2.dp,
+                                strokeColor = SolidColor(Color(0xFF1D9E75))
+                            )
+                        )
+                    )
+                },
+                labelHelperProperties = LabelHelperProperties(enabled = false),
+                labelProperties = LabelProperties(
+                    enabled = true,
+                    labels = months
+                ),
+                minValue = 0.0,
+                maxValue = 60.0,
+            )
+        }
+    }
+}
+

@@ -67,18 +67,19 @@ class FrostViewModel(
                 val tempDeferred = async { repo.getTemperatureData(location.lat, location.lon) }
                 val windDeferred = async { repo.getWindData(location.lat, location.lon) }
                 val sunDeferred  = async { repo.getSunshineData(location.lat, location.lon) }
-                // TODO: uncomment when getSnowData() and getPrecipitationData() are implemented in FrostRepository
+                // TODO: uncomment when getSnowData() is implemented in FrostRepository
                 // val snowDeferred          = async { repo.getSnowData(location.lat, location.lon) }
-                // val precipitationDeferred = async { repo.getPrecipitationData(location.lat, location.lon) }
+                val precipitationDeferred = async { repo.getPrecipitationData(location.lat, location.lon) }
 
                 val tempResult = tempDeferred.await()
                 val windResult = windDeferred.await()
                 val sunResult  = sunDeferred.await()
                 // val snowResult          = snowDeferred.await()
-                // val precipitationResult = precipitationDeferred.await()
+                val precipitationResult = precipitationDeferred.await()
 
                 val tempData = tempResult.getOrNull()
                 val windData = windResult.getOrNull()
+                val precipData = precipitationResult.getOrNull()
 
                 _uiState.update {
                     it.copy(
@@ -98,9 +99,9 @@ class FrostViewModel(
                         // snowMean           = snowResult.getOrNull()?.first,
                         // snowMax            = snowResult.getOrNull()?.second,
                         // snowError          = snowResult.exceptionOrNull()?.message,
-                        // precipitationMean  = precipitationResult.getOrNull()?.first,
-                        // precipitationDays  = precipitationResult.getOrNull()?.second,
-                        // precipitationError = precipitationResult.exceptionOrNull()?.message,
+                        precipitationMean  = precipData?.second,
+                        precipitationDays  = precipData?.first,
+                        precipitationError = precipitationResult.exceptionOrNull()?.message,
                     )
                 }
             }

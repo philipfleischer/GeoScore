@@ -100,13 +100,23 @@ class FrostRepository(
         TODO("Not yet implemented")
     }
 
-    override suspend fun getPrecipitationData(lat: Double, lon: Double): Result<Pair<List<Double>, List<Double>>> {
-        // TODO: implement f eks fetch sum(precipitation_amount_normal P1M 1991_2020) and
-        // number_of_days_gte(sum(precipitation_amount_normal P1D 1991_2020) P1M 1.0)
-        // from getPrecipitationNormals() in datasource
-        // return Pair(amountList, rainyDaysList) sorted by month 1–12
-        TODO("Not yet implemented")
-    }
+    override suspend fun getPrecipitationData(lat: Double, lon: Double): Result<Pair<List<Double>, List<Double>>> =
+        runCatching {
+            // Rainy days. raw aggregation since pre-computed normal is unavailable
+            val rainyDaysRaw = dataSource.getPrecipitationNormals(lat, lon)
+            val rainyDays = rainyDaysRaw.aggregateByMonthV0(
+                "number_of_days_gte(sum(precipitation_amount P1D) P1M 1.0)"
+            )
+
+            // Max daily precipitation. no normal exists, always raw
+            val maxDaily = dataSource.getPrecipitationHistory(lat, lon)
+                .aggregateByMonthV0("max(sum(precipitation_amount P1D) P1M)")
+
+            val rainyDaysList = (1..12).map { rainyDays[it] ?: 0.0 }
+            val maxDailyList  = (1..12).map { maxDaily[it] ?: 0.0 }
+
+            Pair(rainyDaysList, maxDailyList)
+        }
 
     suspend fun getWindAndPrecipitationObservations(
         lat: Double,

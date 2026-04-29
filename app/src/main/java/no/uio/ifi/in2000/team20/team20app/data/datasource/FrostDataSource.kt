@@ -37,7 +37,8 @@ data class SunshineRawResult(
  */
 interface FrostDataSourceService {
     suspend fun getTemperatureNormals(lat: Double, lon: Double): FrostV0ObservationResponseDto
-    suspend fun getPrecipitationNormals(lat: Double, lon: Double): FrostObservationResponseDto
+    suspend fun getPrecipitationNormals(lat: Double, lon: Double): FrostV0ObservationResponseDto
+    suspend fun getPrecipitationHistory(lat: Double, lon: Double): FrostV0ObservationResponseDto
     suspend fun getPrecipitationMean(lat: Double, lon: Double): FrostObservationResponseDto
     suspend fun getSnowDepthHistory(lat: Double, lon: Double): FrostObservationResponseDto
     suspend fun getWindHistory(lat: Double, lon: Double): FrostV0ObservationResponseDto
@@ -117,20 +118,36 @@ class FrostDataSource(
         }.frostBody()
     }
 
-    // Collecting number of days with precipitation >= 1mm per month
-    // TODO: frost-rc V1 likely lacks historical aggregates. Likley need V0 migration like temperature
+    // Fetches raw monthly rainy days (>= 1mm). raw values 1991-2020 that must be aggregated client-side
     override suspend fun getPrecipitationNormals(
         lat: Double,
         lon: Double
-    ): FrostObservationResponseDto {
-        return client.get(FrostRoutes.OBSERVATIONS_V1) {
-            url.encodedParameters.append("nearest", buildNearest(lat, lon))
+    ): FrostV0ObservationResponseDto {
+        val sources = findNearestV0Sources(lat, lon)
+        return client.get(FrostRoutes.OBSERVATIONS_V0) {
+            url.encodedParameters.append("sources", sources)
             url.encodedParameters.append(
-                "elementids",
-                listOf("number_of_days_gte(sum(precipitation_amount_normal P1D 1991_2020) P1M 1.0)").joinToString(",").replace(" ", "%20")
+                "elements",
+                "number_of_days_gte(sum(precipitation_amount%20P1D)%20P1M%201.0)"
             )
-            url.encodedParameters.append("time", "1991-01-01T00:00:00Z/2020-12-31T23:59:59Z")
-            url.encodedParameters.append("incobs", "true")
+            url.encodedParameters.append("referencetime", "1991-01-01/2020-12-31")
+            header("Authorization", authHeader)
+        }.frostBody()
+    }
+
+    // Fetches raw monthly max daily precipitation. no pre-computed normal exists, must be aggregated in the repository
+    override suspend fun getPrecipitationHistory(
+        lat: Double,
+        lon: Double
+    ): FrostV0ObservationResponseDto {
+        val sources = findNearestV0Sources(lat, lon)
+        return client.get(FrostRoutes.OBSERVATIONS_V0) {
+            url.encodedParameters.append("sources", sources)
+            url.encodedParameters.append(
+                "elements",
+                "max(sum(precipitation_amount%20P1D)%20P1M)"
+            )
+            url.encodedParameters.append("referencetime", "1991-01-01/2020-12-31")
             header("Authorization", authHeader)
         }.frostBody()
     }
@@ -152,7 +169,7 @@ class FrostDataSource(
             url.encodedParameters.append(
                 "elementids",
                 listOf(
-                    // Mean snow depth (cm) per month — raw historical values
+                    // Mean snow depth (cm) per month - raw historical values
                     // No pre-computed normal exists, so we fetch all months 1991-2020
                     // This gives up to 360 data points (12 months × 30 years) that must be aggregated
                     "mean(surface_snow_thickness P1M)",
