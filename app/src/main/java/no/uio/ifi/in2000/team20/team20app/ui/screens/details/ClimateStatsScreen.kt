@@ -30,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import no.uio.ifi.in2000.team20.team20app.domain.model.FrostWindNormal
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.ClimateInfoContent
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.ExpandableInfoBox
@@ -124,12 +123,16 @@ fun ClimateStatsScreen(
                             Text("Laster klimadata...")
                         }
 
-                        frostUiState.error != null -> {
-                            Text("Feil: ${frostUiState.error}")
+                        frostUiState.temperatureError != null -> {
+                            Text("Feil: ${frostUiState.temperatureError}")
                         }
 
-                        frostUiState.frostStats != null -> {
-                            ClimateInfoContent(frostStats = frostUiState.frostStats!!)
+                        frostUiState.temperatureMean != null -> {
+                            ClimateInfoContent(
+                                temperatureMean = frostUiState.temperatureMean,
+                                temperatureMax = frostUiState.temperatureMax,
+                                temperatureMin = frostUiState.temperatureMin
+                            )
                         }
 
                         else -> {
@@ -140,58 +143,84 @@ fun ClimateStatsScreen(
             }
 
             // Snow
-            if (frostUiState.frostStats != null) {
-                item {
-                    ExpandableInfoBox(title = "Snø") {
-                        // TODO: Add monthly snow depth chart
-                        // Endpoint exists in FrostDataSource but data not yet fetched
-                        Text(
-                            "Innhold kommer snart",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
+            item {
+                ExpandableInfoBox(title = "Snø") {
+                    when {
+                        frostUiState.isLoading -> {
+                            Text("Laster klimadata...")
+                        }
+
+                        frostUiState.snowError != null -> {
+                            Text("Feil: ${frostUiState.snowError}")
+                        }
+
+                        else -> {
+                            // TODO: Add monthly snow depth chart
+                            // Endpoint exists in FrostDataSource but data not yet fetched
+                            Text(
+                                "Innhold kommer snart",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
                     }
                 }
+            }
 
-                // Rain
-                item {
-                    ExpandableInfoBox(title = "Nedbør") {
-                        // TODO: Add monthly precipitation chart
-                        // Endpoint exists in FrostDataSource but data not yet fetched
-                        Text(
-                            "Innhold kommer snart",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
+            // Rain
+            item {
+                ExpandableInfoBox(title = "Nedbør") {
+                    when {
+                        frostUiState.isLoading -> {
+                            Text("Laster klimadata...")
+                        }
+
+                        frostUiState.precipitationError != null -> {
+                            Text("Feil: ${frostUiState.precipitationError}")
+                        }
+
+                        else -> {
+                            // TODO: Add monthly precipitation chart
+                            // Endpoint exists in FrostDataSource but data not yet fetched
+                            Text(
+                                "Innhold kommer snart",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
                     }
                 }
+            }
 
-                // Wind
-                item {
-                    ExpandableInfoBox(
-                        title = "Vind",
-                        initiallyExpanded = false
-                    ) {
-                        Text(
-                            text = "Dette diagrammet viser gjennomsnittlig vindstyrke per måned.",
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
+            // Wind
+            item {
+                ExpandableInfoBox(
+                    title = "Vind",
+                    initiallyExpanded = false
+                ) {
+                    Text(
+                        text = "Dette diagrammet viser gjennomsnittlig vindstyrke per måned.",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
 
-                        when {
-                            frostUiState.isLoading -> {
-                                Text("Laster klimadata...")
-                            }
+                    when {
+                        frostUiState.isLoading -> {
+                            Text("Laster klimadata...")
+                        }
 
-                            frostUiState.error != null -> {
-                                Text("Feil: ${frostUiState.error}")
-                            }
+                        frostUiState.windError != null -> {
+                            Text("Feil: ${frostUiState.windError}")
+                        }
 
-                            frostUiState.frostStats?.wind != null -> {
-                                WindChart(windNormals = frostUiState.frostStats!!.wind!!)
-                            }
+                        frostUiState.windMean != null -> {
+                            WindChart(
+                                windMean = frostUiState.windMean!!,
+                                windMaxSpeed = frostUiState.windMaxSpeed!!,
+                                windMaxGust = frostUiState.windMaxGust!!
+                            )
+                        }
 
-                            else -> {
-                                Text("Ingen vinddata tilgjengelig.")
-                            }
+                        else -> {
+                            Text("Ingen vinddata tilgjengelig.")
                         }
                     }
                 }
@@ -269,15 +298,13 @@ fun TemperatureChartPreview() {
 // Compose chart for wind speed
 @Composable
 fun WindChart(
-    windNormals: Map<Int, FrostWindNormal>,
+    windMean: List<Double>,
+    windMaxSpeed: List<Double>,
+    windMaxGust: List<Double>,
     modifier: Modifier = Modifier
 ) {
     val months = listOf("Jan", "Feb", "Mar", "Apr", "Mai", "Jun",
         "Jul", "Aug", "Sep", "Okt", "Nov", "Des")
-
-    val meanSpeeds  = (1..12).map { windNormals[it]?.mean     ?: 0.0 }
-    val maxSpeeds   = (1..12).map { windNormals[it]?.maxSpeed ?: 0.0 }
-    val maxGusts    = (1..12).map { windNormals[it]?.maxGust  ?: 0.0 }
 
     Column(modifier = modifier
         .fillMaxWidth()
@@ -293,11 +320,11 @@ fun WindChart(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp),
-            data = remember(windNormals) {
+            data = remember(windMean, windMaxSpeed, windMaxGust) {
                 listOf(
                     Line(
                         label = "Middelvind (m/s)",
-                        values = meanSpeeds,
+                        values = windMean,
                         color = SolidColor(Color(0xFF4CAF50)),
                         firstGradientFillColor = Color(0xFF4CAF50).copy(alpha = .2f),
                         secondGradientFillColor = Color.Transparent,
@@ -310,7 +337,7 @@ fun WindChart(
                     ),
                     Line(
                         label = "Maks middelvind (m/s)",
-                        values = maxSpeeds,
+                        values = windMaxSpeed,
                         color = SolidColor(Color(0xFFFFA726)),
                         firstGradientFillColor = Color.Transparent,
                         secondGradientFillColor = Color.Transparent,
@@ -323,7 +350,7 @@ fun WindChart(
                     ),
                     Line(
                         label = "Maks vindkast (m/s)",
-                        values = maxGusts,
+                        values = windMaxGust,
                         color = SolidColor(Color(0xFFEF5350)),
                         firstGradientFillColor = Color.Transparent,
                         secondGradientFillColor = Color.Transparent,

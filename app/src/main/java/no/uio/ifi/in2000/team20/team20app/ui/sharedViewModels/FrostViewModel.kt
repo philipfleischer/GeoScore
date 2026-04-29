@@ -1,31 +1,49 @@
 package no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepositoryService
-import no.uio.ifi.in2000.team20.team20app.domain.model.FrostStats
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 
 data class FrostUiState(
     val isLoading: Boolean = false,
-    val error: String? = null,
-    val frostStats: FrostStats? = null
+    // Temperature normals (Jan–Dec, index 0–11), aggregated from 1991-2020 raw monthly data
+    val temperatureMean: List<Double>? = null,
+    val temperatureMax: List<Double>? = null,
+    val temperatureMin: List<Double>? = null,
+    val temperatureError: String? = null,
+    // Wind normals (Jan–Dec, index 0–11)
+    val windMean: List<Double>? = null,
+    val windMaxSpeed: List<Double>? = null,
+    val windMaxGust: List<Double>? = null,
+    val windError: String? = null,
+    // Sunshine hours per month (Jan–Dec, index 0–11)
+    val sunshineHours: List<Double>? = null,
+    val sunshineError: String? = null,
+    // Snow depth — ready for implementation, always null until fetched
+    val snowMean: List<Double>? = null,
+    val snowMax: List<Double>? = null,
+    val snowError: String? = null,
+    // Precipitation — ready for implementation, always null until fetched
+    val precipitationMean: List<Double>? = null,
+    val precipitationDays: List<Double>? = null,
+    val precipitationError: String? = null,
 )
 
 /**
  * Shared ViewModel for Frost climate data.
  *
  * Responsibility:
- * - Load FrostStats for a given location
- * - Manage FrostUiState (loading, success, error)
+ * - Load climate data for a given location, launching all parameters concurrently
+ * - Manage FrostUiState with per-parameter loading and error fields
  *
  * Why:
  * Shared across HomeScreen and FavoriteDetailsScreen so both tabs observe
@@ -41,16 +59,45 @@ class FrostViewModel(
 
     fun loadFrostStats(location: Location) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
-            try {
-                val frostStats = repo.getFrostStats(location.lat, location.lon)
-                _uiState.update { it.copy(isLoading = false, frostStats = frostStats) }
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Throwable) {
-                Log.e("FrostViewModel", "getFrostStats failed", e)
+            _uiState.update { it.copy(isLoading = true) }
+            coroutineScope {
+                // All parameters fetched concurrently, each fails independently via Result
+                val tempDeferred = async { repo.getTemperatureData(location.lat, location.lon) }
+                val windDeferred = async { repo.getWindData(location.lat, location.lon) }
+                val sunDeferred  = async { repo.getSunshineData(location.lat, location.lon) }
+                // TODO: uncomment when getSnowData() and getPrecipitationData() are implemented in FrostRepository
+                // val snowDeferred          = async { repo.getSnowData(location.lat, location.lon) }
+                // val precipitationDeferred = async { repo.getPrecipitationData(location.lat, location.lon) }
+
+                val tempResult = tempDeferred.await()
+                val windResult = windDeferred.await()
+                val sunResult  = sunDeferred.await()
+                // val snowResult          = snowDeferred.await()
+                // val precipitationResult = precipitationDeferred.await()
+
+                val tempData = tempResult.getOrNull()
+                val windData = windResult.getOrNull()
+
                 _uiState.update {
-                    it.copy(isLoading = false, error = "Kunne ikke laste inn klimadata.")
+                    it.copy(
+                        isLoading        = false,
+                        temperatureMean  = tempData?.first,
+                        temperatureMax   = tempData?.second,
+                        temperatureMin   = tempData?.third,
+                        temperatureError = tempResult.exceptionOrNull()?.message,
+                        windMean         = windData?.first,
+                        windMaxSpeed     = windData?.second,
+                        windMaxGust      = windData?.third,
+                        windError        = windResult.exceptionOrNull()?.message,
+                        sunshineHours    = sunResult.getOrNull(),
+                        sunshineError    = sunResult.exceptionOrNull()?.message,
+                        // snowMean           = snowResult.getOrNull()?.first,
+                        // snowMax            = snowResult.getOrNull()?.second,
+                        // snowError          = snowResult.exceptionOrNull()?.message,
+                        // precipitationMean  = precipitationResult.getOrNull()?.first,
+                        // precipitationDays  = precipitationResult.getOrNull()?.second,
+                        // precipitationError = precipitationResult.exceptionOrNull()?.message,
+                    )
                 }
             }
         }

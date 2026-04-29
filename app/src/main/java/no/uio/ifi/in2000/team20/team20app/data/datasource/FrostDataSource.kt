@@ -194,7 +194,7 @@ class FrostDataSource(
             url.encodedParameters.append("sources", sources)
             url.encodedParameters.append(
                 "elements",
-                "sum(duration_of_sunshine%20P1M)"
+                listOf("sum(duration_of_sunshine P1M)").joinToString(",").replace(" ", "%20")
             )
             url.encodedParameters.append("referencetime", "1991-01-01/2020-12-31")
             header("Authorization", authHeader)

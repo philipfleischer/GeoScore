@@ -41,8 +41,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import no.uio.ifi.in2000.team20.team20app.domain.model.FrostStats
-import no.uio.ifi.in2000.team20.team20app.domain.model.FrostTemperatureNormal
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchBarObject
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
@@ -510,11 +508,14 @@ fun SummaryMiniCard(
 }
 
 @Composable
-fun ClimateInfoContent(frostStats: FrostStats) {
+fun ClimateInfoContent(
+    temperatureMean: List<Double>?,
+    temperatureMax: List<Double>?,
+    temperatureMin: List<Double>?
+) {
     val months = listOf("Jan","Feb","Mar","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Des")
-    val temps = frostStats.temperatureNormals
 
-    if (temps == null) {
+    if (temperatureMean == null) {
         Text("Ingen temperaturdata tilgjengelig.", style = MaterialTheme.typography.bodyMedium)
         return
     }
@@ -533,16 +534,15 @@ fun ClimateInfoContent(frostStats: FrostStats) {
     Spacer(modifier = Modifier.height(4.dp))
 
     // One row per month
-    (1..12).forEach { month ->
-        val normal = temps[month]
+    months.forEachIndexed { i, month ->
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(months[month - 1], style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
-            Text(normal?.minMean?.let { "%.1f°".format(it) } ?: "-", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
-            Text(normal?.mean?.let { "%.1f°".format(it) } ?: "-", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
-            Text(normal?.maxMean?.let { "%.1f°".format(it) } ?: "-", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+            Text(month, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+            Text(temperatureMin?.getOrNull(i)?.let { "%.1f°".format(it) } ?: "-", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+            Text(temperatureMean.getOrNull(i)?.let { "%.1f°".format(it) } ?: "-", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+            Text(temperatureMax?.getOrNull(i)?.let { "%.1f°".format(it) } ?: "-", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
         }
     }
 }
@@ -581,7 +581,11 @@ private fun HomeScreenLayoutPreview() {
             )
 
             ExpandableInfoBox(title = "Historiske klimadata") {
-                ClimateInfoContent(frostStats = previewFrostStats())
+                ClimateInfoContent(
+                    temperatureMean  = listOf(-6.8, -6.3, -1.8, 3.9, 10.3, 15.0, 17.2, 16.4, 11.0, 5.8, 0.2, -4.5),
+                    temperatureMax   = listOf(-2.1, -1.8, 2.9, 8.9, 15.5, 20.3, 22.4, 21.3, 15.7, 10.0, 3.7, -0.4),
+                    temperatureMin   = listOf(-10.3,-10.1,-5.8,-0.5, 5.4,10.1,12.4,11.8, 6.6, 2.0,-2.8,-7.9)
+                )
             }
         }
     }
@@ -592,28 +596,11 @@ private fun HomeScreenLayoutPreview() {
 private fun ClimateInfoContentPreview() {
     MaterialTheme {
         Column(modifier = Modifier.padding(16.dp)) {
-            ClimateInfoContent(frostStats = previewFrostStats())
+            ClimateInfoContent(
+                temperatureMean  = listOf(-6.8, -6.3, -1.8, 3.9, 10.3, 15.0, 17.2, 16.4, 11.0, 5.8, 0.2, -4.5),
+                temperatureMax   = listOf(-2.1, -1.8, 2.9, 8.9, 15.5, 20.3, 22.4, 21.3, 15.7, 10.0, 3.7, -0.4),
+                temperatureMin   = listOf(-10.3,-10.1,-5.8,-0.5, 5.4,10.1,12.4,11.8, 6.6, 2.0,-2.8,-7.9)
+            )
         }
     }
 }
-
-private fun previewFrostStats() = FrostStats(
-    temperatureNormals = mapOf(
-        1  to FrostTemperatureNormal(-6.8, -2.1, -10.3),
-        2  to FrostTemperatureNormal(-6.3, -1.8, -10.1),
-        3  to FrostTemperatureNormal(-1.8,  2.9,  -5.8),
-        4  to FrostTemperatureNormal( 3.9,  8.9,  -0.5),
-        5  to FrostTemperatureNormal(10.3, 15.5,   5.4),
-        6  to FrostTemperatureNormal(15.0, 20.3,  10.1),
-        7  to FrostTemperatureNormal(17.2, 22.4,  12.4),
-        8  to FrostTemperatureNormal(16.4, 21.3,  11.8),
-        9  to FrostTemperatureNormal(11.0, 15.7,   6.6),
-        10 to FrostTemperatureNormal( 5.8, 10.0,   2.0),
-        11 to FrostTemperatureNormal( 0.2,  3.7,  -2.8),
-        12 to FrostTemperatureNormal(-4.5, -0.4,  -7.9),
-    ),
-    precipitation = null,
-    snowDepth = null,
-    wind = null,
-    sunshineNormals = null
-)

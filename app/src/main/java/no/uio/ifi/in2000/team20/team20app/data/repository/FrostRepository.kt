@@ -4,11 +4,7 @@ import android.util.Log
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import no.uio.ifi.in2000.team20.team20app.data.datasource.FrostDataSourceService
-import no.uio.ifi.in2000.team20.team20app.data.model.FrostObservationResponseDto
 import no.uio.ifi.in2000.team20.team20app.data.model.FrostV0ObservationResponseDto
-import no.uio.ifi.in2000.team20.team20app.domain.model.FrostStats
-import no.uio.ifi.in2000.team20.team20app.domain.model.FrostTemperatureNormal
-import no.uio.ifi.in2000.team20.team20app.domain.model.FrostWindNormal
 import no.uio.ifi.in2000.team20.team20app.data.model.FrostV1ResponseDto
 import no.uio.ifi.in2000.team20.team20app.domain.model.WindAndPrecipitationObservationsResult
 
@@ -19,8 +15,13 @@ import no.uio.ifi.in2000.team20.team20app.domain.model.WindAndPrecipitationObser
  * Makes FrostRepository testable by allowing fake implementations in tests.
  */
 interface FrostRepositoryService {
-    // Fetches all climate parameters in parallel and returns a single domain model
-    suspend fun getFrostStats(lat: Double, lon: Double): FrostStats
+    // Each method fetches one climate parameter and wraps in Result to isolate failures.
+    // Triple order for temperature: (mean, max, min). For wind: (mean, maxSpeed, maxGust).
+    suspend fun getTemperatureData(lat: Double, lon: Double): Result<Triple<List<Double>, List<Double>, List<Double>>>
+    suspend fun getWindData(lat: Double, lon: Double): Result<Triple<List<Double>, List<Double>, List<Double>>>
+    suspend fun getSunshineData(lat: Double, lon: Double): Result<List<Double>>
+    suspend fun getSnowData(lat: Double, lon: Double): Result<Pair<List<Double>, List<Double>>>
+    suspend fun getPrecipitationData(lat: Double, lon: Double): Result<Pair<List<Double>, List<Double>>>
 }
 
 /**
@@ -38,63 +39,64 @@ class FrostRepository(
     private val dataSource: FrostDataSourceService
 ) : FrostRepositoryService {
 
-    // Launches all datasource calls concurrently with async, then maps and combines into FrostStats.
-    override suspend fun getFrostStats(lat: Double, lon: Double): FrostStats =
-        coroutineScope {
-            val tempDeferred = async { dataSource.getTemperatureNormals(lat, lon) }
-            val sunDeferred = async { dataSource.getSunshineNormals(lat, lon) }
-            val windDeferred = async { dataSource.getWindHistory(lat, lon) }
-            // TODO: add remaining async calls once other datasource methods are implemented
-            // val precipDeferred  = async { dataSource.getPrecipitationNormals(lat, lon) }
-            // val snowDeferred    = async { dataSource.getSnowDepthHistory(lat, lon) }
-
-            val tempData = tempDeferred.await()
-            val sunData = sunDeferred.await()
-            val windData = windDeferred.await()
+    override suspend fun getTemperatureData(lat: Double, lon: Double): Result<Triple<List<Double>, List<Double>, List<Double>>> =
+        runCatching {
+            val data = dataSource.getTemperatureNormals(lat, lon)
 
             // Log which stations contributed data
-            val stationIds = tempData.data.map { it.sourceId }.distinct()
-            Log.d(
-                "FrostRepository",
-                "Temperature data from stations: $stationIds (${stationIds.size} stations)"
-            )
+            val stationIds = data.data.map { it.sourceId }.distinct()
+            Log.d("FrostRepository", "Temperature data from stations: $stationIds (${stationIds.size} stations)")
 
             // V0 returns 360 raw monthly observations (30 years × 12 months).
             // aggregateByMonthV0 groups by calendar month and averages → 1991-2020 normals computed client-side.
-            val meanMap = tempData.aggregateByMonthV0("mean(air_temperature P1M)")
-            val maxMeanMap = tempData.aggregateByMonthV0("mean(max(air_temperature P1D) P1M)")
-            val minMeanMap = tempData.aggregateByMonthV0("mean(min(air_temperature P1D) P1M)")
+            val meanMap    = data.aggregateByMonthV0("mean(air_temperature P1M)")
+            val maxMeanMap = data.aggregateByMonthV0("mean(max(air_temperature P1D) P1M)")
+            val minMeanMap = data.aggregateByMonthV0("mean(min(air_temperature P1D) P1M)")
 
-            val temperatureNormals = (1..12).associateWith { month ->
-                FrostTemperatureNormal(
-                    mean = meanMap[month],
-                    maxMean = maxMeanMap[month],
-                    minMean = minMeanMap[month]
-                )
-            }
-
-            val sunshineNormals = sunData.aggregateByMonthV0("sum(duration_of_sunshine P1M)")
-            val windMeanMap     = windData.aggregateByMonthV0("mean(wind_speed P1M)")
-            val windMaxMap      = windData.aggregateByMonthV0("max(wind_speed P1M)")
-            val windGustMap     = windData.aggregateByMonthV0("max(wind_speed_of_gust P1M)")
-
-            val windNormals = (1..12).associateWith { month ->
-                FrostWindNormal(
-                    mean     = windMeanMap[month],
-                    maxSpeed = windMaxMap[month],
-                    maxGust  = windGustMap[month]
-                )
-            }.ifEmpty { null }
-
-            FrostStats(
-                temperatureNormals = temperatureNormals,
-                precipitation = null,        // TODO: implement
-                snowDepth = null,            // TODO: implement
-                wind = windNormals,
-                sunshineNormals = sunshineNormals.ifEmpty { null }
+            Triple(
+                (1..12).map { meanMap[it]    ?: 0.0 },
+                (1..12).map { maxMeanMap[it] ?: 0.0 },
+                (1..12).map { minMeanMap[it] ?: 0.0 }
             )
         }
 
+    override suspend fun getWindData(lat: Double, lon: Double): Result<Triple<List<Double>, List<Double>, List<Double>>> =
+        runCatching {
+            val data = dataSource.getWindHistory(lat, lon)
+
+            val windMeanMap = data.aggregateByMonthV0("mean(wind_speed P1M)")
+            val windMaxMap  = data.aggregateByMonthV0("max(wind_speed P1M)")
+            val windGustMap = data.aggregateByMonthV0("max(wind_speed_of_gust P1M)")
+
+            Triple(
+                (1..12).map { windMeanMap[it] ?: 0.0 },
+                (1..12).map { windMaxMap[it]  ?: 0.0 },
+                (1..12).map { windGustMap[it] ?: 0.0 }
+            )
+        }
+
+    override suspend fun getSunshineData(lat: Double, lon: Double): Result<List<Double>> =
+        runCatching {
+            val data = dataSource.getSunshineNormals(lat, lon)
+            // Aggregated in the repository to produce 1991-2020 monthly normals
+            val map = data.aggregateByMonthV0("sum(duration_of_sunshine P1M)")
+            (1..12).map { map[it] ?: 0.0 }
+        }
+
+    override suspend fun getSnowData(lat: Double, lon: Double): Result<Pair<List<Double>, List<Double>>> {
+        // TODO: implement f eks fetch mean(surface_snow_thickness P1M) and max(surface_snow_thickness P1M)
+        // from getSnowDepthHistory() in datasource, aggregate with aggregateByMonthV0(),
+        // return Pair(meanList, maxList) sorted by month 1–12
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getPrecipitationData(lat: Double, lon: Double): Result<Pair<List<Double>, List<Double>>> {
+        // TODO: implement f eks fetch sum(precipitation_amount_normal P1M 1991_2020) and
+        // number_of_days_gte(sum(precipitation_amount_normal P1D 1991_2020) P1M 1.0)
+        // from getPrecipitationNormals() in datasource
+        // return Pair(amountList, rainyDaysList) sorted by month 1–12
+        TODO("Not yet implemented")
+    }
 
     suspend fun getWindAndPrecipitationObservations(
         lat: Double,
@@ -133,39 +135,6 @@ class FrostRepository(
                     entry.referenceTime.substring(5, 7).toIntOrNull() ?: return@mapNotNull null
                 val value = entry.observations.find { it.elementId == elementId }?.value
                     ?: return@mapNotNull null
-                month to value
-            }
-            .groupBy({ it.first }, { it.second })
-            .mapValues { (_, values) -> values.average() }
-    }
-
-// ─── V1 mappers ─────────────────────────────────────────────────────────────
-
-    // Finds the first V1 time series matching elementId and maps observations to month (1–12) -> value.
-    private fun FrostObservationResponseDto.toMonthlyMap(elementId: String): Map<Int, Double> {
-        return tseries
-            .firstOrNull { it.header.extra?.element?.id == elementId }
-            ?.observations
-            ?.mapNotNull { obs ->
-                val month = obs.time.substring(5, 7).toIntOrNull() ?: return@mapNotNull null
-                val value = obs.body.value?.toDoubleOrNull() ?: return@mapNotNull null
-                month to value
-            }
-            ?.toMap()
-            ?: emptyMap()
-    }
-
-    // Groups raw 30-year V1 monthly observations by calendar month (1–12) and averages the values.
-// Used for parameters without a pre-computed normal (snow depth, wind, precipitation).
-    private fun FrostObservationResponseDto.aggregateByMonth(elementId: String): Map<Int, Double> {
-        val observations = tseries
-            .firstOrNull { it.header.extra?.element?.id == elementId }
-            ?.observations ?: return emptyMap()
-
-        return observations
-            .mapNotNull { obs ->
-                val month = obs.time.substring(5, 7).toIntOrNull() ?: return@mapNotNull null
-                val value = obs.body.value?.toDoubleOrNull() ?: return@mapNotNull null
                 month to value
             }
             .groupBy({ it.first }, { it.second })
