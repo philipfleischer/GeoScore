@@ -84,8 +84,6 @@ class FrostDataSource(
         return response.data.joinToString(",") { it.id }
     }
 
-    // V0 normals methods
-
     // Fetches raw monthly temperature observations for 1991-2020 from V0
     // Pre-computed normals (air_temperature_normal P1M 1991_2020) are defined in the Frost catalog
     // but i cant find data in nay endpoints. So we fetch the raw monthly means instead
@@ -104,21 +102,6 @@ class FrostDataSource(
                     // Monthly mean of daily minimums
                     "mean(min(air_temperature P1D) P1M)"
                 ).joinToString(",").replace(" ", "%20")
-            )
-            url.encodedParameters.append("referencetime", "1991-01-01/2020-12-31")
-            header("Authorization", authHeader)
-        }.frostBody()
-    }
-
-    // Fetches raw monthly sunshine hours for 1991-2020 from V0
-    // Aggregated in the repository to produce 1991-2020 monthly normals
-    override suspend fun getSunshineNormals(lat: Double, lon: Double): FrostV0ObservationResponseDto {
-        val sources = findNearestV0Sources(lat, lon)
-        return client.get(FrostRoutes.OBSERVATIONS_V0) {
-            url.encodedParameters.append("sources", sources)
-            url.encodedParameters.append(
-                "elements",
-                "sum(duration_of_sunshine%20P1M)"
             )
             url.encodedParameters.append("referencetime", "1991-01-01/2020-12-31")
             header("Authorization", authHeader)
@@ -148,6 +131,58 @@ class FrostDataSource(
         lon: Double
     ): FrostObservationResponseDto {
         TODO("Not yet implemented")
+    }
+
+    // Fetches raw snow depth history — no pre-computed normal exists, must be aggregated in the repository
+    override suspend fun getSnowDepthHistory(
+        lat: Double,
+        lon: Double
+    ): FrostObservationResponseDto {
+        return client.get(FrostRoutes.OBSERVATIONS_V1) {
+            url.encodedParameters.append("nearest", buildNearest(lat, lon, maxCount = 5)) // more stations since snow data is not always available
+            url.encodedParameters.append(
+                "elementids",
+                listOf(
+                    // Mean snow depth (cm) per month — raw historical values
+                    // No pre-computed normal exists, so we fetch all months 1991-2020
+                    // This gives up to 360 data points (12 months × 30 years) that must be aggregated
+                    "mean(surface_snow_thickness P1M)",
+
+                    // Highest measured snow depth per month — also raw historical values
+                    // Useful for showing snow peaks; may be dropped later
+                    "max(surface_snow_thickness P1M)"
+                ).joinToString(",").replace(" ", "%20")
+            )
+            url.encodedParameters.append("time", "1991-01-01T00:00:00Z/2020-12-31T23:59:59Z")
+            url.encodedParameters.append("incobs", "true")
+            header("Authorization", authHeader)
+        }.frostBody()
+    }
+
+    // TODO: fill in element ID and likely switch to V0 (frost-rc lacks historical aggregates)
+    override suspend fun getWindHistory(
+        lat: Double,
+        lon: Double
+    ): FrostObservationResponseDto {
+        //mean(wind_speed P1M) gjennomsnittlig middelvind per måned — hovedtallet - slik blåser det typisk her i januar
+        //max(wind_speed P1M) høyeste middelvind per måned — gir ekstrembildet - så kraftig kan middelvinden bli i januar, typisk stormtyrke i januar
+        //max(wind_speed_of_gust P1M) høyeste vindkast per måned — relevant for boligkjøpere - så kraftig kan vindkastene være i januar
+        TODO("not yet implemented — element ID unknown, V0 migration likely needed")
+    }
+
+    // Fetches raw monthly sunshine hours for 1991-2020 from V0
+    // Aggregated in the repository to produce 1991-2020 monthly normals
+    override suspend fun getSunshineNormals(lat: Double, lon: Double): FrostV0ObservationResponseDto {
+        val sources = findNearestV0Sources(lat, lon)
+        return client.get(FrostRoutes.OBSERVATIONS_V0) {
+            url.encodedParameters.append("sources", sources)
+            url.encodedParameters.append(
+                "elements",
+                "sum(duration_of_sunshine%20P1M)"
+            )
+            url.encodedParameters.append("referencetime", "1991-01-01/2020-12-31")
+            header("Authorization", authHeader)
+        }.frostBody()
     }
 
     override suspend fun getRankedObservationsForPrecipitation(
@@ -199,46 +234,10 @@ class FrostDataSource(
         }
     }
 
-    // Collecting median precipitation amount (mm) per day per month
-
-    // Fetches raw snow depth history — no pre-computed normal exists, must be aggregated in the repository
-    override suspend fun getSnowDepthHistory(
-        lat: Double,
-        lon: Double
-    ): FrostObservationResponseDto {
-        return client.get(FrostRoutes.OBSERVATIONS_V1) {
-            url.encodedParameters.append("nearest", buildNearest(lat, lon, maxCount = 5)) // more stations since snow data is not always available
-            url.encodedParameters.append(
-                "elementids",
-                listOf(
-                    // Mean snow depth (cm) per month — raw historical values
-                    // No pre-computed normal exists, so we fetch all months 1991-2020
-                    // This gives up to 360 data points (12 months × 30 years) that must be aggregated
-                    "mean(surface_snow_thickness P1M)",
-
-                    // Highest measured snow depth per month — also raw historical values
-                    // Useful for showing snow peaks; may be dropped later
-                    "max(surface_snow_thickness P1M)"
-                ).joinToString(",").replace(" ", "%20")
-            )
-            url.encodedParameters.append("time", "1991-01-01T00:00:00Z/2020-12-31T23:59:59Z")
-            url.encodedParameters.append("incobs", "true")
-            header("Authorization", authHeader)
-        }.frostBody()
-    }
-
     private fun buildNearest(lat: Double, lon: Double, maxDist: Double = 10.0, maxCount: Int = 5): String {
         return """{"maxdist":$maxDist,"maxcount":$maxCount,"points":[{"lon":$lon,"lat":$lat}]}"""
     }
 
     private fun buildTime(startYear: Int, endYear: Int): String =
         "$startYear-01-01T00:00:00Z/$endYear-01-01T00:00:00Z"
-
-    // TODO: fill in element ID and likely switch to V0 (frost-rc lacks historical aggregates)
-    override suspend fun getWindHistory(
-        lat: Double,
-        lon: Double
-    ): FrostObservationResponseDto {
-        TODO("not yet implemented — element ID unknown, V0 migration likely needed")
-    }
 }

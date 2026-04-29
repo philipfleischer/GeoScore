@@ -24,14 +24,27 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.ClimateInfoContent
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.ExpandableInfoBox
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
+import ir.ehsannarmani.compose_charts.LineChart
+import ir.ehsannarmani.compose_charts.models.Line
+import ir.ehsannarmani.compose_charts.models.DotProperties
+import ir.ehsannarmani.compose_charts.models.LineProperties
+import ir.ehsannarmani.compose_charts.models.LabelProperties
+import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
+import ir.ehsannarmani.compose_charts.models.DrawStyle
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.unit.sp
+import ir.ehsannarmani.compose_charts.models.ZeroLineProperties
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -86,26 +99,40 @@ fun ClimateStatsScreen(
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             item {
-                when {
-                    frostUiState.isLoading -> {
-                        Text("Laster klimadata...")
-                    }
+                Text(
+                    text = "Lurer du på hvordan klimaet er for ${location.name}? Her kan du få et overblikk.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 20.sp,
+                )
+            }
 
-                    frostUiState.error != null -> {
-                        Text("Feil: ${frostUiState.error}")
-                    }
+            item {
+                ExpandableInfoBox(
+                    title = "Temperatur",
+                    initiallyExpanded = true
+                ) {
+                    Text(
+                        text = "Dette diagrammet viser gjennomsnittlig temperatur. Klikk for å lese mer.",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
 
-                    frostUiState.frostStats != null -> {
-                        ExpandableInfoBox(
-                            title = "Temperatur",
-                            initiallyExpanded = true
-                        ) {
+                    when {
+                        frostUiState.isLoading -> {
+                            Text("Laster klimadata...")
+                        }
+
+                        frostUiState.error != null -> {
+                            Text("Feil: ${frostUiState.error}")
+                        }
+
+                        frostUiState.frostStats != null -> {
                             ClimateInfoContent(frostStats = frostUiState.frostStats!!)
                         }
-                    }
 
-                    else -> {
-                        Text("Ingen klimadata tilgjengelig.")
+                        else -> {
+                            Text("Ingen klimadata tilgjengelig.")
+                        }
                     }
                 }
             }
@@ -139,4 +166,68 @@ fun ClimateStatsScreen(
             }
         }
     }
+}
+
+// Compose chart for temperature
+@Composable
+fun TemperatureChart(
+    monthlyTemperatures: List<Double>,
+    modifier: Modifier = Modifier
+) {
+    val months = listOf("Jan", "Feb", "Mar", "Apr", "Mai", "Jun",
+        "Jul", "Aug", "Sep", "Okt", "Nov", "Des")
+
+    Column(modifier = modifier.fillMaxWidth().padding(16.dp)) {
+
+        Text(
+            text = "Månedlig temperatur",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        LineChart(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp),
+            data = remember(monthlyTemperatures) {
+                listOf(
+                    Line(
+                        label = "Temperatur (°C)",
+                        values = monthlyTemperatures,
+                        color = SolidColor(Color(0xFF378ADD)),
+                        firstGradientFillColor = Color(0xFF378ADD).copy(alpha = .3f),
+                        secondGradientFillColor = Color.Transparent,
+                        curvedEdges = true,
+                        dotProperties = DotProperties(
+                            enabled = true,
+                            color = SolidColor(Color.White),
+                            //strokeWidth = 4f,
+                            //radius = 6f,
+                            strokeColor = SolidColor(Color(0xFF378ADD))
+                        )
+                    )
+                )
+            },
+            zeroLineProperties = ZeroLineProperties(
+                enabled = true,
+                color = SolidColor(Color.Red),
+            ),
+            labelHelperProperties = LabelHelperProperties(enabled = false),
+            labelProperties = LabelProperties(
+                enabled = true,
+                labels = months
+            ),
+            minValue = -20.0,
+            maxValue = 50.0,
+        )
+    }
+}
+
+@Composable
+@Preview
+fun TemperatureChartPreview() {
+    TemperatureChart(
+        monthlyTemperatures = listOf(-3.0, -2.5, 1.2, 6.4, 11.8, 15.9,
+            17.2, 16.8, 12.1, 7.3, 2.1, -1.4)
+    )
 }

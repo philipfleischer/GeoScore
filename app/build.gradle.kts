@@ -126,5 +126,8 @@ dependencies {
     implementation(libs.androidx.compose.material3.adaptive.navigation)
     implementation("androidx.compose.material3:material3-adaptive-navigation-suite")
 
+    // Compose charts
+    implementation("io.github.ehsannarmani:compose-charts:0.2.5")
+
 
 }
