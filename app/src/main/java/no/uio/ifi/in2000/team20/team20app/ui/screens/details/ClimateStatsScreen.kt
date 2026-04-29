@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import no.uio.ifi.in2000.team20.team20app.domain.model.FrostWindNormal
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.ClimateInfoContent
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.ExpandableInfoBox
@@ -106,6 +107,7 @@ fun ClimateStatsScreen(
                 )
             }
 
+            // Temperature
             item {
                 ExpandableInfoBox(
                     title = "Temperatur",
@@ -137,6 +139,7 @@ fun ClimateStatsScreen(
                 }
             }
 
+            // Snow
             if (frostUiState.frostStats != null) {
                 item {
                     ExpandableInfoBox(title = "Snø") {
@@ -149,6 +152,7 @@ fun ClimateStatsScreen(
                     }
                 }
 
+                // Rain
                 item {
                     ExpandableInfoBox(title = "Nedbør") {
                         // TODO: Add monthly precipitation chart
@@ -160,8 +164,36 @@ fun ClimateStatsScreen(
                     }
                 }
 
+                // Wind
                 item {
-                    Spacer(modifier = Modifier.height(8.dp))
+                    ExpandableInfoBox(
+                        title = "Vind",
+                        initiallyExpanded = false
+                    ) {
+                        Text(
+                            text = "Dette diagrammet viser gjennomsnittlig vindstyrke per måned.",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        when {
+                            frostUiState.isLoading -> {
+                                Text("Laster klimadata...")
+                            }
+
+                            frostUiState.error != null -> {
+                                Text("Feil: ${frostUiState.error}")
+                            }
+
+                            frostUiState.frostStats?.wind != null -> {
+                                WindChart(windNormals = frostUiState.frostStats!!.wind!!)
+                            }
+
+                            else -> {
+                                Text("Ingen vinddata tilgjengelig.")
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -177,7 +209,9 @@ fun TemperatureChart(
     val months = listOf("Jan", "Feb", "Mar", "Apr", "Mai", "Jun",
         "Jul", "Aug", "Sep", "Okt", "Nov", "Des")
 
-    Column(modifier = modifier.fillMaxWidth().padding(16.dp)) {
+    Column(modifier = modifier
+        .fillMaxWidth()
+        .padding(16.dp)) {
 
         Text(
             text = "Månedlig temperatur",
@@ -230,4 +264,85 @@ fun TemperatureChartPreview() {
         monthlyTemperatures = listOf(-3.0, -2.5, 1.2, 6.4, 11.8, 15.9,
             17.2, 16.8, 12.1, 7.3, 2.1, -1.4)
     )
+}
+
+// Compose chart for wind speed
+@Composable
+fun WindChart(
+    windNormals: Map<Int, FrostWindNormal>,
+    modifier: Modifier = Modifier
+) {
+    val months = listOf("Jan", "Feb", "Mar", "Apr", "Mai", "Jun",
+        "Jul", "Aug", "Sep", "Okt", "Nov", "Des")
+
+    val meanSpeeds  = (1..12).map { windNormals[it]?.mean     ?: 0.0 }
+    val maxSpeeds   = (1..12).map { windNormals[it]?.maxSpeed ?: 0.0 }
+    val maxGusts    = (1..12).map { windNormals[it]?.maxGust  ?: 0.0 }
+
+    Column(modifier = modifier
+        .fillMaxWidth()
+        .padding(16.dp)) {
+
+        Text(
+            text = "Månedlig vindstyrke",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        LineChart(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp),
+            data = remember(windNormals) {
+                listOf(
+                    Line(
+                        label = "Middelvind (m/s)",
+                        values = meanSpeeds,
+                        color = SolidColor(Color(0xFF4CAF50)),
+                        firstGradientFillColor = Color(0xFF4CAF50).copy(alpha = .2f),
+                        secondGradientFillColor = Color.Transparent,
+                        curvedEdges = true,
+                        dotProperties = DotProperties(
+                            enabled = true,
+                            color = SolidColor(Color.White),
+                            strokeColor = SolidColor(Color(0xFF4CAF50))
+                        )
+                    ),
+                    Line(
+                        label = "Maks middelvind (m/s)",
+                        values = maxSpeeds,
+                        color = SolidColor(Color(0xFFFFA726)),
+                        firstGradientFillColor = Color.Transparent,
+                        secondGradientFillColor = Color.Transparent,
+                        curvedEdges = true,
+                        dotProperties = DotProperties(
+                            enabled = true,
+                            color = SolidColor(Color.White),
+                            strokeColor = SolidColor(Color(0xFFFFA726))
+                        )
+                    ),
+                    Line(
+                        label = "Maks vindkast (m/s)",
+                        values = maxGusts,
+                        color = SolidColor(Color(0xFFEF5350)),
+                        firstGradientFillColor = Color.Transparent,
+                        secondGradientFillColor = Color.Transparent,
+                        curvedEdges = true,
+                        dotProperties = DotProperties(
+                            enabled = true,
+                            color = SolidColor(Color.White),
+                            strokeColor = SolidColor(Color(0xFFEF5350))
+                        )
+                    )
+                )
+            },
+            labelHelperProperties = LabelHelperProperties(enabled = true),
+            labelProperties = LabelProperties(
+                enabled = true,
+                labels = months
+            ),
+            minValue = 0.0,
+            maxValue = 30.0,
+        )
+    }
 }

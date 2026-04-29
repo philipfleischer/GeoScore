@@ -31,7 +31,7 @@ interface FrostDataSourceService {
     suspend fun getPrecipitationNormals(lat: Double, lon: Double): FrostObservationResponseDto
     suspend fun getPrecipitationMean(lat: Double, lon: Double): FrostObservationResponseDto
     suspend fun getSnowDepthHistory(lat: Double, lon: Double): FrostObservationResponseDto
-    suspend fun getWindHistory(lat: Double, lon: Double): FrostObservationResponseDto
+    suspend fun getWindHistory(lat: Double, lon: Double): FrostV0ObservationResponseDto
     suspend fun getSunshineNormals(lat: Double, lon: Double): FrostV0ObservationResponseDto
     suspend fun getRankedObservationsForPrecipitation(lat: Double, lon: Double, startYear: Int = 1980, endYear: Int = 2025, maxDist: Double = 10.0, maxCount: Int = 5): FrostV1ResponseDto
     suspend fun getRankedObservationsForWind(lat: Double, lon: Double, startYear: Int = 1980, endYear: Int = 2025, maxDist: Double = 10.0, maxCount: Int = 5): FrostV1ResponseDto
@@ -159,15 +159,31 @@ class FrostDataSource(
         }.frostBody()
     }
 
-    // TODO: fill in element ID and likely switch to V0 (frost-rc lacks historical aggregates)
+    // Fetches raw wind history — no pre-computed normal exists, must be aggregated in the repository
     override suspend fun getWindHistory(
         lat: Double,
         lon: Double
-    ): FrostObservationResponseDto {
-        //mean(wind_speed P1M) gjennomsnittlig middelvind per måned — hovedtallet - slik blåser det typisk her i januar
-        //max(wind_speed P1M) høyeste middelvind per måned — gir ekstrembildet - så kraftig kan middelvinden bli i januar, typisk stormtyrke i januar
-        //max(wind_speed_of_gust P1M) høyeste vindkast per måned — relevant for boligkjøpere - så kraftig kan vindkastene være i januar
-        TODO("not yet implemented — element ID unknown, V0 migration likely needed")
+    ): FrostV0ObservationResponseDto {
+        val sources = findNearestV0Sources(lat, lon)
+        return client.get(FrostRoutes.OBSERVATIONS_V0) {
+            url.encodedParameters.append("sources", sources)
+            url.encodedParameters.append(
+                "elements",
+                listOf(
+                    // Mean wind speed per month - raw historical values
+                    // "Slik blåser det typisk her i januar"
+                    "mean(wind_speed P1M)",
+                    // Highest measured wind speed per month - raw
+                    // "Så kraftig kan middelvinden bli i januar, typisk stormtyrke i januar"
+                    "max(wind_speed P1M)",
+                    // Highest measured wind gust per month - raw
+                    // "Så kraftig kan vindkastene være i januar"
+                    "max(wind_speed_of_gust P1M)"
+                ).joinToString(",").replace(" ", "%20")
+            )
+            url.encodedParameters.append("referencetime", "1991-01-01/2020-12-31")
+            header("Authorization", authHeader)
+            }.frostBody()
     }
 
     // Fetches raw monthly sunshine hours for 1991-2020 from V0

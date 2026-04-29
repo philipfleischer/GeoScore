@@ -8,6 +8,7 @@ import no.uio.ifi.in2000.team20.team20app.data.model.FrostObservationResponseDto
 import no.uio.ifi.in2000.team20.team20app.data.model.FrostV0ObservationResponseDto
 import no.uio.ifi.in2000.team20.team20app.domain.model.FrostStats
 import no.uio.ifi.in2000.team20.team20app.domain.model.FrostTemperatureNormal
+import no.uio.ifi.in2000.team20.team20app.domain.model.FrostWindNormal
 import no.uio.ifi.in2000.team20.team20app.data.model.FrostV1ResponseDto
 import no.uio.ifi.in2000.team20.team20app.domain.model.WindAndPrecipitationObservationsResult
 
@@ -42,13 +43,14 @@ class FrostRepository(
         coroutineScope {
             val tempDeferred = async { dataSource.getTemperatureNormals(lat, lon) }
             val sunDeferred = async { dataSource.getSunshineNormals(lat, lon) }
+            val windDeferred = async { dataSource.getWindHistory(lat, lon) }
             // TODO: add remaining async calls once other datasource methods are implemented
             // val precipDeferred  = async { dataSource.getPrecipitationNormals(lat, lon) }
             // val snowDeferred    = async { dataSource.getSnowDepthHistory(lat, lon) }
-            // val windDeferred    = async { dataSource.getWindHistory(lat, lon) }
 
             val tempData = tempDeferred.await()
             val sunData = sunDeferred.await()
+            val windData = windDeferred.await()
 
             // Log which stations contributed data
             val stationIds = tempData.data.map { it.sourceId }.distinct()
@@ -72,12 +74,23 @@ class FrostRepository(
             }
 
             val sunshineNormals = sunData.aggregateByMonthV0("sum(duration_of_sunshine P1M)")
+            val windMeanMap     = windData.aggregateByMonthV0("mean(wind_speed P1M)")
+            val windMaxMap      = windData.aggregateByMonthV0("max(wind_speed P1M)")
+            val windGustMap     = windData.aggregateByMonthV0("max(wind_speed_of_gust P1M)")
+
+            val windNormals = (1..12).associateWith { month ->
+                FrostWindNormal(
+                    mean     = windMeanMap[month],
+                    maxSpeed = windMaxMap[month],
+                    maxGust  = windGustMap[month]
+                )
+            }.ifEmpty { null }
 
             FrostStats(
                 temperatureNormals = temperatureNormals,
                 precipitation = null,        // TODO: implement
                 snowDepth = null,            // TODO: implement
-                wind = null,                 // TODO: implement
+                wind = windNormals,
                 sunshineNormals = sunshineNormals.ifEmpty { null }
             )
         }

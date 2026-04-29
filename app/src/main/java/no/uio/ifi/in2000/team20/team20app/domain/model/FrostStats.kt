@@ -30,6 +30,13 @@ data class FrostSnowNormal(
     val max: Double?   // max(surface_snow_thickness P1M)
 )
 
+// Three wind values per calendar month (aggregated from raw 30-year history)
+data class FrostWindNormal(
+    val mean: Double?,    // mean(wind_speed P1M) — typical monthly wind speed
+    val maxSpeed: Double?, // max(wind_speed P1M) — strongest monthly mean wind
+    val maxGust: Double?   // max(wind_speed_of_gust P1M) — strongest gust
+)
+
 data class FrostStats(
     // month 1–12 -> temperature normals (mean, mean-max, mean-min)
     val temperatureNormals: Map<Int, FrostTemperatureNormal>?,
@@ -37,8 +44,8 @@ data class FrostStats(
     val precipitation: Map<Int, FrostPrecipitationNormal>?,
     // month 1–12 -> snow depth (mean + peak), aggregated from raw 30-year history
     val snowDepth: Map<Int, FrostSnowNormal>?,
-    // month 1–12 -> mean wind speed in m/s, aggregated from raw 30-year history
-    val wind: Map<Int, Double>?,
+    // month 1–12 -> wind (mean, max speed, max gust), aggregated from raw 30-year history
+    val wind: Map<Int, FrostWindNormal>?,
     // month 1–12 -> mean sunshine duration in hours
     val sunshineNormals: Map<Int, Double>?
 )
