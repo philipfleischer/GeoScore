@@ -1,19 +1,24 @@
 package no.uio.ifi.in2000.team20.team20app.ui.screens.details
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,19 +33,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.ExpandableInfoBox
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.theme.LocalTheme
 import ir.ehsannarmani.compose_charts.LineChart
 import ir.ehsannarmani.compose_charts.models.Line
 import ir.ehsannarmani.compose_charts.models.DotProperties
-import ir.ehsannarmani.compose_charts.models.LineProperties
 import ir.ehsannarmani.compose_charts.models.LabelProperties
 import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
-import ir.ehsannarmani.compose_charts.models.DrawStyle
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.sp
@@ -51,9 +56,11 @@ import ir.ehsannarmani.compose_charts.models.ZeroLineProperties
 fun ClimateStatsScreen(
     location: Location,
     onBackClick: () -> Unit,
+    onRapportClick: () -> Unit,
     frostViewModel: FrostViewModel
 ) {
     val frostUiState by frostViewModel.uiState.collectAsStateWithLifecycle()
+    val theme = LocalTheme.current
 
     LaunchedEffect(location) {
         frostViewModel.loadFrostStats(location)
@@ -64,12 +71,13 @@ fun ClimateStatsScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .statusBarsPadding()
+                    .background(MaterialTheme.colorScheme.surface)
+                    .windowInsetsPadding(WindowInsets.statusBars)
             ) {
                 SecondaryTabRow(selectedTabIndex = 1, modifier = Modifier.fillMaxWidth()) {
                     Tab(
                         selected = false,
-                        onClick = onBackClick,
+                        onClick = onRapportClick,
                         text = { Text("Rapport") }
                     )
                     Tab(
@@ -91,26 +99,46 @@ fun ClimateStatsScreen(
             }
         }
     ) { paddingValues ->
-        LazyColumn(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+                .background(theme.background)
         ) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp)
+            ) {
             item {
-                Text(
-                    text = "Lurer du på hvordan klimaet er for ${location.name}? Her kan du få et overblikk.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontSize = 20.sp,
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Home,
+                        contentDescription = null,
+                        tint = theme.tertiary,
+                        modifier = Modifier
+                            .size(36.dp)
+                            .padding(end = 8.dp)
+                    )
+                    Text(
+                        text = location.name,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = theme.tertiary
+                    )
+                }
             }
 
             // Temperature
             item {
                 ExpandableInfoBox(
                     title = "Temperatur",
-                    initiallyExpanded = true
+                    initiallyExpanded = true,
+                    cardColor = theme.secondary
                 ) {
                     Text(
                         text = "Dette diagrammet viser gjennomsnittlig temperatur. Klikk for å lese mer.",
@@ -133,13 +161,6 @@ fun ClimateStatsScreen(
                                 maxTemperatures = frostUiState.temperatureMax ?: emptyList(),
                                 minTemperatures = frostUiState.temperatureMin ?: emptyList()
                             )
-                            //kept for visual confirmation
-//                            Spacer(modifier = Modifier.height(12.dp))
-//                            ClimateInfoContent(
-//                                temperatureMean = frostUiState.temperatureMean,
-//                                temperatureMax = frostUiState.temperatureMax,
-//                                temperatureMin = frostUiState.temperatureMin
-//                            )
                         }
 
                         else -> {
@@ -151,7 +172,13 @@ fun ClimateStatsScreen(
 
             // Snow
             item {
-                ExpandableInfoBox(title = "Snø") {
+                ExpandableInfoBox(title = "Snø", cardColor = theme.secondary) {
+                    Text(
+                        text = "Gjennomsnittlig og høyeste snødybde per måned, basert på målinger fra 1991–2020. Høye verdier kan påvirke tilgjengelighet, vedlikehold og taklast.",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+
                     when {
                         frostUiState.isLoading -> {
                             Text("Laster klimadata...")
@@ -161,13 +188,15 @@ fun ClimateStatsScreen(
                             Text("Feil: ${frostUiState.snowError}")
                         }
 
-                        else -> {
-                            // TODO: Add monthly snow depth chart
-                            // Endpoint exists in FrostDataSource but data not yet fetched
-                            Text(
-                                "Innhold kommer snart",
-                                style = MaterialTheme.typography.bodyMedium
+                        frostUiState.snowMean != null && frostUiState.snowMax != null -> {
+                            SnowChart(
+                                meanSnowDepth = frostUiState.snowMean!!,
+                                maxSnowDepth = frostUiState.snowMax!!
                             )
+                        }
+
+                        else -> {
+                            Text("Ingen snødata tilgjengelig.")
                         }
                     }
                 }
@@ -175,7 +204,7 @@ fun ClimateStatsScreen(
 
             // Rain
             item {
-                ExpandableInfoBox(title = "Nedbør") {
+                ExpandableInfoBox(title = "Nedbør", cardColor = theme.secondary) {
                     Text(
                         text = "Nedbørsdager viser typisk antall dager med målbar nedbør per måned. Høyeste daglige nedbør viser hvor kraftige regnværene typisk er — høye verdier indikerer risiko for styrtregn og oversvømmelse.",
                         style = MaterialTheme.typography.bodySmall
@@ -209,7 +238,8 @@ fun ClimateStatsScreen(
             item {
                 ExpandableInfoBox(
                     title = "Vind",
-                    initiallyExpanded = false
+                    initiallyExpanded = false,
+                    cardColor = theme.secondary
                 ) {
                     Text(
                         text = "Dette diagrammet viser gjennomsnittlig vindstyrke per måned.",
@@ -245,7 +275,8 @@ fun ClimateStatsScreen(
             item {
                 ExpandableInfoBox(
                     title = "Soltimer",
-                    initiallyExpanded = false
+                    initiallyExpanded = false,
+                    cardColor = theme.secondary
                 ) {
                     Text(
                         text = "Dette diagrammet viser gjennomsnittlig antall soltimer per dag per måned, basert på målinger fra 1991–2020.",
@@ -279,6 +310,7 @@ fun ClimateStatsScreen(
                         }
                     }
                 }
+            }
             }
         }
     }
@@ -490,10 +522,11 @@ fun SunshineChart(
                 .fillMaxWidth()
                 .height(200.dp),
             data = remember(sunshineHours) {
+                val safeValues = sunshineHours.map { maxOf(0.0, it) }
                 listOf(
                     Line(
                         label = "Timer/dag",
-                        values = sunshineHours,
+                        values = safeValues,
                         color = SolidColor(Color(0xFFFFCA28)),
                         firstGradientFillColor = Color(0xFFFFCA28).copy(alpha = .3f),
                         secondGradientFillColor = Color.Transparent,
@@ -514,47 +547,6 @@ fun SunshineChart(
             minValue = 0.0,
             maxValue = 20.0,
         )
-    }
-}
-
-// Keeping this for now for visual confirmation and peace of mind
-@Composable
-fun ClimateInfoContent(
-    temperatureMean: List<Double>?,
-    temperatureMax: List<Double>?,
-    temperatureMin: List<Double>?
-) {
-    val months = listOf("Jan","Feb","Mar","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Des")
-
-    if (temperatureMean == null) {
-        Text("Ingen temperaturdata tilgjengelig.", style = MaterialTheme.typography.bodyMedium)
-        return
-    }
-
-    // Header row
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text("Måned", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
-        Text("Min", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
-        Text("Snitt", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
-        Text("Maks", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
-    }
-
-    Spacer(modifier = Modifier.height(4.dp))
-
-    // One row per month
-    months.forEachIndexed { i, month ->
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(month, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
-            Text(temperatureMin?.getOrNull(i)?.let { "%.1f°".format(it) } ?: "-", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
-            Text(temperatureMean.getOrNull(i)?.let { "%.1f°".format(it) } ?: "-", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
-            Text(temperatureMax?.getOrNull(i)?.let { "%.1f°".format(it) } ?: "-", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
-        }
     }
 }
 
@@ -657,6 +649,74 @@ fun PrecipitationChart(
                 maxValue = 60.0,
             )
         }
+    }
+}
+
+@Composable
+fun SnowChart(
+    meanSnowDepth: List<Double>,
+    maxSnowDepth: List<Double>,
+    modifier: Modifier = Modifier
+) {
+    val months = listOf("Jan", "Feb", "Mar", "Apr", "Mai", "Jun",
+        "Jul", "Aug", "Sep", "Okt", "Nov", "Des")
+
+    Column(modifier = modifier
+        .fillMaxWidth()
+        .padding(16.dp)) {
+
+        Text(
+            text = "Snødybde per måned",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        LineChart(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(240.dp),
+            data = remember(meanSnowDepth, maxSnowDepth) {
+                listOf(
+                    Line(
+                        label = "Snittdybde (cm)",
+                        values = meanSnowDepth,
+                        color = SolidColor(Color(0xFF9FDDFF)),
+                        firstGradientFillColor = Color(0xFF9FDDFF).copy(alpha = .2f),
+                        secondGradientFillColor = Color.Transparent,
+                        curvedEdges = true,
+                        dotProperties = DotProperties(
+                            enabled = true,
+                            color = SolidColor(Color.White),
+                            radius = 4.dp,
+                            strokeWidth = 2.dp,
+                            strokeColor = SolidColor(Color(0xFF9FDDFF))
+                        )
+                    ),
+                    Line(
+                        label = "Maksdybde (cm)",
+                        values = maxSnowDepth,
+                        color = SolidColor(Color(0xFF1A6FB5)),
+                        firstGradientFillColor = Color.Transparent,
+                        secondGradientFillColor = Color.Transparent,
+                        curvedEdges = true,
+                        dotProperties = DotProperties(
+                            enabled = true,
+                            color = SolidColor(Color.White),
+                            radius = 4.dp,
+                            strokeWidth = 2.dp,
+                            strokeColor = SolidColor(Color(0xFF1A6FB5))
+                        )
+                    )
+                )
+            },
+            labelHelperProperties = LabelHelperProperties(enabled = true),
+            labelProperties = LabelProperties(
+                enabled = true,
+                labels = months
+            ),
+            minValue = 0.0,
+            maxValue = 150.0,
+        )
     }
 }
 

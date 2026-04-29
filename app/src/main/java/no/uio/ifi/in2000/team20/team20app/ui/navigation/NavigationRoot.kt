@@ -133,6 +133,7 @@ fun NavigationRoot(
                     location = destination.location,
                     onBackClick = goBack,
                     onHistoricDataClick = {
+                        backStack.removeLastOrNull()
                         backStack.add(Route.ClimateStatsDestination(destination.location))
                     },
                     frostViewModel = frostViewModel,
@@ -175,6 +176,9 @@ fun NavigationRoot(
                 ClimateStatsScreen(
                     location = destination.location,
                     onBackClick = goBack,
+                    onRapportClick = {
+                        backStack.add(Route.GeoscoreDestination(destination.location))
+                    },
                     frostViewModel = frostViewModel
                 )
             }

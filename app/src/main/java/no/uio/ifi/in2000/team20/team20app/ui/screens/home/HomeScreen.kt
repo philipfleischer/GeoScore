@@ -42,7 +42,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchBarObject
-import no.uio.ifi.in2000.team20.team20app.ui.screens.details.ClimateInfoContent
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
 import androidx.compose.material.icons.filled.Star
@@ -113,72 +112,6 @@ fun HomeScreen(
         item {
             SearchBarObject(onOpenSearch = onOpenSearch)
         }
-
-//        item {
-//            HomeHeaderSection(
-//                selectedLocation = selectedLocation,
-//                isFavorite = isCurrentFavorite,
-//                onFavoriteClick = {
-//                    location?.let {
-//                        if (isCurrentFavorite) {
-//                            favoritesViewModel.removeFavorite(it)
-//                        } else {
-//                            favoritesViewModel.addFavorite(it)
-//                        }
-//                    }
-//                }
-//            )
-//        }
-//
-//
-//        item {
-//            GeomarkingInfoBox(
-//                selectedLocation = selectedLocation,
-//                geomarking = "C",
-//                riskLabel = "Moderat georisiko",
-//                expandedText = "Geomerkingen er basert på en samlet vurdering av historiske forhold i området. " +
-//                        "Dette kan inkludere terreng, nedbørsmønstre, lokal eksponering og andre faktorer som påvirker naturfare over tid."
-//            )
-//        }
-//
-//        item {
-//            AreaSummaryBox(
-//                selectedLocation = selectedLocation,
-//                summary = "Dette området har moderate historiske risikofaktorer knyttet til naturhendelser. " +
-//                        "Informasjonen er ment å gi brukeren en enkel og forståelig oversikt før videre utforsking i kart og detaljvisninger."
-//            )
-//        }
-//
-//        item {
-//            HistoricalHighlightsGrid(
-//                selectedLocation = selectedLocation,
-//                averageTemperature = "5.8 °C",
-//                precipitationLevel = "Høy",
-//                terrainExposure = "Moderat",
-//                floodRisk = "Lav–moderat"
-//            )
-//        }
-//
-//        item {
-//            ExpandableInfoBox(
-//                title = "Historiske klimadata"
-//            ) {
-//                when {
-//                    frostUiState.isLoading -> {
-//                        Text("Laster data...")
-//                    }
-//                    frostUiState.error != null -> {
-//                        Text("Feil: ${frostUiState.error}")
-//                    }
-//                    frostUiState.frostStats != null -> {
-//                        ClimateInfoContent(frostStats = frostUiState.frostStats!!)
-//                    }
-//                    else -> {
-//                        Text("Søk et område for å vise historiske data.")
-//                    }
-//                }
-//            }
-//        }
     }
 }
 

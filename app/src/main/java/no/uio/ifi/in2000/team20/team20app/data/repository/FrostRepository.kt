@@ -88,17 +88,25 @@ class FrostRepository(
             )
             val hoursPerDay = (1..12).map { month ->
                 val hours = map[month] ?: 0.0
-                hours / (daysInMonth[month] ?: 30)
+                maxOf(0.0, hours / (daysInMonth[month] ?: 30))
             }
             Triple(hoursPerDay, sunshineResult.stationName, sunshineResult.distanceKm)
         }
 
-    override suspend fun getSnowData(lat: Double, lon: Double): Result<Pair<List<Double>, List<Double>>> {
-        // TODO: implement f eks fetch mean(surface_snow_thickness P1M) and max(surface_snow_thickness P1M)
-        // from getSnowDepthHistory() in datasource, aggregate with aggregateByMonthV0(),
-        // return Pair(meanList, maxList) sorted by month 1–12
-        TODO("Not yet implemented")
-    }
+    override suspend fun getSnowData(lat: Double, lon: Double): Result<Pair<List<Double>, List<Double>>> =
+        runCatching {
+            val raw = dataSource.getSnowDepthHistory(lat, lon)
+
+            val meanMap = raw.aggregateByMonthV0("mean(surface_snow_thickness P1M)")
+                .mapValues { if (it.value < 0) 0.0 else it.value }
+            val maxMap = raw.aggregateByMonthV0("max(surface_snow_thickness P1M)")
+                .mapValues { if (it.value < 0) 0.0 else it.value }
+
+            val meanList = (1..12).map { meanMap[it] ?: 0.0 }
+            val maxList  = (1..12).map { maxMap[it] ?: 0.0 }
+
+            Pair(meanList, maxList)
+        }
 
     override suspend fun getPrecipitationData(lat: Double, lon: Double): Result<Pair<List<Double>, List<Double>>> =
         runCatching {
@@ -159,5 +167,4 @@ class FrostRepository(
             }
             .groupBy({ it.first }, { it.second })
             .mapValues { (_, values) -> values.average() }
-    }
-}
+    }}

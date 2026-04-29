@@ -30,11 +30,12 @@ data class FrostUiState(
     val sunshineStationName: String? = null,
     val sunshineDistanceKm: Double? = null,
     val sunshineError: String? = null,
-    // Snow depth — ready for implementation, always null until fetched
+    // Snow depth (Jan–Dec, index 0–11), aggregated from 1991-2020 raw monthly data
     val snowMean: List<Double>? = null,
     val snowMax: List<Double>? = null,
     val snowError: String? = null,
-    // Precipitation — ready for implementation, always null until fetched
+    // Precipitation (Jan–Dec, index 0–11), aggregated from 1991-2020 raw monthly data
+    // precipitationDays = rainy days per month, precipitationMean = max daily precipitation in mm
     val precipitationMean: List<Double>? = null,
     val precipitationDays: List<Double>? = null,
     val precipitationError: String? = null,
@@ -67,18 +68,18 @@ class FrostViewModel(
                 val tempDeferred = async { repo.getTemperatureData(location.lat, location.lon) }
                 val windDeferred = async { repo.getWindData(location.lat, location.lon) }
                 val sunDeferred  = async { repo.getSunshineData(location.lat, location.lon) }
-                // TODO: uncomment when getSnowData() is implemented in FrostRepository
-                // val snowDeferred          = async { repo.getSnowData(location.lat, location.lon) }
+                val snowDeferred = async { repo.getSnowData(location.lat, location.lon) }
                 val precipitationDeferred = async { repo.getPrecipitationData(location.lat, location.lon) }
 
                 val tempResult = tempDeferred.await()
                 val windResult = windDeferred.await()
                 val sunResult  = sunDeferred.await()
-                // val snowResult          = snowDeferred.await()
+                val snowResult = snowDeferred.await()
                 val precipitationResult = precipitationDeferred.await()
 
                 val tempData = tempResult.getOrNull()
                 val windData = windResult.getOrNull()
+                val snowData = snowResult.getOrNull()
                 val precipData = precipitationResult.getOrNull()
 
                 _uiState.update {
@@ -96,9 +97,9 @@ class FrostViewModel(
                         sunshineStationName = sunResult.getOrNull()?.second,
                         sunshineDistanceKm  = sunResult.getOrNull()?.third,
                         sunshineError    = sunResult.exceptionOrNull()?.message,
-                        // snowMean           = snowResult.getOrNull()?.first,
-                        // snowMax            = snowResult.getOrNull()?.second,
-                        // snowError          = snowResult.exceptionOrNull()?.message,
+                        snowMean           = snowData?.first,
+                        snowMax            = snowData?.second,
+                        snowError          = snowResult.exceptionOrNull()?.message,
                         precipitationMean  = precipData?.second,
                         precipitationDays  = precipData?.first,
                         precipitationError = precipitationResult.exceptionOrNull()?.message,

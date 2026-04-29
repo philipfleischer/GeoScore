@@ -6,12 +6,17 @@ import androidx.compose.material.icons.filled.Bookmarks
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation3.runtime.NavKey
 import no.uio.ifi.in2000.team20.team20app.ui.navigation.Route
@@ -53,25 +58,48 @@ private fun SharedBottomBar(
     onMapClick: () -> Unit,
     onSavedClick: () -> Unit
 ) {
-    NavigationBar {
-        NavigationBarItem(
-            selected = currentDestination is Route.HomeDestination,
-            onClick = onHomeClick,
-            icon = { Icon(Icons.Default.LocationOn, contentDescription = "Søk") },
-            label = { Text("Søk") }
-        )
-        NavigationBarItem(
-            selected = currentDestination is Route.MapDestination,
-            onClick = onMapClick,
-            icon = { Icon(Icons.Default.Map, contentDescription = "Kart") },
-            label = { Text("Kart") }
-        )
-        NavigationBarItem(
-            selected = currentDestination is Route.SavedDestination,
-            onClick = onSavedClick,
-            icon = { Icon(Icons.Default.Bookmarks, contentDescription = "Lagret") },
-            label = { Text("Lagret") }
-        )
+    Surface(
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 8.dp
+    ) {
+        NavigationBar(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+        ) {
+            NavigationBarItem(
+                selected = currentDestination is Route.HomeDestination,
+                onClick = onHomeClick,
+                icon = { Icon(Icons.Default.LocationOn, contentDescription = "Søk") },
+                label = { Text("Søk") },
+                colors = NavigationBarItemDefaults.colors(
+                    indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            )
+            NavigationBarItem(
+                selected = currentDestination is Route.MapDestination,
+                onClick = onMapClick,
+                icon = { Icon(Icons.Default.Map, contentDescription = "Kart") },
+                label = { Text("Kart") },
+                colors = NavigationBarItemDefaults.colors(
+                    indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            )
+            NavigationBarItem(
+                selected = currentDestination is Route.SavedDestination,
+                onClick = onSavedClick,
+                icon = { Icon(Icons.Default.Bookmarks, contentDescription = "Lagret") },
+                label = { Text("Lagret") },
+                colors = NavigationBarItemDefaults.colors(
+                    indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            )
+        }
     }
 }
 
