@@ -27,6 +27,8 @@ data class FrostUiState(
     val windError: String? = null,
     // Sunshine hours per month (Jan–Dec, index 0–11)
     val sunshineHours: List<Double>? = null,
+    val sunshineStationName: String? = null,
+    val sunshineDistanceKm: Double? = null,
     val sunshineError: String? = null,
     // Snow depth — ready for implementation, always null until fetched
     val snowMean: List<Double>? = null,
@@ -89,7 +91,9 @@ class FrostViewModel(
                         windMaxSpeed     = windData?.second,
                         windMaxGust      = windData?.third,
                         windError        = windResult.exceptionOrNull()?.message,
-                        sunshineHours    = sunResult.getOrNull(),
+                        sunshineHours    = sunResult.getOrNull()?.first,
+                        sunshineStationName = sunResult.getOrNull()?.second,
+                        sunshineDistanceKm  = sunResult.getOrNull()?.third,
                         sunshineError    = sunResult.exceptionOrNull()?.message,
                         // snowMean           = snowResult.getOrNull()?.first,
                         // snowMax            = snowResult.getOrNull()?.second,

@@ -17,9 +17,10 @@ import no.uio.ifi.in2000.team20.team20app.domain.model.WindAndPrecipitationObser
 interface FrostRepositoryService {
     // Each method fetches one climate parameter and wraps in Result to isolate failures.
     // Triple order for temperature: (mean, max, min). For wind: (mean, maxSpeed, maxGust).
+    // For sunshine: (hoursPerDay, stationName, distanceKm) includes station metadata. Only 36 stations in Norway that have sunshine data
     suspend fun getTemperatureData(lat: Double, lon: Double): Result<Triple<List<Double>, List<Double>, List<Double>>>
     suspend fun getWindData(lat: Double, lon: Double): Result<Triple<List<Double>, List<Double>, List<Double>>>
-    suspend fun getSunshineData(lat: Double, lon: Double): Result<List<Double>>
+    suspend fun getSunshineData(lat: Double, lon: Double): Result<Triple<List<Double>, String?, Double?>>
     suspend fun getSnowData(lat: Double, lon: Double): Result<Pair<List<Double>, List<Double>>>
     suspend fun getPrecipitationData(lat: Double, lon: Double): Result<Pair<List<Double>, List<Double>>>
 }
@@ -75,12 +76,21 @@ class FrostRepository(
             )
         }
 
-    override suspend fun getSunshineData(lat: Double, lon: Double): Result<List<Double>> =
+    override suspend fun getSunshineData(lat: Double, lon: Double): Result<Triple<List<Double>, String?, Double?>> =
         runCatching {
-            val data = dataSource.getSunshineNormals(lat, lon)
+            val sunshineResult = dataSource.getSunshineNormals(lat, lon)
             // Aggregated in the repository to produce 1991-2020 monthly normals
-            val map = data.aggregateByMonthV0("sum(duration_of_sunshine P1M)")
-            (1..12).map { map[it] ?: 0.0 }
+            val map = sunshineResult.observations.aggregateByMonthV0("sum(duration_of_sunshine P1M)")
+            val daysInMonth = mapOf(
+                1 to 31, 2 to 28, 3 to 31, 4 to 30,
+                5 to 31, 6 to 30, 7 to 31, 8 to 31,
+                9 to 30, 10 to 31, 11 to 30, 12 to 31
+            )
+            val hoursPerDay = (1..12).map { month ->
+                val hours = map[month] ?: 0.0
+                hours / (daysInMonth[month] ?: 30)
+            }
+            Triple(hoursPerDay, sunshineResult.stationName, sunshineResult.distanceKm)
         }
 
     override suspend fun getSnowData(lat: Double, lon: Double): Result<Pair<List<Double>, List<Double>>> {

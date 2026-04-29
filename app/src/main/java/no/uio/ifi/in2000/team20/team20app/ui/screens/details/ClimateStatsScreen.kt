@@ -225,6 +225,46 @@ fun ClimateStatsScreen(
                     }
                 }
             }
+
+            // Sunshine
+            item {
+                ExpandableInfoBox(
+                    title = "Soltimer",
+                    initiallyExpanded = false
+                ) {
+                    Text(
+                        text = "Dette diagrammet viser gjennomsnittlig antall soltimer per dag per måned, basert på målinger fra 1991–2020.",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    when {
+                        frostUiState.isLoading -> {
+                            Text("Laster klimadata...")
+                        }
+
+                        frostUiState.sunshineError != null -> {
+                            Text("Feil: ${frostUiState.sunshineError}")
+                        }
+
+                        frostUiState.sunshineHours != null -> {
+                            SunshineChart(sunshineHours = frostUiState.sunshineHours!!)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            val distanceText = frostUiState.sunshineDistanceKm
+                                ?.let { " (${it.toInt()} km unna)" } ?: ""
+                            Text(
+                                text = "Data fra ${frostUiState.sunshineStationName}$distanceText",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+
+                        else -> {
+                            Text("Ingen soltimer data tilgjengelig.")
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -370,6 +410,56 @@ fun WindChart(
             ),
             minValue = 0.0,
             maxValue = 30.0,
+        )
+    }
+}
+
+@Composable
+fun SunshineChart(
+    sunshineHours: List<Double>,
+    modifier: Modifier = Modifier
+) {
+    val months = listOf("Jan", "Feb", "Mar", "Apr", "Mai", "Jun",
+        "Jul", "Aug", "Sep", "Okt", "Nov", "Des")
+
+    Column(modifier = modifier
+        .fillMaxWidth()
+        .padding(16.dp)) {
+
+        Text(
+            text = "Soltimer per dag",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        LineChart(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp),
+            data = remember(sunshineHours) {
+                listOf(
+                    Line(
+                        label = "Timer/dag",
+                        values = sunshineHours,
+                        color = SolidColor(Color(0xFFFFCA28)),
+                        firstGradientFillColor = Color(0xFFFFCA28).copy(alpha = .3f),
+                        secondGradientFillColor = Color.Transparent,
+                        curvedEdges = true,
+                        dotProperties = DotProperties(
+                            enabled = true,
+                            color = SolidColor(Color.White),
+                            strokeColor = SolidColor(Color(0xFFFFCA28))
+                        )
+                    )
+                )
+            },
+            labelHelperProperties = LabelHelperProperties(enabled = false),
+            labelProperties = LabelProperties(
+                enabled = true,
+                labels = months
+            ),
+            minValue = 0.0,
+            maxValue = 20.0,
         )
     }
 }

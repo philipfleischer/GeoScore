@@ -44,4 +44,5 @@ object FrostRoutes {
     // V0 - frost.met.no: has historical normals and monthly aggregates
     const val OBSERVATIONS_V0 = "https://frost.met.no/observations/v0.jsonld"
     const val SOURCES_V0 = "https://frost.met.no/sources/v0.jsonld"
+    const val AVAILABLE_TIMESERIES_V0 = "https://frost.met.no/observations/availableTimeSeries/v0.jsonld"
 }

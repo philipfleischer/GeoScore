@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team20.team20app.data.datasource
 
+import android.util.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -10,10 +11,18 @@ import io.ktor.http.isSuccess
 import io.ktor.util.encodeBase64
 import no.uio.ifi.in2000.team20.team20app.data.api.FrostRoutes
 import no.uio.ifi.in2000.team20.team20app.data.model.FrostObservationResponseDto
+import no.uio.ifi.in2000.team20.team20app.data.model.FrostV0AvailableTimeSeriesResponseDto
 import no.uio.ifi.in2000.team20.team20app.data.model.FrostV0ObservationResponseDto
 import no.uio.ifi.in2000.team20.team20app.data.model.FrostV0SourceResponseDto
 import no.uio.ifi.in2000.team20.team20app.data.model.FrostV1ResponseDto
 
+
+data class SunshineRawResult(
+    val stationId: String,
+    val stationName: String?,
+    val distanceKm: Double?,
+    val observations: FrostV0ObservationResponseDto
+)
 
 /**
  * Interface for Frost API data fetching.
@@ -32,7 +41,7 @@ interface FrostDataSourceService {
     suspend fun getPrecipitationMean(lat: Double, lon: Double): FrostObservationResponseDto
     suspend fun getSnowDepthHistory(lat: Double, lon: Double): FrostObservationResponseDto
     suspend fun getWindHistory(lat: Double, lon: Double): FrostV0ObservationResponseDto
-    suspend fun getSunshineNormals(lat: Double, lon: Double): FrostV0ObservationResponseDto
+    suspend fun getSunshineNormals(lat: Double, lon: Double): SunshineRawResult
     suspend fun getRankedObservationsForPrecipitation(lat: Double, lon: Double, startYear: Int = 1980, endYear: Int = 2025, maxDist: Double = 10.0, maxCount: Int = 5): FrostV1ResponseDto
     suspend fun getRankedObservationsForWind(lat: Double, lon: Double, startYear: Int = 1980, endYear: Int = 2025, maxDist: Double = 10.0, maxCount: Int = 5): FrostV1ResponseDto
 }
@@ -186,12 +195,65 @@ class FrostDataSource(
             }.frostBody()
     }
 
+    // Finds the nearest station that has sunshine data for the 1991-2020 period
+    // Returns stationId, stationName, and distance in km
+    private suspend fun findNearestSunshineStation(lat: Double, lon: Double): Triple<String, String?, Double?> {
+        Log.d("FrostSunshine", "findNearestSunshineStation() START lat=$lat lon=$lon")
+        try {
+            // First, find all stations with sunshine data
+            val availableResponse: FrostV0AvailableTimeSeriesResponseDto = client.get(FrostRoutes.AVAILABLE_TIMESERIES_V0) {
+                url.encodedParameters.append("elements", "sum(duration_of_sunshine%20P1M)")
+                url.encodedParameters.append("referencetime", "1991-01-01/2020-12-31")
+                url.encodedParameters.append("fields", "sourceId")
+                header("Authorization", authHeader)
+            }.let { response ->
+                Log.d("FrostDataSource", "availableTimeSeries response status: ${response.status.value}")
+                if (!response.status.isSuccess()) {
+                    Log.e("FrostDataSource", "availableTimeSeries error ${response.status.value}: ${response.bodyAsText()}")
+                    throw Exception("Frost ${response.status.value}: ${response.bodyAsText()}")
+                }
+                response.body()
+            }
+
+            if (availableResponse.data.isEmpty()) {
+                throw Exception("No stations found with sunshine data for 1991-2020")
+            }
+
+            val allStationIds = availableResponse.data
+                .map { it.sourceId.removeSuffix(":0") }
+                .distinct()
+            val stationIds = allStationIds.take(50).joinToString(",")
+            Log.d("FrostDataSource", "Sunshine stations: found ${allStationIds.size}, sending ${allStationIds.take(50).size} to sources endpoint")
+
+            // Then find the nearest station among those with sunshine data
+            val lonStr = String.format(java.util.Locale.US, "%.4f", lon)
+            val latStr = String.format(java.util.Locale.US, "%.4f", lat)
+            val sourcesResponse: FrostV0SourceResponseDto = client.get(FrostRoutes.SOURCES_V0) {
+                url.encodedParameters.append("geometry", "nearest(POINT($lonStr%20$latStr))")
+                url.encodedParameters.append("nearestmaxcount", "200")
+                url.encodedParameters.append("ids", stationIds)
+                header("Authorization", authHeader)
+            }.frostBody()
+
+            if (sourcesResponse.data.isEmpty()) {
+                throw Exception("No nearby stations with sunshine data found")
+            }
+
+            val nearestStation = sourcesResponse.data.first()
+            return Triple(nearestStation.id, nearestStation.name, nearestStation.distance)
+        } catch (e: Exception) {
+            Log.e("FrostDataSource", "findNearestSunshineStation() exception: ${e.message}", e)
+            throw e
+        }
+    }
+
     // Fetches raw monthly sunshine hours for 1991-2020 from V0
-    // Aggregated in the repository to produce 1991-2020 monthly normals
-    override suspend fun getSunshineNormals(lat: Double, lon: Double): FrostV0ObservationResponseDto {
-        val sources = findNearestV0Sources(lat, lon)
-        return client.get(FrostRoutes.OBSERVATIONS_V0) {
-            url.encodedParameters.append("sources", sources)
+    // Finds the nearest station with actual sunshine data to avoid HTTP 412 failures
+    override suspend fun getSunshineNormals(lat: Double, lon: Double): SunshineRawResult {
+        Log.d("FrostSunshine", "getSunshineNormals() START lat=$lat lon=$lon")
+        val (stationId, stationName, distance) = findNearestSunshineStation(lat, lon)
+        val observations: FrostV0ObservationResponseDto = client.get(FrostRoutes.OBSERVATIONS_V0) {
+            url.encodedParameters.append("sources", stationId)
             url.encodedParameters.append(
                 "elements",
                 listOf("sum(duration_of_sunshine P1M)").joinToString(",").replace(" ", "%20")
@@ -199,6 +261,13 @@ class FrostDataSource(
             url.encodedParameters.append("referencetime", "1991-01-01/2020-12-31")
             header("Authorization", authHeader)
         }.frostBody()
+
+        return SunshineRawResult(
+            stationId = stationId,
+            stationName = stationName,
+            distanceKm = distance,
+            observations = observations
+        )
     }
 
     override suspend fun getRankedObservationsForPrecipitation(
