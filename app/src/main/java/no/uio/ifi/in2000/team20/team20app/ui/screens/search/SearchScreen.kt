@@ -237,12 +237,3 @@ private fun SearchResultItem(
         }
     }
 }
-
-@Composable
-@Preview
-fun SearchScreenPreview() {
-    SearchScreen(
-        onBackClick = {},
-        onLocationSelected = { _ -> }
-    )
-}

@@ -79,10 +79,3 @@ fun SavedScreen(
         }
     }
 }
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-private fun SavedScreenPreview() {
-    MaterialTheme {
-    }
-}

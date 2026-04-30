@@ -13,14 +13,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -33,26 +31,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.window.core.layout.WindowSizeClass
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchBarObject
+import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.StarBorder
-import androidx.compose.material3.IconButton
+import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.sp
-import androidx.window.core.layout.WindowSizeClass
-import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
-import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
 
 @Composable
 fun HomeScreen(
@@ -64,8 +58,6 @@ fun HomeScreen(
     frostViewModel: FrostViewModel
 ) {
     val location = sharedViewModel.selectedLocation
-    val frostUiState by frostViewModel.uiState.collectAsStateWithLifecycle()
-    val isCurrentSaved by savedViewModel.isCurrentSaved.collectAsStateWithLifecycle()
 
     // Calculates window width and returns true if the size width class is compact, and false for everything else.
     val compactScreenWidth = !LocalWindowSizeClass.current.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
@@ -76,8 +68,6 @@ fun HomeScreen(
             savedViewModel.checkIfSaved(it)
         }
     }
-
-    val selectedLocation = location?.name ?: "Oslo"
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(if(compactScreenWidth) 1 else 2),
@@ -111,81 +101,6 @@ fun HomeScreen(
         }
         item {
             SearchBarObject(onOpenSearch = onOpenSearch)
-        }
-    }
-}
-
-@Composable
-fun HomeHeaderSection(
-    selectedLocation: String,
-    isFavorite: Boolean,
-    onFavoriteClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(28.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = "Naturfareoversikt",
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-
-                    Text(
-                        text = "Valgt område: $selectedLocation",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }
-
-                IconButton(
-                    onClick = onFavoriteClick
-                ) {
-                    Icon(
-                        imageVector = if (isFavorite) {
-                            Icons.Filled.Star
-                        } else {
-                            Icons.Outlined.StarBorder
-                        },
-                        contentDescription = if (isFavorite) {
-                            "Fjern fra favoritter"
-                        } else {
-                            "Legg til i favoritter"
-                        },
-                        tint = if (isFavorite) {
-                            Color(0xFFFFC107)
-                        } else {
-                            MaterialTheme.colorScheme.onPrimaryContainer
-                        },
-                        modifier = Modifier.size(28.dp)
-                    )
-                }
-            }
-
-            Text(
-                text = "Se geomerking, historiske nøkkelfaktorer og klimadata for området.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f)
-            )
         }
     }
 }
@@ -316,131 +231,6 @@ fun GeomarkingBadge(
     }
 }
 
-@Composable
-fun AreaSummaryBox(
-    selectedLocation: String,
-    summary: String,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Default.LocationOn,
-                    contentDescription = null
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Områdeoversikt for $selectedLocation",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-
-            Divider()
-
-            Text(
-                text = summary,
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
-    }
-}
-
-@Composable
-fun HistoricalHighlightsGrid(
-    selectedLocation: String,
-    averageTemperature: String,
-    precipitationLevel: String,
-    terrainExposure: String,
-    floodRisk: String,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Text(
-            text = "Historiske nøkkelfaktorer for $selectedLocation",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold
-        )
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            SummaryMiniCard(
-                title = "Temp.",
-                value = averageTemperature,
-                modifier = Modifier.weight(1f)
-            )
-            SummaryMiniCard(
-                title = "Nedbør",
-                value = precipitationLevel,
-                modifier = Modifier.weight(1f)
-            )
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            SummaryMiniCard(
-                title = "Terreng",
-                value = terrainExposure,
-                modifier = Modifier.weight(1f)
-            )
-            SummaryMiniCard(
-                title = "Flomfare",
-                value = floodRisk,
-                modifier = Modifier.weight(1f)
-            )
-        }
-    }
-}
-
-@Composable
-fun SummaryMiniCard(
-    title: String,
-    value: String,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier.aspectRatio(1.9f),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(18.dp),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            Text(
-                text = value,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        }
-    }
-}
-
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun HomeScreenLayoutPreview() {
@@ -451,29 +241,12 @@ private fun HomeScreenLayoutPreview() {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            //HomeHeaderSection()
-
             GeomarkingInfoBox(
                 selectedLocation = "Oslo",
                 geomarking = "C",
                 riskLabel = "Moderat georisiko",
                 expandedText = "Dette området har moderate historiske risikofaktorer knyttet til naturhendelser."
             )
-
-            AreaSummaryBox(
-                selectedLocation = "Oslo",
-                summary = "Området har en moderat samlet historisk eksponering for naturfare."
-            )
-
-            HistoricalHighlightsGrid(
-                averageTemperature = "5.8 °C",
-                precipitationLevel = "Høy",
-                terrainExposure = "Moderat",
-                floodRisk = "Lav–moderat",
-                selectedLocation = "Oslo",
-                modifier = Modifier
-            )
         }
     }
 }
-

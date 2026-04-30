@@ -50,9 +50,6 @@ fun NavigationRoot(
         screen -> screen.route.let { backStack.add(it) }
     }
 
-//    val goToHome: () -> Unit = {backStack.add(Route.HomeDestination)}
-//    val goToMap: () -> Unit = {backStack.add(Route.MapDestination)}
-//    val goToSaved: () -> Unit = {backStack.add(Route.SavedDestination)}
     val goToSettings: () -> Unit = { backStack.add(Route.SettingsDestination) }
     val goToSearch: () -> Unit = { backStack.add(Route.SearchDestination) }
 
