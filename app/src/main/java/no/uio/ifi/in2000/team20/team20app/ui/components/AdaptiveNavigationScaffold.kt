@@ -1,8 +1,10 @@
 package no.uio.ifi.in2000.team20.team20app.ui.components
 
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
@@ -48,7 +50,14 @@ fun AdaptiveNavigationScaffold (
             NavigationSuiteType.NavigationRail
         } else {
             NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(currentWindowAdaptiveInfo())
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        navigationSuiteColors = NavigationSuiteDefaults.colors(
+            navigationBarContainerColor = MaterialTheme.colorScheme.surface,
+            navigationBarContentColor = MaterialTheme.colorScheme.onSurface,
+            navigationRailContainerColor = MaterialTheme.colorScheme.surface,
+        ),
     ){
         Scaffold(
             topBar = { SharedTopAppBar(

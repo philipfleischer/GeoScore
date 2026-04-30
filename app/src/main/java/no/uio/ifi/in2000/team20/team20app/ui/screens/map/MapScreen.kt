@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffold
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -82,54 +82,14 @@ fun MapScreen(
                 )
 
                 Text(
-                    text = "Sammendrag",
-                    style = MaterialTheme.typography.titleLarge
+                    text = "Her vil du kunne se historisk klimadata en gang i fremtiden!",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
-                Text(
-                    text = "Kort risikoanalyse for området: flom, skred eller styrtregn.",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(20.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text(
-                            text = "Mitigerende tiltak",
-                            style = MaterialTheme.typography.titleLarge
-                        )
-
-                        Text(
-                            text = "Eksempel: forbedret drenering eller terrengtilpasning.",
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                    }
-                }
-
-                Button(
-                    onClick = {
-                        if (isCurrentSaved) {
-                            savedViewModel.removeSaved(chosenPosition)
-                        } else {
-                            savedViewModel.addSaved(chosenPosition)
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(if (isCurrentSaved) "Fjern fra lagrede" else "Lagre sted")
-                }
-
-                Button(
-                    onClick = {},
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Åpne full detaljvisning")
-                }
+                // TODO: Add historical climate charts here (temperature, snow, precipitation, wind)
+                // FrostViewModel must be passed in and loadFrostStats() called on location change
+                // See ClimateStatsScreen.kt for chart implementations
             }
         }
     ) { paddingValues ->
@@ -188,7 +148,10 @@ fun MapScreen(
                     .align(Alignment.TopCenter)
                     .padding(top = 16.dp, start = 16.dp, end = 16.dp)
                     .fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp)
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                )
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp)

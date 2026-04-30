@@ -52,8 +52,6 @@ sealed interface Route: NavKey {
     /*
      * Dette er Lagret-skjermen.
      * Det viser områder brukeren har lagret.
-     * Brukeren kan velge et lagret område for å åpne
-     * detaljskjermen for dette området.
      */
     @Serializable
     object SavedDestination : Route, NavKey
