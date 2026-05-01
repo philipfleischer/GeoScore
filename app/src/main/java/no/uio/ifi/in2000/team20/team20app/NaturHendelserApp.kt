@@ -13,7 +13,6 @@ import no.uio.ifi.in2000.team20.team20app.data.api.FrostClientProvider
 import no.uio.ifi.in2000.team20.team20app.data.api.GeoSearchClientProvider
 import no.uio.ifi.in2000.team20.team20app.data.datasource.AddressRemoteDataSource
 import no.uio.ifi.in2000.team20.team20app.data.datasource.FrostDataSource
-import no.uio.ifi.in2000.team20.team20app.data.datasource.LocationRemoteDatasource
 import no.uio.ifi.in2000.team20.team20app.data.local.AppDatabase
 import no.uio.ifi.in2000.team20.team20app.data.repository.SavedRepository
 import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepository
@@ -44,9 +43,6 @@ fun NaturhendelserApp() {
     }
     val geoSearchRepository = remember {
         GeoSearchRepository(
-            locationDatasource = LocationRemoteDatasource(
-                client = GeoSearchClientProvider.client
-            ),
             addressDatasource = AddressRemoteDataSource(
                 client = GeoSearchClientProvider.client
             )
