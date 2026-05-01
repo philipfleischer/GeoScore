@@ -68,7 +68,7 @@ fun NavigationRoot(
                     title = Screen.HOME.title,
                     onNavigate = onNavigate,
                     onOpenSettings = goToSettings,
-                    currentDestination = Screen.HOME.route
+                    currentDestination = Screen.HOME.route,
                 ) { modifier ->
                     HomeScreen(
                         onOpenSearch = goToSearch,
@@ -148,14 +148,23 @@ fun NavigationRoot(
             }
 
             entry<Route.SearchDestination> {
-                SearchScreen(
+                AdaptiveNavigationScaffold(
+                    title = "Søk etter en adresse",
+                    currentDestination = Screen.HOME.route,
+                    onNavigate = onNavigate,
                     onBackClick = goBack,
-                    onLocationSelected = { location ->
-                        appViewModel.setSelectedArea(location)
-                        backStack.add(Route.GeoscoreDestination(location))
-                    },
-                    searchViewModel = searchViewModel
-                )
+                    hasTopBar = true
+                ) { modifier ->
+                    SearchScreen(
+                        onBackClick = goBack,
+                        onLocationSelected = { location ->
+                            appViewModel.setSelectedArea(location)
+                            backStack.add(Route.GeoscoreDestination(location))
+                        },
+                        searchViewModel = searchViewModel,
+                        modifier = modifier
+                    )
+                }
             }
 
             entry<Route.AreaDetailsDestination> { destination ->

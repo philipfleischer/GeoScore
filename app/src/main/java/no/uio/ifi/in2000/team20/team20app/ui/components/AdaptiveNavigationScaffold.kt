@@ -15,6 +15,7 @@ import androidx.window.core.layout.WindowSizeClass
 import no.uio.ifi.in2000.team20.team20app.ui.navigation.Route
 import no.uio.ifi.in2000.team20.team20app.util.Screen
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.unit.dp
 
 /*
 Main changes done (24.04.2026 adaptive-navigation-impl):
@@ -26,7 +27,9 @@ fun AdaptiveNavigationScaffold (
     title: String,
     currentDestination: NavKey?,
     onNavigate: (Screen) -> Unit,
-    onOpenSettings: () -> Unit,
+    onOpenSettings: () -> Unit = {},
+    onBackClick: () -> Unit = {},
+    hasTopBar: Boolean = false,
     content: @Composable (Modifier) -> Unit
 ){
 
@@ -59,13 +62,18 @@ fun AdaptiveNavigationScaffold (
             navigationRailContainerColor = MaterialTheme.colorScheme.surface,
         ),
     ){
-        Scaffold(
-            topBar = { SharedTopAppBar(
-                title = title,
-                onOpenSettings = onOpenSettings)
+        if (hasTopBar) {
+            Scaffold(
+                topBar = { SharedTopAppBar(
+                    title = title,
+                    onBackClick = onBackClick
+                )
+                }
+            ) { innerPadding ->
+                content(Modifier.padding(innerPadding))
             }
-        ) { innerPadding ->
-            content(Modifier.padding(innerPadding))
+        } else {
+            content(Modifier.padding(0.dp))
         }
     }
 }
