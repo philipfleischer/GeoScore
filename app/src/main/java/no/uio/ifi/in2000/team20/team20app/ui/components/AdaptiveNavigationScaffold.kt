@@ -12,9 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavKey
 import androidx.window.core.layout.WindowSizeClass
-import no.uio.ifi.in2000.team20.team20app.ui.navigation.Route
 import no.uio.ifi.in2000.team20.team20app.util.Screen
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.unit.dp
 
 /*
 Main changes done (24.04.2026 adaptive-navigation-impl):
@@ -24,9 +24,11 @@ Main changes done (24.04.2026 adaptive-navigation-impl):
 @Composable
 fun AdaptiveNavigationScaffold (
     title: String,
-    currentDestination: NavKey?,
+    highlightedDest: NavKey?,
     onNavigate: (Screen) -> Unit,
-    onOpenSettings: () -> Unit,
+    onOpenSettings: () -> Unit = {},
+    onBackClick: () -> Unit = {},
+    hasTopBar: Boolean = false,
     content: @Composable (Modifier) -> Unit
 ){
 
@@ -38,7 +40,7 @@ fun AdaptiveNavigationScaffold (
         navigationSuiteItems = {
             Screen.entries.forEach { screen ->
                 item(
-                    selected = screen.route == currentDestination,
+                    selected = screen.route == highlightedDest,
                     onClick = { onNavigate(screen) },
                     icon = { Icon(imageVector = screen.icon, contentDescription = screen.title) },
                     label = { screen.title },
@@ -59,13 +61,18 @@ fun AdaptiveNavigationScaffold (
             navigationRailContainerColor = MaterialTheme.colorScheme.surface,
         ),
     ){
-        Scaffold(
-            topBar = { SharedTopAppBar(
-                title = title,
-                onOpenSettings = onOpenSettings)
+        if (hasTopBar) {
+            Scaffold(
+                topBar = { SharedTopAppBar(
+                    title = title,
+                    onBackClick = onBackClick
+                )
+                }
+            ) { innerPadding ->
+                content(Modifier.padding(innerPadding))
             }
-        ) { innerPadding ->
-            content(Modifier.padding(innerPadding))
+        } else {
+            content(Modifier.padding(0.dp))
         }
     }
 }
