@@ -19,8 +19,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.maps.model.CameraPosition
@@ -53,6 +58,7 @@ fun MapScreen(
     savedViewModel: SavedViewModel,
     mapViewModel: MapViewModel = viewModel()
 ) {
+    //TODO: Import custom colors
     val chosenPosition = sharedViewModel.selectedLocation
     val isCurrentSaved by savedViewModel.isCurrentSaved.collectAsStateWithLifecycle()
     val layers by mapViewModel.layers.collectAsStateWithLifecycle()
@@ -67,84 +73,92 @@ fun MapScreen(
         savedViewModel.checkIfSaved(chosenPosition)
     }
 
-    BottomSheetScaffold(
-        modifier = modifier,
-        sheetPeekHeight = 100.dp,
-        sheetContainerColor = MaterialTheme.colorScheme.surface,
-        sheetContent = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Text(
-                    text = chosenPosition.name,
-                    style = MaterialTheme.typography.headlineMedium
-                )
-
-                Text(
-                    text = "Her vil du kunne se historisk klimadata en gang i fremtiden!",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-
-                // TODO: Add historical climate charts here (temperature, snow, precipitation, wind)
-                // FrostViewModel must be passed in and loadFrostStats() called on location change
-                // See ClimateStatsScreen.kt for chart implementations
-            }
-        }
-    ) { paddingValues ->
-
-        Box(
+//    BottomSheetScaffold(
+//        modifier = modifier,
+//        sheetPeekHeight = 100.dp,
+//        sheetContainerColor = MaterialTheme.colorScheme.surface,
+//        sheetContent = {
+//            Column(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(20.dp),
+//                verticalArrangement = Arrangement.spacedBy(16.dp)
+//            ) {
+//                Text(
+//                    text = chosenPosition.name,
+//                    style = MaterialTheme.typography.headlineMedium
+//                )
+//
+//                Text(
+//                    text = "Her vil du kunne se historisk klimadata en gang i fremtiden!",
+//                    style = MaterialTheme.typography.bodyMedium,
+//                    color = MaterialTheme.colorScheme.onSurfaceVariant
+//                )
+//
+//                // TODO: Add historical climate charts here (temperature, snow, precipitation, wind)
+//                // FrostViewModel must be passed in and loadFrostStats() called on location change
+//                // See ClimateStatsScreen.kt for chart implementations
+//            }
+//        }
+//    ) { paddingValues ->
+//
+//
+//    }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        val context = LocalContext.current
+        val mapStyleOptions = MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style)
+        GoogleMap(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .background(MaterialTheme.colorScheme.surfaceVariant),
+            cameraPositionState = cameraPositionState,
+            properties = MapProperties(
+                maxZoomPreference = MAX_ZOOM,
+                minZoomPreference = MIN_ZOOM,
+                mapStyleOptions = mapStyleOptions
+            )
         ) {
-            val context = LocalContext.current
-            val mapStyleOptions = MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style)
-            GoogleMap(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                cameraPositionState = cameraPositionState,
-                properties = MapProperties(
-                    maxZoomPreference = MAX_ZOOM,
-                    minZoomPreference = MIN_ZOOM,
-                    mapStyleOptions = mapStyleOptions
-                )
-            ) {
-                layers.forEach { layer ->
-                    WmsTileOverlay(
-                        urlFormatter = layer.formatter,
-                        visible = layer.toggled
-                    )
-                }
-                Marker(
-                    state = markerPosition,
-                    title = chosenPosition.name,
-                    snippet = "Markør for ${chosenPosition.name}"
+            layers.forEach { layer ->
+                WmsTileOverlay(
+                    urlFormatter = layer.formatter,
+                    visible = layer.toggled
                 )
             }
-
-            Card(
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = 16.dp, start = 16.dp, end = 16.dp)
-                    .fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text("Valgt område")
-                    Text(chosenPosition.name)
-                }
-            }
+            Marker(
+                state = markerPosition,
+                title = chosenPosition.name,
+                snippet = "Markør for ${chosenPosition.name}"
+            )
         }
+        Text(
+            text = chosenPosition.name,
+            style = MaterialTheme.typography.labelLarge,
+            fontSize = 30.sp,
+            color = Color.Black,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.semantics{ heading() }.fillMaxWidth().padding(32.dp)
+        )
+
+//        Card(
+//            modifier = Modifier
+//                .align(Alignment.TopCenter)
+//                .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+//                .fillMaxWidth(),
+//            shape = RoundedCornerShape(20.dp),
+//            colors = CardDefaults.cardColors(
+//                containerColor = MaterialTheme.colorScheme.primaryContainer
+//            )
+//        ) {
+//            Column(
+//                modifier = Modifier.padding(16.dp)
+//            ) {
+//                Text("Valgt område")
+//                Text(chosenPosition.name)
+//            }
+//        }
     }
 }
 
