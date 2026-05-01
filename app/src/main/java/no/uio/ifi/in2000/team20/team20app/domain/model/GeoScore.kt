@@ -13,3 +13,10 @@ data class WindAndPrecipitationObservationsResult(
     val precipitationValues: Map<String, Double>,
     val windValues: Map<String, Double>
 )
+
+data class GeoScore (
+    val hazardScore: Double,
+    val exposureScore: Double,
+    val vulnerabilityScore: Double,
+    val geoScore: Double
+)

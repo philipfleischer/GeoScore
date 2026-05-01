@@ -37,22 +37,6 @@ data class FrostV0ObservationValueDto(
     val value: Double
 )
 
-// ─── V0 available time series (frost.met.no/observations/availableTimeSeries/v0.jsonld) ─────
-// Used to find which stations have data for a specific element
-// We currently only use it for sunshine cause only 36 stations measure that
-
-@Serializable
-data class FrostV0AvailableTimeSeriesResponseDto(
-    val data: List<FrostV0AvailableTimeSeriesDto>
-)
-
-@Serializable
-data class FrostV0AvailableTimeSeriesDto(
-    val sourceId: String,
-    val elementId: String? = null,
-    val referenceTime: String? = null
-)
-
 // ─── V0 sources types (frost.met.no/sources/v0.jsonld) ──────────────────────
 
 @Serializable
@@ -63,8 +47,7 @@ data class FrostV0SourceResponseDto(
 @Serializable
 data class FrostV0SourceDto(
     val id: String,
-    val name: String? = null,
-    val distance: Double? = null
+    val name: String? = null
 )
 
 // ─── V1 observation types (frost-rc.met.no/api/v1/obs/) ─────────────────────
@@ -133,12 +116,12 @@ data class FrostObservationBodyDto(
 
 @Serializable
 data class FrostV1ResponseDto(
-    val data: FrostV1DataDto
+    val data: FrostV1DataDto = FrostV1DataDto(emptyList())
 )
 
 @Serializable
 data class FrostV1DataDto(
-    val tseries: List<FrostV1TimeSeriesDto>
+    val tseries: List<FrostV1TimeSeriesDto> = emptyList()
 )
 
 @Serializable

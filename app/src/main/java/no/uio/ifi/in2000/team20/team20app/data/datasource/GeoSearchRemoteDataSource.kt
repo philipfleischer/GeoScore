@@ -4,11 +4,19 @@ import android.util.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
-import no.uio.ifi.in2000.team20.team20app.data.api.AddressApiService
-import no.uio.ifi.in2000.team20.team20app.data.api.GeoSearchApiService
 import no.uio.ifi.in2000.team20.team20app.data.model.AddressResponse
 import no.uio.ifi.in2000.team20.team20app.data.model.LocationResponse
 import java.net.URLEncoder
+
+
+interface GeoSearchApiService {
+    suspend fun searchLocationWithQuery(query: String, lat: Double? = null, lon: Double? = null): LocationResponse
+    suspend fun searchLocationWithCoordinates(lat: Double, lon: Double): LocationResponse
+}
+
+interface AddressApiService {
+    suspend fun searchAddress(query: String): AddressResponse
+}
 
 class LocationRemoteDatasource(
     private val client: HttpClient

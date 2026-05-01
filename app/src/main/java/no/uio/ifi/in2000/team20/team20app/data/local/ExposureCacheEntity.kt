@@ -8,5 +8,6 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "exposure_cache")
 data class ExposureCacheEntity(
     @PrimaryKey val locationKey: String,
-    val eventCount: Int
+    val eventCount: Int,
+    val score: Double
 )
