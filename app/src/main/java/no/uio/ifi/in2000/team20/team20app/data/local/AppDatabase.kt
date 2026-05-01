@@ -6,7 +6,7 @@ import androidx.room.RoomDatabase
 
 @Database(
     entities = [
-        FavoriteLocationEntity::class,
+        SavedLocationEntity::class,
         HazardCacheEntity::class,
         ExposureCacheEntity::class,
         VulnerabilityCacheEntity::class,
@@ -16,7 +16,7 @@ import androidx.room.RoomDatabase
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun favoriteLocationDao(): FavoriteLocationDao
+    abstract fun savedLocationDao(): SavedLocationDao
     abstract fun hazardCacheDao(): HazardCacheDao
     abstract fun exposureCacheDao(): ExposureCacheDao
     abstract fun vulnerabilityCacheDao(): VulnerabilityCacheDao
