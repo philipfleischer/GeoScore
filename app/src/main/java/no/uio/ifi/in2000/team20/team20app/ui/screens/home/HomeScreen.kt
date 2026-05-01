@@ -84,7 +84,7 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxWidth(if (compactScreenWidth) 1f else 0.5f)
             ){
                 Text(
-                    text = "Vit hva du kjøper- før du kjøper det",
+                    text = "Vit hva du kjøper - før du kjøper det",
                     fontSize = 40.sp,
                     lineHeight = 48.sp,
                     color = Color.Blue,
@@ -92,7 +92,7 @@ fun HomeScreen(
                     modifier = Modifier.semantics{ heading() }
                 )
                 Text(
-                    text = "Få innsikt i grunnforhold og naturfare. Søk op en adresse og få en risikovurdering" +
+                    text = "Få innsikt i grunnforhold og naturfare. Søk opp en adresse og få en risikovurdering " +
                             "basert på geologisk og meterologisk data.",
                     style = MaterialTheme.typography.bodyMedium,
                     fontSize = 20.sp,

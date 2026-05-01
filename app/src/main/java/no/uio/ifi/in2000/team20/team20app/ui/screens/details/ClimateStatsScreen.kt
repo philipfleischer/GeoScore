@@ -50,6 +50,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.sp
 import ir.ehsannarmani.compose_charts.models.ZeroLineProperties
+import ir.ehsannarmani.compose_charts.models.PopupProperties
+import androidx.compose.animation.core.tween
+import androidx.compose.ui.text.TextStyle
+import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
+import ir.ehsannarmani.compose_charts.models.IndicatorCount
+import ir.ehsannarmani.compose_charts.models.GridProperties
+import ir.ehsannarmani.compose_charts.models.GridProperties.AxisProperties
+import ir.ehsannarmani.compose_charts.models.StrokeStyle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -279,7 +287,8 @@ fun ClimateStatsScreen(
                     cardColor = theme.secondary
                 ) {
                     Text(
-                        text = "Dette diagrammet viser gjennomsnittlig antall soltimer per dag per måned, basert på målinger fra 1991–2020.",
+                        text = "Dette diagrammet viser gjennomsnittlig antall timer med direkte sollys på en sensor per dag per måned. " +
+                                "Den sier ikke hvor mange timer i døgnet det er lyst. Målingene er basert på data fra 1991–2020.",
                         style = MaterialTheme.typography.bodySmall
                     )
                     Spacer(modifier = Modifier.height(12.dp))
@@ -326,8 +335,8 @@ fun TemperatureChart(
     minTemperatures: List<Double>,
     modifier: Modifier = Modifier
 ) {
-    val months = listOf("Jan", "Feb", "Mar", "Apr", "Mai", "Jun",
-        "Jul", "Aug", "Sep", "Okt", "Nov", "Des")
+    val months = listOf("Jan", " ", "Mar", " ", "Mai", " ",
+        " ", "Aug", " ", "Okt", " ", "Des")
 
     Column(modifier = modifier
         .fillMaxWidth()
@@ -401,6 +410,45 @@ fun TemperatureChart(
                 enabled = true,
                 labels = months
             ),
+            popupProperties = PopupProperties(
+                enabled = true,
+                animationSpec = tween(300),
+                duration = 2000L,
+                textStyle = TextStyle(
+                    color = Color.White,
+                    fontSize = 11.sp
+                ),
+                containerColor = Color(0xFF1E1E2E),
+                cornerRadius = 8.dp,
+                contentHorizontalPadding = 8.dp,
+                contentVerticalPadding = 4.dp,
+                contentBuilder = { popup ->
+                    val monthNames = listOf("Jan", "Feb", "Mar", "Apr", "Mai", "Jun",
+                        "Jul", "Aug", "Sep", "Okt", "Nov", "Des")
+                    "${monthNames[popup.valueIndex]}: ${"%.1f".format(popup.value)}°C"
+                }
+            ),
+            indicatorProperties = HorizontalIndicatorProperties(
+                enabled = true,
+                // Temperature axis increases in steps by 5
+                count = IndicatorCount.StepBased(stepBy = 5.0),
+                contentBuilder = { value ->
+                    "%.0f".format(value)
+                }
+            ),
+            gridProperties = GridProperties(
+                enabled = true,
+                xAxisProperties = AxisProperties(
+                    color = SolidColor(Color.Gray.copy(alpha = 0.2f)),
+                    style = StrokeStyle.Dashed(intervals = floatArrayOf(6f, 6f))
+                ),
+                // lineCount 12 for 12 months
+                yAxisProperties = AxisProperties(
+                    lineCount = 12,
+                    color = SolidColor(Color.Gray.copy(alpha = 0.2f)),
+                    style = StrokeStyle.Dashed(intervals = floatArrayOf(6f, 6f))
+                )
+            ),
             minValue = -20.0,
             maxValue = 30.0,
         )
@@ -428,15 +476,15 @@ fun WindChart(
     windMaxGust: List<Double>,
     modifier: Modifier = Modifier
 ) {
-    val months = listOf("Jan", "Feb", "Mar", "Apr", "Mai", "Jun",
-        "Jul", "Aug", "Sep", "Okt", "Nov", "Des")
+    val months = listOf("Jan", " ", "Mar", " ", "Mai", "Jun",
+        "Jul", "Aug", " ", "Okt", " ", "Des")
 
     Column(modifier = modifier
         .fillMaxWidth()
         .padding(16.dp)) {
 
         Text(
-            text = "Månedlig vindstyrke",
+            text = "Månedlig vindstyrke (m/s)",
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -448,7 +496,7 @@ fun WindChart(
             data = remember(windMean, windMaxSpeed, windMaxGust) {
                 listOf(
                     Line(
-                        label = "Middelvind (m/s)",
+                        label = "Middelvind",
                         values = windMean,
                         color = SolidColor(Color(0xFF4CAF50)),
                         firstGradientFillColor = Color(0xFF4CAF50).copy(alpha = .2f),
@@ -461,7 +509,7 @@ fun WindChart(
                         )
                     ),
                     Line(
-                        label = "Maks middelvind (m/s)",
+                        label = "Maks middelvind",
                         values = windMaxSpeed,
                         color = SolidColor(Color(0xFFFFA726)),
                         firstGradientFillColor = Color.Transparent,
@@ -474,7 +522,7 @@ fun WindChart(
                         )
                     ),
                     Line(
-                        label = "Maks vindkast (m/s)",
+                        label = "Maks vindkast",
                         values = windMaxGust,
                         color = SolidColor(Color(0xFFEF5350)),
                         firstGradientFillColor = Color.Transparent,
@@ -504,8 +552,8 @@ fun SunshineChart(
     sunshineHours: List<Double>,
     modifier: Modifier = Modifier
 ) {
-    val months = listOf("Jan", "Feb", "Mar", "Apr", "Mai", "Jun",
-        "Jul", "Aug", "Sep", "Okt", "Nov", "Des")
+    val months = listOf(" ", " ", "Mar", " ", " ", "Jun",
+        " ", " ", "Sep", " ", " ", "Des")
 
     Column(modifier = modifier
         .fillMaxWidth()
@@ -556,8 +604,8 @@ fun PrecipitationChart(
     maxDailyPrecip: List<Double>,
     modifier: Modifier = Modifier
 ) {
-    val months = listOf("Jan", "Feb", "Mar", "Apr", "Mai", "Jun",
-        "Jul", "Aug", "Sep", "Okt", "Nov", "Des")
+    val months = listOf("Jan", " ", " ", "Apr", " ", " ",
+        "Jul", " ", " ", "Okt", " ", " ")
 
     Column(modifier = modifier.fillMaxWidth()) {
         // Rainy days chart
@@ -658,8 +706,8 @@ fun SnowChart(
     maxSnowDepth: List<Double>,
     modifier: Modifier = Modifier
 ) {
-    val months = listOf("Jan", "Feb", "Mar", "Apr", "Mai", "Jun",
-        "Jul", "Aug", "Sep", "Okt", "Nov", "Des")
+    val months = listOf(" ", "Feb", " ", "Apr", " ", "Jun",
+        " ", "Aug", " ", "Okt", " ", "Des")
 
     Column(modifier = modifier
         .fillMaxWidth()
@@ -714,8 +762,48 @@ fun SnowChart(
                 enabled = true,
                 labels = months
             ),
+            popupProperties = PopupProperties(
+                enabled = true,
+                mode = PopupProperties.Mode.PointMode(), // "snaps" to next month
+                animationSpec = tween(300),
+                duration = 2000L,
+                textStyle = TextStyle(
+                    color = Color.White,
+                    fontSize = 11.sp
+                ),
+                containerColor = Color(0xFF1E1E2E),
+                cornerRadius = 8.dp,
+                contentHorizontalPadding = 8.dp,
+                contentVerticalPadding = 4.dp,
+                contentBuilder = { popup ->
+                    val monthNames = listOf("Jan", "Feb", "Mar", "Apr", "Mai", "Jun",
+                        "Jul", "Aug", "Sep", "Okt", "Nov", "Des")
+                    "${monthNames[popup.valueIndex]}: ${"%.1f".format(popup.value)} cm"
+                }
+            ),
+            indicatorProperties = HorizontalIndicatorProperties(
+                enabled = true,
+                // Depth axis increases in steps by 20 cm
+                count = IndicatorCount.StepBased(stepBy = 20.0),
+                contentBuilder = { value ->
+                    "%.0f".format(value)
+                }
+            ),
+            gridProperties = GridProperties(
+                enabled = true,
+                xAxisProperties = AxisProperties(
+                    color = SolidColor(Color.Gray.copy(alpha = 0.2f)),
+                    style = StrokeStyle.Dashed(intervals = floatArrayOf(6f, 6f))
+                ),
+                // lineCount 12 for 12 months
+                yAxisProperties = AxisProperties(
+                    lineCount = 12,
+                    color = SolidColor(Color.Gray.copy(alpha = 0.2f)),
+                    style = StrokeStyle.Dashed(intervals = floatArrayOf(6f, 6f))
+                )
+            ),
             minValue = 0.0,
-            maxValue = 150.0,
+            maxValue = 120.0,
         )
     }
 }
