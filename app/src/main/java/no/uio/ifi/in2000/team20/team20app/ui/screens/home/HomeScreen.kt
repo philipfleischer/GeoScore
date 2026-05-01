@@ -13,14 +13,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -33,28 +31,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import no.uio.ifi.in2000.team20.team20app.domain.model.FrostStats
-import no.uio.ifi.in2000.team20.team20app.domain.model.FrostTemperatureNormal
+import androidx.window.core.layout.WindowSizeClass
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchBarObject
+import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.StarBorder
-import androidx.compose.material3.IconButton
+import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.sp
-import androidx.window.core.layout.WindowSizeClass
-import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesViewModel
-import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
 
 @Composable
 fun HomeScreen(
@@ -62,12 +54,10 @@ fun HomeScreen(
     onOpenSearch: () -> Unit,
     viewModel: HomeViewModel = viewModel(),
     sharedViewModel: AppViewModel = viewModel(),
-    favoritesViewModel: FavoritesViewModel,
+    savedViewModel: SavedViewModel,
     frostViewModel: FrostViewModel
 ) {
     val location = sharedViewModel.selectedLocation
-    val frostUiState by frostViewModel.uiState.collectAsStateWithLifecycle()
-    val isCurrentFavorite by favoritesViewModel.isCurrentFavorite.collectAsStateWithLifecycle()
 
     // Calculates window width and returns true if the size width class is compact, and false for everything else.
     val compactScreenWidth = !LocalWindowSizeClass.current.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
@@ -75,11 +65,9 @@ fun HomeScreen(
     LaunchedEffect(location) {
         location?.let {
             frostViewModel.loadFrostStats(it)
-            favoritesViewModel.checkIfFavorite(it)
+            savedViewModel.checkIfSaved(it)
         }
     }
-
-    val selectedLocation = location?.name ?: "Oslo"
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(if(compactScreenWidth) 1 else 2),
@@ -113,147 +101,6 @@ fun HomeScreen(
         }
         item {
             SearchBarObject(onOpenSearch = onOpenSearch)
-        }
-
-//        item {
-//            HomeHeaderSection(
-//                selectedLocation = selectedLocation,
-//                isFavorite = isCurrentFavorite,
-//                onFavoriteClick = {
-//                    location?.let {
-//                        if (isCurrentFavorite) {
-//                            favoritesViewModel.removeFavorite(it)
-//                        } else {
-//                            favoritesViewModel.addFavorite(it)
-//                        }
-//                    }
-//                }
-//            )
-//        }
-//
-//
-//        item {
-//            GeomarkingInfoBox(
-//                selectedLocation = selectedLocation,
-//                geomarking = "C",
-//                riskLabel = "Moderat georisiko",
-//                expandedText = "Geomerkingen er basert på en samlet vurdering av historiske forhold i området. " +
-//                        "Dette kan inkludere terreng, nedbørsmønstre, lokal eksponering og andre faktorer som påvirker naturfare over tid."
-//            )
-//        }
-//
-//        item {
-//            AreaSummaryBox(
-//                selectedLocation = selectedLocation,
-//                summary = "Dette området har moderate historiske risikofaktorer knyttet til naturhendelser. " +
-//                        "Informasjonen er ment å gi brukeren en enkel og forståelig oversikt før videre utforsking i kart og detaljvisninger."
-//            )
-//        }
-//
-//        item {
-//            HistoricalHighlightsGrid(
-//                selectedLocation = selectedLocation,
-//                averageTemperature = "5.8 °C",
-//                precipitationLevel = "Høy",
-//                terrainExposure = "Moderat",
-//                floodRisk = "Lav–moderat"
-//            )
-//        }
-//
-//        item {
-//            ExpandableInfoBox(
-//                title = "Historiske klimadata"
-//            ) {
-//                when {
-//                    frostUiState.isLoading -> {
-//                        Text("Laster data...")
-//                    }
-//                    frostUiState.error != null -> {
-//                        Text("Feil: ${frostUiState.error}")
-//                    }
-//                    frostUiState.frostStats != null -> {
-//                        ClimateInfoContent(frostStats = frostUiState.frostStats!!)
-//                    }
-//                    else -> {
-//                        Text("Søk et område for å vise historiske data.")
-//                    }
-//                }
-//            }
-//        }
-    }
-}
-
-@Composable
-fun HomeHeaderSection(
-    selectedLocation: String,
-    isFavorite: Boolean,
-    onFavoriteClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(28.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = "Naturfareoversikt",
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-
-                    Text(
-                        text = "Valgt område: $selectedLocation",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }
-
-                IconButton(
-                    onClick = onFavoriteClick
-                ) {
-                    Icon(
-                        imageVector = if (isFavorite) {
-                            Icons.Filled.Star
-                        } else {
-                            Icons.Outlined.StarBorder
-                        },
-                        contentDescription = if (isFavorite) {
-                            "Fjern fra favoritter"
-                        } else {
-                            "Legg til i favoritter"
-                        },
-                        tint = if (isFavorite) {
-                            Color(0xFFFFC107)
-                        } else {
-                            MaterialTheme.colorScheme.onPrimaryContainer
-                        },
-                        modifier = Modifier.size(28.dp)
-                    )
-                }
-            }
-
-            Text(
-                text = "Se geomerking, historiske nøkkelfaktorer og klimadata for området.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f)
-            )
         }
     }
 }
@@ -384,169 +231,6 @@ fun GeomarkingBadge(
     }
 }
 
-@Composable
-fun AreaSummaryBox(
-    selectedLocation: String,
-    summary: String,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Default.LocationOn,
-                    contentDescription = null
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Områdeoversikt for $selectedLocation",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-
-            Divider()
-
-            Text(
-                text = summary,
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
-    }
-}
-
-@Composable
-fun HistoricalHighlightsGrid(
-    selectedLocation: String,
-    averageTemperature: String,
-    precipitationLevel: String,
-    terrainExposure: String,
-    floodRisk: String,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Text(
-            text = "Historiske nøkkelfaktorer for $selectedLocation",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold
-        )
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            SummaryMiniCard(
-                title = "Temp.",
-                value = averageTemperature,
-                modifier = Modifier.weight(1f)
-            )
-            SummaryMiniCard(
-                title = "Nedbør",
-                value = precipitationLevel,
-                modifier = Modifier.weight(1f)
-            )
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            SummaryMiniCard(
-                title = "Terreng",
-                value = terrainExposure,
-                modifier = Modifier.weight(1f)
-            )
-            SummaryMiniCard(
-                title = "Flomfare",
-                value = floodRisk,
-                modifier = Modifier.weight(1f)
-            )
-        }
-    }
-}
-
-@Composable
-fun SummaryMiniCard(
-    title: String,
-    value: String,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier.aspectRatio(1.9f),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(18.dp),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            Text(
-                text = value,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        }
-    }
-}
-
-@Composable
-private fun ClimateInfoContent(frostStats: FrostStats) {
-    val months = listOf("Jan","Feb","Mar","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Des")
-    val temps = frostStats.temperatureNormals
-
-    if (temps == null) {
-        Text("Ingen temperaturdata tilgjengelig.", style = MaterialTheme.typography.bodyMedium)
-        return
-    }
-
-    // Header row
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text("Måned", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
-        Text("Min", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
-        Text("Snitt", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
-        Text("Maks", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
-    }
-
-    Spacer(modifier = Modifier.height(4.dp))
-
-    // One row per month
-    (1..12).forEach { month ->
-        val normal = temps[month]
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(months[month - 1], style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
-            Text(normal?.minMean?.let { "%.1f°".format(it) } ?: "-", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
-            Text(normal?.mean?.let { "%.1f°".format(it) } ?: "-", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
-            Text(normal?.maxMean?.let { "%.1f°".format(it) } ?: "-", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
-        }
-    }
-}
-
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun HomeScreenLayoutPreview() {
@@ -557,63 +241,12 @@ private fun HomeScreenLayoutPreview() {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            //HomeHeaderSection()
-
             GeomarkingInfoBox(
                 selectedLocation = "Oslo",
                 geomarking = "C",
                 riskLabel = "Moderat georisiko",
                 expandedText = "Dette området har moderate historiske risikofaktorer knyttet til naturhendelser."
             )
-
-            AreaSummaryBox(
-                selectedLocation = "Oslo",
-                summary = "Området har en moderat samlet historisk eksponering for naturfare."
-            )
-
-            HistoricalHighlightsGrid(
-                averageTemperature = "5.8 °C",
-                precipitationLevel = "Høy",
-                terrainExposure = "Moderat",
-                floodRisk = "Lav–moderat",
-                selectedLocation = "Oslo",
-                modifier = Modifier
-            )
-
-            ExpandableInfoBox(title = "Historiske klimadata") {
-                ClimateInfoContent(frostStats = previewFrostStats())
-            }
         }
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-private fun ClimateInfoContentPreview() {
-    MaterialTheme {
-        Column(modifier = Modifier.padding(16.dp)) {
-            ClimateInfoContent(frostStats = previewFrostStats())
-        }
-    }
-}
-
-private fun previewFrostStats() = FrostStats(
-    temperatureNormals = mapOf(
-        1  to FrostTemperatureNormal(-6.8, -2.1, -10.3),
-        2  to FrostTemperatureNormal(-6.3, -1.8, -10.1),
-        3  to FrostTemperatureNormal(-1.8,  2.9,  -5.8),
-        4  to FrostTemperatureNormal( 3.9,  8.9,  -0.5),
-        5  to FrostTemperatureNormal(10.3, 15.5,   5.4),
-        6  to FrostTemperatureNormal(15.0, 20.3,  10.1),
-        7  to FrostTemperatureNormal(17.2, 22.4,  12.4),
-        8  to FrostTemperatureNormal(16.4, 21.3,  11.8),
-        9  to FrostTemperatureNormal(11.0, 15.7,   6.6),
-        10 to FrostTemperatureNormal( 5.8, 10.0,   2.0),
-        11 to FrostTemperatureNormal( 0.2,  3.7,  -2.8),
-        12 to FrostTemperatureNormal(-4.5, -0.4,  -7.9),
-    ),
-    precipitation = null,
-    snowDepth = null,
-    wind = null,
-    sunshineNormals = null
-)

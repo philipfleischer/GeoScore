@@ -50,16 +50,14 @@ sealed interface Route: NavKey {
     ) : Route, NavKey
 
     /*
-     * Dette er Favorittskjermen.
-     * Det viser områder brukeren har lagret som favoritter.
-     * Brukeren kan velge et favorittområde for å åpne
-     * detaljskjermen for dette området.
+     * Dette er Lagret-skjermen.
+     * Det viser områder brukeren har lagret.
      */
     @Serializable
-    object FavoritesDestination : Route, NavKey
+    object SavedDestination : Route, NavKey
 
     @Serializable
-    data class FavoriteDetailsDestination(
+    data class GeoscoreDestination(
         val location: Location
     ) : Route, NavKey
 

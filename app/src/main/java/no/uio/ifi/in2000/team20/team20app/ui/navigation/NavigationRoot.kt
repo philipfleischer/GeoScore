@@ -5,14 +5,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import no.uio.ifi.in2000.team20.team20app.data.repository.FavoritesRepository
+import no.uio.ifi.in2000.team20.team20app.data.repository.SavedRepository
 import no.uio.ifi.in2000.team20.team20app.ui.components.AdaptiveNavigationScaffold
 import no.uio.ifi.in2000.team20.team20app.ui.screens.details.AreaDetailsScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.details.ClimateStatsScreen
-import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoriteDetailsScreen
-import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesScreen
-import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesViewModel
-import no.uio.ifi.in2000.team20.team20app.ui.screens.favorite.FavoritesViewModelFactory
+import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.GeoscoreScreen
+import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedScreen
+import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModelFactory
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapScreen
@@ -26,7 +26,7 @@ import no.uio.ifi.in2000.team20.team20app.util.Screen
 
 /*
 Main changes (24.04.2026 adaptive-navigation-impl):
-- Replaced goToHome, goToMap and goToFavorites with a general onNavigate to reduce repetition (I commented out old code).
+- Replaced goToHome, goToMap and goToSaved with a general onNavigate to reduce repetition (I commented out old code).
 - Replaced ScreenScaffold with AdaptiveNavigationScaffold
 */
 @Composable
@@ -36,7 +36,7 @@ fun NavigationRoot(
     homeViewModel: HomeViewModel,
     mapViewModel: MapViewModel,
     frostViewModel: FrostViewModel,
-    favoritesRepository: FavoritesRepository
+    savedRepository: SavedRepository
 ){
     //BackStack
     val backStack = rememberNavBackStack(Screen.HOME.route)
@@ -52,9 +52,6 @@ fun NavigationRoot(
         screen -> screen.route.let { backStack.add(it) }
     }
 
-//    val goToHome: () -> Unit = {backStack.add(Route.HomeDestination)}
-//    val goToMap: () -> Unit = {backStack.add(Route.MapDestination)}
-//    val goToFavorites: () -> Unit = {backStack.add(Route.FavoritesDestination)}
     val goToSettings: () -> Unit = { backStack.add(Route.SettingsDestination) }
     val goToSearch: () -> Unit = { backStack.add(Route.SearchDestination) }
 
@@ -63,8 +60,8 @@ fun NavigationRoot(
         onBack = goBack,
         entryProvider = entryProvider {
             entry<Route.HomeDestination> { // Type parameter. Can't use Screen.XXX.route
-                val favoritesViewModel: FavoritesViewModel = viewModel(
-                    factory = FavoritesViewModelFactory(favoritesRepository)
+                val savedViewModel: SavedViewModel = viewModel(
+                    factory = SavedViewModelFactory(savedRepository)
                 )
 
                 AdaptiveNavigationScaffold(
@@ -78,15 +75,15 @@ fun NavigationRoot(
                         modifier = modifier,
                         viewModel = homeViewModel,
                         sharedViewModel = appViewModel,
-                        favoritesViewModel = favoritesViewModel,
+                        savedViewModel = savedViewModel,
                         frostViewModel = frostViewModel
                     )
                 }
             }
 
             entry<Route.MapDestination> {
-                val favoritesViewModel: FavoritesViewModel = viewModel(
-                    factory = FavoritesViewModelFactory(favoritesRepository)
+                val savedViewModel: SavedViewModel = viewModel(
+                    factory = SavedViewModelFactory(savedRepository)
                 )
 
                 AdaptiveNavigationScaffold(
@@ -98,49 +95,49 @@ fun NavigationRoot(
                     MapScreen(
                         modifier = modifier,
                         sharedViewModel = appViewModel,
-                        favoritesViewModel = favoritesViewModel,
+                        savedViewModel = savedViewModel,
                         mapViewModel = mapViewModel
                     )
                 }
             }
 
-            entry<Route.FavoritesDestination> {
-                val favoritesViewModel: FavoritesViewModel = viewModel(
-                    factory = FavoritesViewModelFactory(favoritesRepository)
+            entry<Route.SavedDestination> {
+                val savedViewModel: SavedViewModel = viewModel(
+                    factory = SavedViewModelFactory(savedRepository)
                 )
 
                 AdaptiveNavigationScaffold(
-                    title = Screen.FAVORITES.title,
+                    title = Screen.SAVED.title,
                     onNavigate = onNavigate,
                     onOpenSettings = goToSettings,
-                    currentDestination = Screen.FAVORITES.route
+                    currentDestination = Screen.SAVED.route
                 ) { modifier ->
-                    FavoritesScreen(
+                    SavedScreen(
                         modifier = modifier,
                         sharedViewModel = appViewModel,
-                        favoritesViewModel = favoritesViewModel,
-                        onFavoriteClick = { location ->
+                        savedViewModel = savedViewModel,
+                        onSavedClick = { location ->
                             appViewModel.setSelectedArea(location)
-                            backStack.add(Route.FavoriteDetailsDestination(location))
+                            backStack.add(Route.GeoscoreDestination(location))
                         }
                     )
                 }
             }
 
-            entry<Route.FavoriteDetailsDestination> { destination ->
-                val favoritesViewModel: FavoritesViewModel = viewModel(
-                    factory = FavoritesViewModelFactory(favoritesRepository)
+            entry<Route.GeoscoreDestination> { destination ->
+                val savedViewModel: SavedViewModel = viewModel(
+                    factory = SavedViewModelFactory(savedRepository)
                 )
 
-                FavoriteDetailsScreen(
+                GeoscoreScreen(
                     location = destination.location,
                     onBackClick = goBack,
-                    onOpenMap = {
-                        appViewModel.setSelectedArea(destination.location)
-                        backStack.add(Route.MapDestination)
+                    onHistoricDataClick = {
+                        backStack.removeLastOrNull()
+                        backStack.add(Route.ClimateStatsDestination(destination.location))
                     },
                     frostViewModel = frostViewModel,
-                    favoritesViewModel = favoritesViewModel
+                    savedViewModel = savedViewModel
                 )
             }
 
@@ -155,7 +152,7 @@ fun NavigationRoot(
                     onBackClick = goBack,
                     onLocationSelected = { location ->
                         appViewModel.setSelectedArea(location)
-                        goBack()
+                        backStack.add(Route.GeoscoreDestination(location))
                     },
                     searchViewModel = searchViewModel
                 )
@@ -179,6 +176,9 @@ fun NavigationRoot(
                 ClimateStatsScreen(
                     location = destination.location,
                     onBackClick = goBack,
+                    onRapportClick = {
+                        backStack.add(Route.GeoscoreDestination(destination.location))
+                    },
                     frostViewModel = frostViewModel
                 )
             }
