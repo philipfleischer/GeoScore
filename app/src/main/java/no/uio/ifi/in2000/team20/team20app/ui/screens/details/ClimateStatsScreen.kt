@@ -39,8 +39,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.ExpandableInfoBox
+import no.uio.ifi.in2000.team20.team20app.ui.components.ErrorState
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
-import no.uio.ifi.in2000.team20.team20app.ui.theme.LocalTheme
+import no.uio.ifi.in2000.team20.team20app.ui.theme.*
 import ir.ehsannarmani.compose_charts.LineChart
 import ir.ehsannarmani.compose_charts.models.Line
 import ir.ehsannarmani.compose_charts.models.DotProperties
@@ -50,6 +51,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.sp
 import ir.ehsannarmani.compose_charts.models.ZeroLineProperties
+import ir.ehsannarmani.compose_charts.models.PopupProperties
+import androidx.compose.animation.core.tween
+import androidx.compose.ui.text.TextStyle
+import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
+import ir.ehsannarmani.compose_charts.models.IndicatorCount
+import ir.ehsannarmani.compose_charts.models.GridProperties
+import ir.ehsannarmani.compose_charts.models.GridProperties.AxisProperties
+import ir.ehsannarmani.compose_charts.models.StrokeStyle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -141,7 +150,11 @@ fun ClimateStatsScreen(
                     cardColor = theme.secondary
                 ) {
                     Text(
-                        text = "Dette diagrammet viser gjennomsnittlig temperatur. Klikk for å lese mer.",
+                        text = "Dette diagrammet viser gjennomsnittlig temperatur per måned, basert på målinger fra 1991–2020. " +
+                                "Snittkurven viser den typiske månedstemperaturen i perioden. " +
+                                "Maks-kurven viser gjennomsnittet av dagens høyeste temperaturer i hver måned, " +
+                                "og min-kurven viser gjennomsnittet av dagens laveste temperaturer. " +
+                                "Til sammen gir dette et bilde av hvor varme dagene og hvor kalde nettene vanligvis er.",
                         style = MaterialTheme.typography.bodySmall
                     )
                     Spacer(modifier = Modifier.height(12.dp))
@@ -152,7 +165,11 @@ fun ClimateStatsScreen(
                         }
 
                         frostUiState.temperatureError != null -> {
-                            Text("Feil: ${frostUiState.temperatureError}")
+                            ErrorState(
+                                message = friendlyErrorMessage(frostUiState.temperatureError),
+                                onRetry = { frostViewModel.loadFrostStats(location) },
+                                modifier = Modifier.fillMaxWidth()
+                            )
                         }
 
                         frostUiState.temperatureMean != null -> {
@@ -174,7 +191,8 @@ fun ClimateStatsScreen(
             item {
                 ExpandableInfoBox(title = "Snø", cardColor = theme.secondary) {
                     Text(
-                        text = "Gjennomsnittlig og høyeste snødybde per måned, basert på målinger fra 1991–2020. Høye verdier kan påvirke tilgjengelighet, vedlikehold og taklast.",
+                        text = "Diagrammet viser gjennomsnittlig og høyeste målte snødybde per måned, basert på målinger fra 1991–2020. " +
+                                "Høye verdier kan påvirke fremkommelighet, behov for snørydding og belastning på tak.",
                         style = MaterialTheme.typography.bodySmall
                     )
                     Spacer(modifier = Modifier.height(12.dp))
@@ -185,7 +203,11 @@ fun ClimateStatsScreen(
                         }
 
                         frostUiState.snowError != null -> {
-                            Text("Feil: ${frostUiState.snowError}")
+                            ErrorState(
+                                message = friendlyErrorMessage(frostUiState.snowError),
+                                onRetry = { frostViewModel.loadFrostStats(location) },
+                                modifier = Modifier.fillMaxWidth()
+                            )
                         }
 
                         frostUiState.snowMean != null && frostUiState.snowMax != null -> {
@@ -206,7 +228,10 @@ fun ClimateStatsScreen(
             item {
                 ExpandableInfoBox(title = "Nedbør", cardColor = theme.secondary) {
                     Text(
-                        text = "Nedbørsdager viser typisk antall dager med målbar nedbør per måned. Høyeste daglige nedbør viser hvor kraftige regnværene typisk er — høye verdier indikerer risiko for styrtregn og oversvømmelse.",
+                        text = "Nedbørsdager viser typisk antall dager per måned med minst 1,0 mm målbar nedbør. " +
+                                "Merk at i vintermånedene kan nedbøren komme som snø. " +
+                                "Høyeste daglige nedbør per måned viser hvor kraftige regn eller snøværet typisk er. " +
+                                "Høye verdier indikerer økt risiko for styrtregn, overvann og lokale oversvømmelser.",
                         style = MaterialTheme.typography.bodySmall
                     )
                     Spacer(modifier = Modifier.height(12.dp))
@@ -217,7 +242,11 @@ fun ClimateStatsScreen(
                         }
 
                         frostUiState.precipitationError != null -> {
-                            Text("Feil: ${frostUiState.precipitationError}")
+                            ErrorState(
+                                message = friendlyErrorMessage(frostUiState.precipitationError),
+                                onRetry = { frostViewModel.loadFrostStats(location) },
+                                modifier = Modifier.fillMaxWidth()
+                            )
                         }
 
                         frostUiState.precipitationDays != null && frostUiState.precipitationMean != null -> {
@@ -242,7 +271,11 @@ fun ClimateStatsScreen(
                     cardColor = theme.secondary
                 ) {
                     Text(
-                        text = "Dette diagrammet viser gjennomsnittlig vindstyrke per måned.",
+                        text = "Gjennomsnittlig vindstyrke per måned viser hvor mye det vanligvis blåser i perioden. " +
+                                "Høyeste målte middelvind per måned viser hvor kraftig og vedvarende vinden kan bli, " +
+                                "typisk opp mot stormstyrke i de mest utsatte månedene. " +
+                                "Høyeste målte vindkast per måned viser hvor kraftige de kortvarige kastene kan være, " +
+                                "noe som er viktig for vurdering av for eksempel vindutsatt infrastruktur, skog og bygg.",
                         style = MaterialTheme.typography.bodySmall
                     )
                     Spacer(modifier = Modifier.height(12.dp))
@@ -253,7 +286,11 @@ fun ClimateStatsScreen(
                         }
 
                         frostUiState.windError != null -> {
-                            Text("Feil: ${frostUiState.windError}")
+                            ErrorState(
+                                message = friendlyErrorMessage(frostUiState.windError),
+                                onRetry = { frostViewModel.loadFrostStats(location) },
+                                modifier = Modifier.fillMaxWidth()
+                            )
                         }
 
                         frostUiState.windMean != null -> {
@@ -279,7 +316,9 @@ fun ClimateStatsScreen(
                     cardColor = theme.secondary
                 ) {
                     Text(
-                        text = "Dette diagrammet viser gjennomsnittlig antall soltimer per dag per måned, basert på målinger fra 1991–2020.",
+                        text = "Diagrammet viser hvor mange timer solen i gjennomsnitt skinner direkte på målestasjonen per dag i hver måned. " +
+                                "Det handler om solskinn, ikke om hvor lenge det er lyst. " +
+                                "Tallene er beregnet ut fra målinger i perioden 1991–2020.",
                         style = MaterialTheme.typography.bodySmall
                     )
                     Spacer(modifier = Modifier.height(12.dp))
@@ -290,7 +329,11 @@ fun ClimateStatsScreen(
                         }
 
                         frostUiState.sunshineError != null -> {
-                            Text("Feil: ${frostUiState.sunshineError}")
+                            ErrorState(
+                                message = friendlyErrorMessage(frostUiState.sunshineError),
+                                onRetry = { frostViewModel.loadFrostStats(location) },
+                                modifier = Modifier.fillMaxWidth()
+                            )
                         }
 
                         frostUiState.sunshineHours != null -> {
@@ -306,7 +349,7 @@ fun ClimateStatsScreen(
                         }
 
                         else -> {
-                            Text("Ingen soltimer data tilgjengelig.")
+                            Text("Ingen data om soltimer tilgjengelig.")
                         }
                     }
                 }
@@ -326,8 +369,8 @@ fun TemperatureChart(
     minTemperatures: List<Double>,
     modifier: Modifier = Modifier
 ) {
-    val months = listOf("Jan", "Feb", "Mar", "Apr", "Mai", "Jun",
-        "Jul", "Aug", "Sep", "Okt", "Nov", "Des")
+    val months = listOf("Jan", " ", " ", " ", " ", "Jun",
+        " ", " ", " ", " ", " ", "Des")
 
     Column(modifier = modifier
         .fillMaxWidth()
@@ -348,58 +391,97 @@ fun TemperatureChart(
                     Line(
                         label = "Min (°C)",
                         values = minTemperatures,
-                        color = SolidColor(Color(0xFF378ADD)),
+                        color = SolidColor(MayaBlue),
                         firstGradientFillColor = Color.Transparent,
                         secondGradientFillColor = Color.Transparent,
                         curvedEdges = true,
                         dotProperties = DotProperties(
                             enabled = true,
-                            color = SolidColor(Color.White),
+                            color = SolidColor(BrightWhite),
                             radius = 4.dp,
                             strokeWidth = 2.dp,
-                            strokeColor = SolidColor(Color(0xFF378ADD))
+                            strokeColor = SolidColor(MayaBlue)
                         )
                     ),
                     Line(
                         label = "Snitt (°C)",
                         values = meanTemperatures,
-                        color = SolidColor(Color(0xFF7F77DD)),
-                        firstGradientFillColor = Color(0xFF7F77DD).copy(alpha = .2f),
+                        color = SolidColor(DustyBlue),
+                        firstGradientFillColor = DustyBlue.copy(alpha = .2f),
                         secondGradientFillColor = Color.Transparent,
                         curvedEdges = true,
                         dotProperties = DotProperties(
                             enabled = true,
-                            color = SolidColor(Color.White),
+                            color = SolidColor(BrightWhite),
                             radius = 4.dp,
                             strokeWidth = 2.dp,
-                            strokeColor = SolidColor(Color(0xFF7F77DD))
+                            strokeColor = SolidColor(DustyBlue)
                         )
                     ),
                     Line(
                         label = "Maks (°C)",
                         values = maxTemperatures,
-                        color = SolidColor(Color(0xFFD85A30)),
+                        color = SolidColor(Salmon),
                         firstGradientFillColor = Color.Transparent,
                         secondGradientFillColor = Color.Transparent,
                         curvedEdges = true,
                         dotProperties = DotProperties(
                             enabled = true,
-                            color = SolidColor(Color.White),
+                            color = SolidColor(BrightWhite),
                             radius = 4.dp,
                             strokeWidth = 2.dp,
-                            strokeColor = SolidColor(Color(0xFFD85A30))
+                            strokeColor = SolidColor(Salmon)
                         )
                     )
                 )
             },
             zeroLineProperties = ZeroLineProperties(
                 enabled = true,
-                color = SolidColor(Color.Red),
+                color = SolidColor(TrafficRed),
             ),
             labelHelperProperties = LabelHelperProperties(enabled = true),
             labelProperties = LabelProperties(
                 enabled = true,
                 labels = months
+            ),
+            popupProperties = PopupProperties(
+                enabled = true,
+                animationSpec = tween(300),
+                duration = 2000L,
+                textStyle = TextStyle(
+                    color = BrightWhite,
+                    fontSize = 11.sp
+                ),
+                containerColor = Charcoal,
+                cornerRadius = 8.dp,
+                contentHorizontalPadding = 8.dp,
+                contentVerticalPadding = 4.dp,
+                contentBuilder = { popup ->
+                    val monthNames = listOf("Jan", "Feb", "Mar", "Apr", "Mai", "Jun",
+                        "Jul", "Aug", "Sep", "Okt", "Nov", "Des")
+                    "${monthNames[popup.valueIndex]}: ${"%.1f".format(popup.value)}°C"
+                }
+            ),
+            indicatorProperties = HorizontalIndicatorProperties(
+                enabled = true,
+                // Temperature axis increases in steps by 5
+                count = IndicatorCount.StepBased(stepBy = 5.0),
+                contentBuilder = { value ->
+                    "%.0f".format(value)
+                }
+            ),
+            gridProperties = GridProperties(
+                enabled = true,
+                xAxisProperties = AxisProperties(
+                    color = SolidColor(SlateGray.copy(alpha = 0.2f)),
+                    style = StrokeStyle.Dashed(intervals = floatArrayOf(6f, 6f))
+                ),
+                // lineCount 12 for 12 months
+                yAxisProperties = AxisProperties(
+                    lineCount = 12,
+                    color = SolidColor(SlateGray.copy(alpha = 0.2f)),
+                    style = StrokeStyle.Dashed(intervals = floatArrayOf(6f, 6f))
+                )
             ),
             minValue = -20.0,
             maxValue = 30.0,
@@ -428,15 +510,15 @@ fun WindChart(
     windMaxGust: List<Double>,
     modifier: Modifier = Modifier
 ) {
-    val months = listOf("Jan", "Feb", "Mar", "Apr", "Mai", "Jun",
-        "Jul", "Aug", "Sep", "Okt", "Nov", "Des")
+    val months = listOf("Jan", " ", "Mar", " ", "Mai", " ",
+        "Jul", " ", "Sep", " ", "Nov", " ")
 
     Column(modifier = modifier
         .fillMaxWidth()
         .padding(16.dp)) {
 
         Text(
-            text = "Månedlig vindstyrke",
+            text = "Månedlig vindstyrke (m/s)",
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -448,42 +530,42 @@ fun WindChart(
             data = remember(windMean, windMaxSpeed, windMaxGust) {
                 listOf(
                     Line(
-                        label = "Middelvind (m/s)",
+                        label = "Middelvind",
                         values = windMean,
-                        color = SolidColor(Color(0xFF4CAF50)),
-                        firstGradientFillColor = Color(0xFF4CAF50).copy(alpha = .2f),
+                        color = SolidColor(TrafficGreen),
+                        firstGradientFillColor = TrafficGreen.copy(alpha = .2f),
                         secondGradientFillColor = Color.Transparent,
                         curvedEdges = true,
                         dotProperties = DotProperties(
                             enabled = true,
-                            color = SolidColor(Color.White),
-                            strokeColor = SolidColor(Color(0xFF4CAF50))
+                            color = SolidColor(BrightWhite),
+                            strokeColor = SolidColor(TrafficGreen)
                         )
                     ),
                     Line(
-                        label = "Maks middelvind (m/s)",
+                        label = "Maks middelvind",
                         values = windMaxSpeed,
-                        color = SolidColor(Color(0xFFFFA726)),
+                        color = SolidColor(RoyalGold),
                         firstGradientFillColor = Color.Transparent,
                         secondGradientFillColor = Color.Transparent,
                         curvedEdges = true,
                         dotProperties = DotProperties(
                             enabled = true,
-                            color = SolidColor(Color.White),
-                            strokeColor = SolidColor(Color(0xFFFFA726))
+                            color = SolidColor(BrightWhite),
+                            strokeColor = SolidColor(RoyalGold)
                         )
                     ),
                     Line(
-                        label = "Maks vindkast (m/s)",
+                        label = "Maks vindkast",
                         values = windMaxGust,
-                        color = SolidColor(Color(0xFFEF5350)),
+                        color = SolidColor(TrafficRed),
                         firstGradientFillColor = Color.Transparent,
                         secondGradientFillColor = Color.Transparent,
                         curvedEdges = true,
                         dotProperties = DotProperties(
                             enabled = true,
-                            color = SolidColor(Color.White),
-                            strokeColor = SolidColor(Color(0xFFEF5350))
+                            color = SolidColor(BrightWhite),
+                            strokeColor = SolidColor(TrafficRed)
                         )
                     )
                 )
@@ -492,6 +574,24 @@ fun WindChart(
             labelProperties = LabelProperties(
                 enabled = true,
                 labels = months
+            ),
+            popupProperties = PopupProperties(
+                enabled = true,
+                animationSpec = tween(300),
+                duration = 2000L,
+                textStyle = TextStyle(
+                    color = BrightWhite,
+                    fontSize = 11.sp
+                ),
+                containerColor = Charcoal,
+                cornerRadius = 8.dp,
+                contentHorizontalPadding = 8.dp,
+                contentVerticalPadding = 4.dp,
+                contentBuilder = { popup ->
+                    val monthNames = listOf("Jan", "Feb", "Mar", "Apr", "Mai", "Jun",
+                        "Jul", "Aug", "Sep", "Okt", "Nov", "Des")
+                    "${monthNames[popup.valueIndex]}: ${"%.1f".format(popup.value)}m/s"
+                }
             ),
             minValue = 0.0,
             maxValue = 30.0,
@@ -504,8 +604,8 @@ fun SunshineChart(
     sunshineHours: List<Double>,
     modifier: Modifier = Modifier
 ) {
-    val months = listOf("Jan", "Feb", "Mar", "Apr", "Mai", "Jun",
-        "Jul", "Aug", "Sep", "Okt", "Nov", "Des")
+    val months = listOf(" ", " ", "Mar", " ", " ", "Jun",
+        " ", " ", "Sep", " ", " ", "Des")
 
     Column(modifier = modifier
         .fillMaxWidth()
@@ -527,14 +627,14 @@ fun SunshineChart(
                     Line(
                         label = "Timer/dag",
                         values = safeValues,
-                        color = SolidColor(Color(0xFFFFCA28)),
-                        firstGradientFillColor = Color(0xFFFFCA28).copy(alpha = .3f),
+                        color = SolidColor(RoyalGold),
+                        firstGradientFillColor = RoyalGold.copy(alpha = .3f),
                         secondGradientFillColor = Color.Transparent,
                         curvedEdges = true,
                         dotProperties = DotProperties(
                             enabled = true,
-                            color = SolidColor(Color.White),
-                            strokeColor = SolidColor(Color(0xFFFFCA28))
+                            color = SolidColor(BrightWhite),
+                            strokeColor = SolidColor(RoyalGold)
                         )
                     )
                 )
@@ -544,8 +644,48 @@ fun SunshineChart(
                 enabled = true,
                 labels = months
             ),
+            popupProperties = PopupProperties(
+                enabled = true,
+                mode = PopupProperties.Mode.PointMode(), // "snaps" to next month
+                animationSpec = tween(300),
+                duration = 2000L,
+                textStyle = TextStyle(
+                    color = BrightWhite,
+                    fontSize = 11.sp
+                ),
+                containerColor = Charcoal,
+                cornerRadius = 8.dp,
+                contentHorizontalPadding = 8.dp,
+                contentVerticalPadding = 4.dp,
+                contentBuilder = { popup ->
+                    val monthNames = listOf("Jan", "Feb", "Mar", "Apr", "Mai", "Jun",
+                        "Jul", "Aug", "Sep", "Okt", "Nov", "Des")
+                    "${monthNames[popup.valueIndex]}: ${"%.1f".format(popup.value)} dager"
+                }
+            ),
+            indicatorProperties = HorizontalIndicatorProperties(
+                enabled = true,
+                // Day axis increases in steps by 3 days
+                count = IndicatorCount.StepBased(stepBy = 3.0),
+                contentBuilder = { value ->
+                    "%.0f".format(value)
+                }
+            ),
+            gridProperties = GridProperties(
+                enabled = true,
+                xAxisProperties = AxisProperties(
+                    color = SolidColor(SlateGray.copy(alpha = 0.2f)),
+                    style = StrokeStyle.Dashed(intervals = floatArrayOf(6f, 6f))
+                ),
+                // lineCount 12 for 12 months
+                yAxisProperties = AxisProperties(
+                    lineCount = 12,
+                    color = SolidColor(SlateGray.copy(alpha = 0.2f)),
+                    style = StrokeStyle.Dashed(intervals = floatArrayOf(6f, 6f))
+                )
+            ),
             minValue = 0.0,
-            maxValue = 20.0,
+            maxValue = 21.0,
         )
     }
 }
@@ -556,8 +696,8 @@ fun PrecipitationChart(
     maxDailyPrecip: List<Double>,
     modifier: Modifier = Modifier
 ) {
-    val months = listOf("Jan", "Feb", "Mar", "Apr", "Mai", "Jun",
-        "Jul", "Aug", "Sep", "Okt", "Nov", "Des")
+    val months = listOf(" ", "Feb", " ", " ", "Mai", " ",
+        " ", "Aug", " ", " ", "Nov", " ")
 
     Column(modifier = modifier.fillMaxWidth()) {
         // Rainy days chart
@@ -580,16 +720,16 @@ fun PrecipitationChart(
                         Line(
                             label = "Dager",
                             values = rainyDays,
-                            color = SolidColor(Color(0xFF378ADD)),
-                            firstGradientFillColor = Color(0xFF378ADD).copy(alpha = .2f),
+                            color = SolidColor(MayaBlue),
+                            firstGradientFillColor = MayaBlue.copy(alpha = .2f),
                             secondGradientFillColor = Color.Transparent,
                             curvedEdges = true,
                             dotProperties = DotProperties(
                                 enabled = true,
-                                color = SolidColor(Color.White),
+                                color = SolidColor(BrightWhite),
                                 radius = 4.dp,
                                 strokeWidth = 2.dp,
-                                strokeColor = SolidColor(Color(0xFF378ADD))
+                                strokeColor = SolidColor(MayaBlue)
                             )
                         )
                     )
@@ -599,8 +739,48 @@ fun PrecipitationChart(
                     enabled = true,
                     labels = months
                 ),
+                popupProperties = PopupProperties(
+                    enabled = true,
+                    mode = PopupProperties.Mode.PointMode(), // "snaps" to next month
+                    animationSpec = tween(300),
+                    duration = 2000L,
+                    textStyle = TextStyle(
+                        color = BrightWhite,
+                        fontSize = 11.sp
+                    ),
+                    containerColor = Charcoal,
+                    cornerRadius = 8.dp,
+                    contentHorizontalPadding = 8.dp,
+                    contentVerticalPadding = 4.dp,
+                    contentBuilder = { popup ->
+                        val monthNames = listOf("Jan", "Feb", "Mar", "Apr", "Mai", "Jun",
+                            "Jul", "Aug", "Sep", "Okt", "Nov", "Des")
+                        "${monthNames[popup.valueIndex]}: ${"%.1f".format(popup.value)} dager"
+                    }
+                ),
+                indicatorProperties = HorizontalIndicatorProperties(
+                    enabled = true,
+                    // Rain axis increases in steps by 3 days
+                    count = IndicatorCount.StepBased(stepBy = 3.0),
+                    contentBuilder = { value ->
+                        "%.0f".format(value)
+                    }
+                ),
+                gridProperties = GridProperties(
+                    enabled = true,
+                    xAxisProperties = AxisProperties(
+                        color = SolidColor(SlateGray.copy(alpha = 0.2f)),
+                        style = StrokeStyle.Dashed(intervals = floatArrayOf(6f, 6f))
+                    ),
+                    // lineCount 12 for 12 months
+                    yAxisProperties = AxisProperties(
+                        lineCount = 12,
+                        color = SolidColor(SlateGray.copy(alpha = 0.2f)),
+                        style = StrokeStyle.Dashed(intervals = floatArrayOf(6f, 6f))
+                    )
+                ),
                 minValue = 0.0,
-                maxValue = 20.0,
+                maxValue = 21.0, //perhaps 20? explore
             )
         }
 
@@ -626,16 +806,16 @@ fun PrecipitationChart(
                         Line(
                             label = "mm",
                             values = maxDailyPrecip,
-                            color = SolidColor(Color(0xFF1D9E75)),
-                            firstGradientFillColor = Color(0xFF1D9E75).copy(alpha = .2f),
+                            color = SolidColor(TrafficGreen),
+                            firstGradientFillColor = TrafficGreen.copy(alpha = .2f),
                             secondGradientFillColor = Color.Transparent,
                             curvedEdges = true,
                             dotProperties = DotProperties(
                                 enabled = true,
-                                color = SolidColor(Color.White),
+                                color = SolidColor(BrightWhite),
                                 radius = 4.dp,
                                 strokeWidth = 2.dp,
-                                strokeColor = SolidColor(Color(0xFF1D9E75))
+                                strokeColor = SolidColor(TrafficGreen)
                             )
                         )
                     )
@@ -644,6 +824,46 @@ fun PrecipitationChart(
                 labelProperties = LabelProperties(
                     enabled = true,
                     labels = months
+                ),
+                popupProperties = PopupProperties(
+                    enabled = true,
+                    mode = PopupProperties.Mode.PointMode(), // "snaps" to next month
+                    animationSpec = tween(300),
+                    duration = 2000L,
+                    textStyle = TextStyle(
+                        color = BrightWhite,
+                        fontSize = 11.sp
+                    ),
+                    containerColor = Charcoal,
+                    cornerRadius = 8.dp,
+                    contentHorizontalPadding = 8.dp,
+                    contentVerticalPadding = 4.dp,
+                    contentBuilder = { popup ->
+                        val monthNames = listOf("Jan", "Feb", "Mar", "Apr", "Mai", "Jun",
+                            "Jul", "Aug", "Sep", "Okt", "Nov", "Des")
+                        "${monthNames[popup.valueIndex]}: ${"%.1f".format(popup.value)}mm"
+                    }
+                ),
+                indicatorProperties = HorizontalIndicatorProperties(
+                    enabled = true,
+                    // Rain axis increases in steps by 10 cm
+                    count = IndicatorCount.StepBased(stepBy = 10.0),
+                    contentBuilder = { value ->
+                        "%.0f".format(value)
+                    }
+                ),
+                gridProperties = GridProperties(
+                    enabled = true,
+                    xAxisProperties = AxisProperties(
+                        color = SolidColor(SlateGray.copy(alpha = 0.2f)),
+                        style = StrokeStyle.Dashed(intervals = floatArrayOf(6f, 6f))
+                    ),
+                    // lineCount 12 for 12 months
+                    yAxisProperties = AxisProperties(
+                        lineCount = 12,
+                        color = SolidColor(SlateGray.copy(alpha = 0.2f)),
+                        style = StrokeStyle.Dashed(intervals = floatArrayOf(6f, 6f))
+                    )
                 ),
                 minValue = 0.0,
                 maxValue = 60.0,
@@ -658,8 +878,7 @@ fun SnowChart(
     maxSnowDepth: List<Double>,
     modifier: Modifier = Modifier
 ) {
-    val months = listOf("Jan", "Feb", "Mar", "Apr", "Mai", "Jun",
-        "Jul", "Aug", "Sep", "Okt", "Nov", "Des")
+    val months = listOf("Jan", " ", " ", "Apr", " ", "Jun", " ", " ", "Sep", " ", " ", "Des")
 
     Column(modifier = modifier
         .fillMaxWidth()
@@ -680,31 +899,31 @@ fun SnowChart(
                     Line(
                         label = "Snittdybde (cm)",
                         values = meanSnowDepth,
-                        color = SolidColor(Color(0xFF9FDDFF)),
-                        firstGradientFillColor = Color(0xFF9FDDFF).copy(alpha = .2f),
+                        color = SolidColor(MayaBlue),
+                        firstGradientFillColor = MayaBlue.copy(alpha = .2f),
                         secondGradientFillColor = Color.Transparent,
                         curvedEdges = true,
                         dotProperties = DotProperties(
                             enabled = true,
-                            color = SolidColor(Color.White),
+                            color = SolidColor(BrightWhite),
                             radius = 4.dp,
                             strokeWidth = 2.dp,
-                            strokeColor = SolidColor(Color(0xFF9FDDFF))
+                            strokeColor = SolidColor(MayaBlue)
                         )
                     ),
                     Line(
                         label = "Maksdybde (cm)",
                         values = maxSnowDepth,
-                        color = SolidColor(Color(0xFF1A6FB5)),
+                        color = SolidColor(DarkBlue),
                         firstGradientFillColor = Color.Transparent,
                         secondGradientFillColor = Color.Transparent,
                         curvedEdges = true,
                         dotProperties = DotProperties(
                             enabled = true,
-                            color = SolidColor(Color.White),
+                            color = SolidColor(BrightWhite),
                             radius = 4.dp,
                             strokeWidth = 2.dp,
-                            strokeColor = SolidColor(Color(0xFF1A6FB5))
+                            strokeColor = SolidColor(DarkBlue)
                         )
                     )
                 )
@@ -714,9 +933,64 @@ fun SnowChart(
                 enabled = true,
                 labels = months
             ),
+            popupProperties = PopupProperties(
+                enabled = true,
+                mode = PopupProperties.Mode.PointMode(), // "snaps" to next month
+                animationSpec = tween(300),
+                duration = 2000L,
+                textStyle = TextStyle(
+                    color = BrightWhite,
+                    fontSize = 11.sp
+                ),
+                containerColor = Charcoal,
+                cornerRadius = 8.dp,
+                contentHorizontalPadding = 8.dp,
+                contentVerticalPadding = 4.dp,
+                contentBuilder = { popup ->
+                    val monthNames = listOf("Jan", "Feb", "Mar", "Apr", "Mai", "Jun",
+                        "Jul", "Aug", "Sep", "Okt", "Nov", "Des")
+                    "${monthNames[popup.valueIndex]}: ${"%.1f".format(popup.value)} cm"
+                }
+            ),
+            indicatorProperties = HorizontalIndicatorProperties(
+                enabled = true,
+                // Depth axis increases in steps by 20 cm
+                count = IndicatorCount.StepBased(stepBy = 20.0),
+                contentBuilder = { value ->
+                    "%.0f".format(value)
+                }
+            ),
+            gridProperties = GridProperties(
+                enabled = true,
+                xAxisProperties = AxisProperties(
+                    color = SolidColor(SlateGray.copy(alpha = 0.2f)),
+                    style = StrokeStyle.Dashed(intervals = floatArrayOf(6f, 6f))
+                ),
+                // lineCount 12 for 12 months
+                yAxisProperties = AxisProperties(
+                    lineCount = 12,
+                    color = SolidColor(SlateGray.copy(alpha = 0.2f)),
+                    style = StrokeStyle.Dashed(intervals = floatArrayOf(6f, 6f))
+                )
+            ),
             minValue = 0.0,
-            maxValue = 150.0,
+            maxValue = 120.0,
         )
     }
+}
+
+private fun friendlyErrorMessage(raw: String?): String = when {
+    raw == null -> "Noe gikk galt. Prøv igjen senere."
+    raw.contains("UnknownHostException") ||
+    raw.contains("Unable to resolve host") -> "Ingen internettforbindelse. Sjekk tilkoblingen din."
+    raw.contains("SocketTimeoutException") ||
+    raw.contains("timed out", ignoreCase = true) -> "Forespørselen tok for lang tid. Prøv igjen."
+    raw.contains("Frost 401") -> "Mangler tilgang til klimadataene."
+    raw.contains("Frost 404") -> "Klimadata ikke funnet for dette stedet."
+    raw.contains("Frost 412") ||
+    raw.contains("No V0 stations found") ||
+    raw.contains("No stations found") ||
+    raw.contains("No nearby stations") -> "Ingen klimastasjoner funnet nær dette stedet."
+    else -> "Noe gikk galt. Prøv igjen senere."
 }
 

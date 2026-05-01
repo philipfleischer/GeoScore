@@ -158,8 +158,14 @@ class FrostDataSource(
             url.encodedParameters.append(
                 "elements",
                 listOf(
+                    // Mean wind speed per month - raw historical values
+                    // "Slik blåser det typisk her i januar"
                     "mean(wind_speed P1M)",
+                    // Highest measured wind speed per month - raw
+                    // "Så kraftig kan middelvinden bli i januar, typisk stormtyrke i januar"
                     "max(wind_speed P1M)",
+                    // Highest measured wind gust per month - raw
+                    // "Så kraftig kan vindkastene være i januar"
                     "max(wind_speed_of_gust P1M)"
                 ).joinToString(",").replace(" ", "%20")
             )
