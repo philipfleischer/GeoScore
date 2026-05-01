@@ -68,7 +68,7 @@ fun NavigationRoot(
                     title = Screen.HOME.title,
                     onNavigate = onNavigate,
                     onOpenSettings = goToSettings,
-                    currentDestination = Screen.HOME.route,
+                    highlightedDest = Screen.HOME.route,
                 ) { modifier ->
                     HomeScreen(
                         onOpenSearch = goToSearch,
@@ -90,7 +90,7 @@ fun NavigationRoot(
                     title = Screen.MAP.title,
                     onNavigate = onNavigate,
                     onOpenSettings = goToSettings,
-                    currentDestination = Screen.MAP.route
+                    highlightedDest = Screen.MAP.route
                 ) { modifier ->
                     MapScreen(
                         modifier = modifier,
@@ -110,7 +110,7 @@ fun NavigationRoot(
                     title = Screen.SAVED.title,
                     onNavigate = onNavigate,
                     onOpenSettings = goToSettings,
-                    currentDestination = Screen.SAVED.route
+                    highlightedDest = Screen.SAVED.route
                 ) { modifier ->
                     SavedScreen(
                         modifier = modifier,
@@ -129,16 +129,23 @@ fun NavigationRoot(
                     factory = SavedViewModelFactory(savedRepository)
                 )
 
-                GeoscoreScreen(
-                    location = destination.location,
+                AdaptiveNavigationScaffold(
+                    title = destination.location.name,
+                    highlightedDest = Screen.SAVED.route,
+                    onNavigate = onNavigate,
                     onBackClick = goBack,
-                    onHistoricDataClick = {
-                        backStack.removeLastOrNull()
-                        backStack.add(Route.ClimateStatsDestination(destination.location))
-                    },
-                    frostViewModel = frostViewModel,
-                    savedViewModel = savedViewModel
-                )
+                ) {
+                    GeoscoreScreen(
+                        location = destination.location,
+                        onBackClick = goBack,
+                        onHistoricDataClick = {
+                            backStack.removeLastOrNull()
+                            backStack.add(Route.ClimateStatsDestination(destination.location))
+                        },
+                        frostViewModel = frostViewModel,
+                        savedViewModel = savedViewModel
+                    )
+                }
             }
 
             entry<Route.SettingsDestination> {
@@ -150,7 +157,7 @@ fun NavigationRoot(
             entry<Route.SearchDestination> {
                 AdaptiveNavigationScaffold(
                     title = "Søk etter en adresse",
-                    currentDestination = Screen.HOME.route,
+                    highlightedDest = Screen.HOME.route,
                     onNavigate = onNavigate,
                     onBackClick = goBack,
                     hasTopBar = true
@@ -182,14 +189,20 @@ fun NavigationRoot(
             }
 
             entry<Route.ClimateStatsDestination> { destination ->
-                ClimateStatsScreen(
-                    location = destination.location,
-                    onBackClick = goBack,
-                    onRapportClick = {
-                        backStack.add(Route.GeoscoreDestination(destination.location))
-                    },
-                    frostViewModel = frostViewModel
-                )
+                AdaptiveNavigationScaffold(
+                    title = destination.location.name,
+                    highlightedDest = Screen.SAVED.route,
+                    onNavigate = onNavigate,
+                ) {
+                    ClimateStatsScreen(
+                        location = destination.location,
+                        onBackClick = goBack,
+                        onRapportClick = {
+                            backStack.add(Route.GeoscoreDestination(destination.location))
+                        },
+                        frostViewModel = frostViewModel
+                    )
+                }
             }
         }
     )
