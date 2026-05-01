@@ -50,10 +50,12 @@ import no.uio.ifi.in2000.team20.team20app.util.WmsFormatterLambdas.RadonUrlForma
 fun MapScreen(
     modifier: Modifier = Modifier,
     sharedViewModel: AppViewModel = viewModel(),
-    savedViewModel: SavedViewModel
+    savedViewModel: SavedViewModel,
+    mapViewModel: MapViewModel = viewModel()
 ) {
     val chosenPosition = sharedViewModel.selectedLocation
     val isCurrentSaved by savedViewModel.isCurrentSaved.collectAsStateWithLifecycle()
+    val layers by mapViewModel.layers.collectAsStateWithLifecycle()
 
     val cameraPosition = LatLng(chosenPosition.lat, chosenPosition.lon)
     val markerPosition = rememberUpdatedMarkerState(position = cameraPosition)
@@ -112,30 +114,12 @@ fun MapScreen(
                     mapStyleOptions = mapStyleOptions
                 )
             ) {
-                WmsTileOverlay(
-                    urlFormatter = RadonUrlFormatter,
-                    visible = true
-                )
-                WmsTileOverlay(
-                    urlFormatter = QuickClayUrlFormatter,
-                    visible = !true
-                )
-                WmsTileOverlay(
-                    urlFormatter = rockUrlFormatter,
-                    visible = !true
-                )
-                WmsTileOverlay(
-                    urlFormatter = ClimateAdjustedFlood20YearUrlFormatter,
-                    visible = !true
-                )
-                WmsTileOverlay(
-                    urlFormatter = ClimateAdjustedFlood200YearUrlFormatter,
-                    visible = !true
-                )
-                WmsTileOverlay(
-                    urlFormatter = ClimateAdjustedFlood1000YearUrlFormatter,
-                    visible = !true
-                )
+                layers.forEach { layer ->
+                    WmsTileOverlay(
+                        urlFormatter = layer.formatter,
+                        visible = layer.toggled
+                    )
+                }
                 Marker(
                     state = markerPosition,
                     title = chosenPosition.name,
