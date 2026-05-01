@@ -2,7 +2,7 @@ package no.uio.ifi.in2000.team20.team20app
 
 import kotlinx.coroutines.runBlocking
 import no.uio.ifi.in2000.team20.team20app.data.datasource.FrostDataSourceService
-import no.uio.ifi.in2000.team20.team20app.data.model.FrostObservationResponseDto
+import no.uio.ifi.in2000.team20.team20app.data.datasource.SunshineRawResult
 import no.uio.ifi.in2000.team20.team20app.data.model.FrostV0ObservationResponseDto
 import no.uio.ifi.in2000.team20.team20app.data.model.FrostV1AvailableDto
 import no.uio.ifi.in2000.team20.team20app.data.model.FrostV1DataDto
