@@ -50,7 +50,7 @@ import no.uio.ifi.in2000.team20.team20app.util.WmsFormatterLambdas.RadonUrlForma
 fun MapScreen(
     modifier: Modifier = Modifier,
     sharedViewModel: AppViewModel = viewModel(),
-    savedViewModel: SavedViewModel
+    savedViewModel: SavedViewModel,
     mapViewModel: MapViewModel = viewModel()
 ) {
     val chosenPosition = sharedViewModel.selectedLocation
