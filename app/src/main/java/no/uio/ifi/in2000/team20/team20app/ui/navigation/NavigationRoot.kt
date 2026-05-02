@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.ui.NavDisplay
 import no.uio.ifi.in2000.team20.team20app.data.repository.SavedRepository
 import no.uio.ifi.in2000.team20.team20app.ui.components.AdaptiveNavigationScaffold
@@ -55,6 +56,19 @@ fun NavigationRoot(
     val goToSettings: () -> Unit = { backStack.add(Route.SettingsDestination) }
     val goToSearch: () -> Unit = { backStack.add(Route.SearchDestination) }
 
+    // Helper to pop back to (but not including) a destination matching the predicate
+    val popBackTo: ((NavKey) -> Boolean) -> Boolean = { predicate ->
+        val targetIndex = backStack.indexOfLast { predicate(it) }
+        if (targetIndex >= 0) {
+            while (backStack.size > targetIndex + 1) {
+                backStack.removeLastOrNull()
+            }
+            true
+        } else {
+            false
+        }
+    }
+
     NavDisplay(
         backStack = backStack,
         onBack = goBack,
@@ -96,7 +110,8 @@ fun NavigationRoot(
                         modifier = modifier,
                         sharedViewModel = appViewModel,
                         savedViewModel = savedViewModel,
-                        mapViewModel = mapViewModel
+                        mapViewModel = mapViewModel,
+                        onOpenSearch = goToSearch
                     )
                 }
             }
@@ -139,7 +154,6 @@ fun NavigationRoot(
                         location = destination.location,
                         onBackClick = goBack,
                         onHistoricDataClick = {
-                            backStack.removeLastOrNull()
                             backStack.add(Route.ClimateStatsDestination(destination.location))
                         },
                         frostViewModel = frostViewModel,
@@ -193,10 +207,27 @@ fun NavigationRoot(
                     title = destination.location.name,
                     highlightedDest = Screen.SAVED.route,
                     onNavigate = onNavigate,
+                    onBackClick = {
+                        // Pop both ClimateStats and Geoscore to return to origin (Map or Saved)
+                        val geoScoreIndex = backStack.indexOfLast { it is Route.GeoscoreDestination }
+                        if (geoScoreIndex > 0) {
+                            popBackTo { backStack.indexOf(it) == geoScoreIndex - 1 }
+                        } else {
+                            goBack()
+                        }
+                    }
                 ) {
                     ClimateStatsScreen(
                         location = destination.location,
-                        onBackClick = goBack,
+                        onBackClick = {
+                            // Pop both ClimateStats and Geoscore to return to origin (Map or Saved)
+                            val geoScoreIndex = backStack.indexOfLast { it is Route.GeoscoreDestination }
+                            if (geoScoreIndex > 0) {
+                                popBackTo { backStack.indexOf(it) == geoScoreIndex - 1 }
+                            } else {
+                                goBack()
+                            }
+                        },
                         onRapportClick = {
                             backStack.add(Route.GeoscoreDestination(destination.location))
                         },

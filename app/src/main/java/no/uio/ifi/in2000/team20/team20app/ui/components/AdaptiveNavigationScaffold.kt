@@ -65,7 +65,8 @@ fun AdaptiveNavigationScaffold (
             Scaffold(
                 topBar = { SharedTopAppBar(
                     title = title,
-                    onBackClick = onBackClick
+                    onBackClick = onBackClick,
+                    onOpenSettings = onOpenSettings
                 )
                 }
             ) { innerPadding ->
