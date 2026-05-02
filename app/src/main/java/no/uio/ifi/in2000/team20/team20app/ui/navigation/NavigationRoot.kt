@@ -219,23 +219,17 @@ fun NavigationRoot(
                     title = destination.location.name,
                     highlightedDest = Screen.SAVED.route,
                     onNavigate = onNavigate,
-                    onBackClick = {
-                        // Pop both ClimateStats and Geoscore to return to origin (Map or Saved)
-                        val geoScoreIndex = backStack.indexOfLast { it is Route.GeoscoreDestination }
-                        if (geoScoreIndex > 0) {
-                            popBackTo { backStack.indexOf(it) == geoScoreIndex - 1 }
-                        } else {
-                            goBack()
-                        }
-                    }
+                    onBackClick = goBack
                 ) {
                     ClimateStatsScreen(
                         location = destination.location,
                         onBackClick = {
-                            // Pop both ClimateStats and Geoscore to return to origin (Map or Saved)
+                            // Back button skips Geoscore and returns directly to Map/Saved origin
                             val geoScoreIndex = backStack.indexOfLast { it is Route.GeoscoreDestination }
                             if (geoScoreIndex > 0) {
-                                popBackTo { backStack.indexOf(it) == geoScoreIndex - 1 }
+                                while (backStack.size > geoScoreIndex) {
+                                    backStack.removeLastOrNull()
+                                }
                             } else {
                                 goBack()
                             }

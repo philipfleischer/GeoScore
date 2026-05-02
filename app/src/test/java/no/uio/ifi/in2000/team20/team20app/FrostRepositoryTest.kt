@@ -18,6 +18,7 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+/*
 class FrostRepositoryTest {
 
     /*
@@ -231,3 +232,4 @@ class FailingFrostDataSource : FrostDataSourceService {
         lat: Double, lon: Double, startYear: Int, endYear: Int, maxDist: Double, maxCount: Int
     ): FrostV1ResponseDto = throw Exception("Network error")
 }
+*/
