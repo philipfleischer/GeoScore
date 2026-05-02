@@ -34,7 +34,7 @@ fun NaturhendelserApp() {
             context,
             AppDatabase::class.java,
             "team20_app_db"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
 
     val savedRepository = remember {
