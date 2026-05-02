@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team20.team20app.domain.usecase
 
-import no.uio.ifi.in2000.team20.team20app.data.local.HazardCacheEntity
 import no.uio.ifi.in2000.team20.team20app.data.local.TotalScoreCacheDao
 import no.uio.ifi.in2000.team20.team20app.data.local.TotalScoreCacheEntity
 import no.uio.ifi.in2000.team20.team20app.domain.model.GeoScore

@@ -39,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.core.layout.WindowSizeClass
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchBarObject
 import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
@@ -57,22 +58,28 @@ fun HomeScreen(
     savedViewModel: SavedViewModel,
     frostViewModel: FrostViewModel
 ) {
-    val location = sharedViewModel.selectedLocation
+    val location by sharedViewModel.selectedLocation.collectAsStateWithLifecycle()
 
     // Calculates window width and returns true if the size width class is compact, and false for everything else.
     val compactScreenWidth = !LocalWindowSizeClass.current.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
 
     LaunchedEffect(location) {
-        location?.let {
-            frostViewModel.loadFrostStats(it)
-            savedViewModel.checkIfSaved(it)
-        }
+        frostViewModel.loadFrostStats(location)
+        savedViewModel.checkIfSaved(location)
     }
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(if(compactScreenWidth) 1 else 2),
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(horizontal = 32.dp, vertical = 32.dp),
+        // Orginal:
+        // contentPadding = PaddingValues(horizontal = 32.dp, vertical = 32.dp),
+        // Attemt to get the text slightly lower in portrait:
+        contentPadding = PaddingValues(
+            start = 32.dp,
+            end = 32.dp,
+            top = if (compactScreenWidth) 80.dp else 32.dp,
+            bottom = 32.dp
+        ),
         verticalArrangement = Arrangement.spacedBy(25.dp),
         horizontalArrangement = Arrangement.spacedBy(25.dp)
     ) {
