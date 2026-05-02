@@ -1,8 +1,6 @@
 package no.uio.ifi.in2000.team20.team20app.ui.screens.saved
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
@@ -33,8 +30,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 
@@ -71,9 +66,18 @@ fun SavedScreen(
                 items(saved) { area ->
                     SavedLocationCard(
                         location = area,
+                        savedList = saved,
                         onOpenReport = {
                             sharedViewModel.setSelectedArea(area)
                             onSavedClick(area)
+                        },
+                        onSavedToggle = { isSaved ->
+                            //TODO make unsaving a location less sudden. give some visual feedback
+                            if (isSaved) {
+                                savedViewModel.removeSaved(area)
+                            } else {
+                                savedViewModel.addSaved(area)
+                            }
                         }
                     )
                 }
@@ -85,10 +89,13 @@ fun SavedScreen(
 @Composable
 private fun SavedLocationCard(
     location: Location,
-    onOpenReport: () -> Unit
+    savedList: List<Location>,
+    onOpenReport: () -> Unit,
+    onSavedToggle: (Boolean) -> Unit
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         ),
@@ -101,7 +108,7 @@ private fun SavedLocationCard(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.Top
         ) {
-            GradeBadge(grade = null)
+            GradeBadge(location = location, savedList = savedList)
 
             Column(
                 modifier = Modifier
@@ -116,10 +123,8 @@ private fun SavedLocationCard(
                     fontSize = 16.sp
                 )
 
-                val dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-                val lastUpdated = LocalDate.now().format(dateFormatter)
                 Text(
-                    text = "Sist oppdatert: $lastUpdated",
+                    text = "Sist oppdatert: 02.05.2026",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -156,13 +161,13 @@ private fun SavedLocationCard(
                 }
 
                 IconButton(
-                    onClick = { },
+                    onClick = { onSavedToggle(true) },
                     modifier = Modifier.size(32.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Bookmark,
-                        contentDescription = "Bokmerke",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        contentDescription = "Fjern fra lagret",
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -185,29 +190,29 @@ private fun SavedLocationCard(
     }
 }
 
+//TODO dont hardcode this, should obviously be based on the actual algorithm but fine for brukertest
 @Composable
-private fun GradeBadge(grade: Char?) {
-    Box(
-        modifier = Modifier
-            .size(56.dp)
-            .background(
-                color = when (grade) {
-                    'A' -> Color(0xFF4CAF50)
-                    'B' -> Color(0xFF8BC34A)
-                    'C' -> Color(0xFFFFC107)
-                    'D' -> Color(0xFFF44336)
-                    else -> Color(0xFFBDBDBD)
-                },
-                shape = CircleShape
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = grade?.toString() ?: "?",
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            fontSize = 24.sp
-        )
+private fun GradeBadge(location: Location, savedList: List<Location>) {
+    val gradeList = listOf('A', 'B', 'C', 'D', 'E', 'F', 'G')
+    val index = savedList.indexOf(location)
+    val grade = if (index >= 0) gradeList[index % 7] else 'A'
+
+    val gradeColor = when (grade) {
+        'A' -> Color(0xFF4CAF50)
+        'B' -> Color(0xFF8BC34A)
+        'C' -> Color(0xFFFFC107)
+        'D' -> Color(0xFFFFC56B)
+        'E' -> Color(0xFFEFA066)
+        'F' -> Color(0xFFE36C5C)
+        'G' -> Color(0xFFB64545)
+        else -> Color(0xFFBDBDBD)
     }
+
+    Text(
+        text = grade.toString(),
+        style = MaterialTheme.typography.headlineSmall,
+        fontWeight = FontWeight.Bold,
+        color = gradeColor,
+        fontSize = 28.sp
+    )
 }

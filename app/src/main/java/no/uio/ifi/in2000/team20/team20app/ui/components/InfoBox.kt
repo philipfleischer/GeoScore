@@ -20,8 +20,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import no.uio.ifi.in2000.team20.team20app.ui.theme.CustomTheme
-import no.uio.ifi.in2000.team20.team20app.ui.theme.LocalTheme
 
 @Composable
 fun InfoBox( // InfoBox is just a placeholder before the actual results, doubling as instruction for new users

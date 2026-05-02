@@ -1,7 +1,6 @@
 package no.uio.ifi.in2000.team20.team20app.data.model
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonElement
 
 //generic DTO class for ArcGis response
 //if Features is not empty then the point is in either a landslide or flood zone

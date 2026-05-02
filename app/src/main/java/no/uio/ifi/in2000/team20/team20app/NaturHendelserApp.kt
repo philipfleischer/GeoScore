@@ -23,7 +23,6 @@ import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
-import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModelFactory
 import no.uio.ifi.in2000.team20.team20app.util.Constants
 
 @Composable
@@ -66,15 +65,37 @@ fun NaturhendelserApp() {
         }
     )
 
-    val homeViewModel: HomeViewModel = viewModel()
-
-    val frostViewModel: FrostViewModel = viewModel(
-        factory = FrostViewModelFactory(frostRepository)
+    val homeViewModel: HomeViewModel = viewModel(
+        factory = viewModelFactory {
+            initializer {
+                HomeViewModel()
+            }
+        }
     )
 
-    val mapViewModel: MapViewModel = viewModel()
+    val frostViewModel: FrostViewModel = viewModel(
+        factory = viewModelFactory {
+            initializer {
+                FrostViewModel(frostRepository)
+            }
+        }
+    )
 
-    val appViewModel: AppViewModel = viewModel()
+    val mapViewModel: MapViewModel = viewModel(
+        factory = viewModelFactory {
+            initializer {
+                MapViewModel()
+            }
+        }
+    )
+
+    val appViewModel: AppViewModel = viewModel(
+        factory = viewModelFactory {
+            initializer {
+                AppViewModel()
+            }
+        }
+    )
 
     NavigationRoot(
         appViewModel = appViewModel,

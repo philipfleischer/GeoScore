@@ -1,15 +1,6 @@
 package no.uio.ifi.in2000.team20.team20app
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runTest
-import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepositoryService
-import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
-import org.junit.Rule
-import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class FrostViewModelTest {

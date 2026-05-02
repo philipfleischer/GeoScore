@@ -3,17 +3,12 @@ package no.uio.ifi.in2000.team20.team20app
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.window.core.layout.WindowSizeClass
 import no.uio.ifi.in2000.team20.team20app.ui.theme.CustomTheme
 import no.uio.ifi.in2000.team20.team20app.ui.theme.DarkColorScheme
 import no.uio.ifi.in2000.team20.team20app.ui.theme.LightColorScheme

@@ -4,19 +4,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.BottomSheetScaffold
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,6 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.window.core.layout.WindowSizeClass
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
@@ -42,17 +42,12 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import com.google.maps.android.compose.wms.WmsTileOverlay
+import no.uio.ifi.in2000.team20.team20app.R
 import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MAX_ZOOM
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MIN_ZOOM
-import no.uio.ifi.in2000.team20.team20app.util.WmsFormatterLambdas.ClimateAdjustedFlood1000YearUrlFormatter
-import no.uio.ifi.in2000.team20.team20app.util.WmsFormatterLambdas.rockUrlFormatter
-import no.uio.ifi.in2000.team20.team20app.R
-import no.uio.ifi.in2000.team20.team20app.util.WmsFormatterLambdas.ClimateAdjustedFlood200YearUrlFormatter
-import no.uio.ifi.in2000.team20.team20app.util.WmsFormatterLambdas.ClimateAdjustedFlood20YearUrlFormatter
-import no.uio.ifi.in2000.team20.team20app.util.WmsFormatterLambdas.QuickClayUrlFormatter
-import no.uio.ifi.in2000.team20.team20app.util.WmsFormatterLambdas.RadonUrlFormatter
+import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,12 +57,15 @@ fun MapScreen(
     sharedViewModel: AppViewModel = viewModel(),
     savedViewModel: SavedViewModel,
     mapViewModel: MapViewModel = viewModel(),
-    onOpenSearch: () -> Unit = {}
+    onOpenSearch: () -> Unit = {},
+    onOpenReport: () -> Unit = {}
 ) {
     //TODO: Import custom colors
-    val chosenPosition = sharedViewModel.selectedLocation
+    val chosenPosition by sharedViewModel.selectedLocation.collectAsStateWithLifecycle()
     val isCurrentSaved by savedViewModel.isCurrentSaved.collectAsStateWithLifecycle()
     val layers by mapViewModel.layers.collectAsStateWithLifecycle()
+
+    val compactScreenWidth = !LocalWindowSizeClass.current.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
 
     val cameraPosition = LatLng(chosenPosition.lat, chosenPosition.lon)
     val markerPosition = rememberUpdatedMarkerState(position = cameraPosition)
@@ -77,39 +75,13 @@ fun MapScreen(
 
     LaunchedEffect(chosenPosition) {
         savedViewModel.checkIfSaved(chosenPosition)
+        cameraPositionState.animate(
+            CameraUpdateFactory.newLatLngZoom(
+                LatLng(chosenPosition.lat, chosenPosition.lon), 12f
+            )
+        )
     }
 
-//    BottomSheetScaffold(
-//        modifier = modifier,
-//        sheetPeekHeight = 100.dp,
-//        sheetContainerColor = MaterialTheme.colorScheme.surface,
-//        sheetContent = {
-//            Column(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(20.dp),
-//                verticalArrangement = Arrangement.spacedBy(16.dp)
-//            ) {
-//                Text(
-//                    text = chosenPosition.name,
-//                    style = MaterialTheme.typography.headlineMedium
-//                )
-//
-//                Text(
-//                    text = "Her vil du kunne se historisk klimadata en gang i fremtiden!",
-//                    style = MaterialTheme.typography.bodyMedium,
-//                    color = MaterialTheme.colorScheme.onSurfaceVariant
-//                )
-//
-//                // TODO: Add historical climate charts here (temperature, snow, precipitation, wind)
-//                // FrostViewModel must be passed in and loadFrostStats() called on location change
-//                // See ClimateStatsScreen.kt for chart implementations
-//            }
-//        }
-//    ) { paddingValues ->
-//
-//
-//    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -139,65 +111,52 @@ fun MapScreen(
                 snippet = "Markør for ${chosenPosition.name}"
             )
         }
-        Text(
-            text = chosenPosition.name,
-            style = MaterialTheme.typography.labelLarge,
-            fontSize = 30.sp,
-            color = Color.Black,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.semantics{ heading() }.fillMaxWidth().padding(32.dp)
-        )
-
-        FloatingActionButton(
-            onClick = onOpenSearch,
+        Column(
             modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(16.dp),
-            containerColor = MaterialTheme.colorScheme.primary
+                .align(Alignment.TopStart)
+                .fillMaxWidth()
+                .padding(
+                    top = if (compactScreenWidth) 48.dp else 16.dp,
+                    start = 16.dp,
+                    end = 16.dp,
+                    bottom = 16.dp
+                ),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = "Søk etter adresse"
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                FloatingActionButton(
+                    onClick = onOpenSearch,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(48.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Søk etter adresse",
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+
+                if (chosenPosition != null) {
+                    Button(onClick = onOpenReport) {
+                        Text("Vis rapport")
+                    }
+                }
+            }
+
+            Text(
+                text = chosenPosition.name,
+                style = MaterialTheme.typography.labelLarge,
+                fontSize = 30.sp,
+                color = Color.Black,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.semantics { heading() }
             )
         }
-
-//        Card(
-//            modifier = Modifier
-//                .align(Alignment.TopCenter)
-//                .padding(top = 16.dp, start = 16.dp, end = 16.dp)
-//                .fillMaxWidth(),
-//            shape = RoundedCornerShape(20.dp),
-//            colors = CardDefaults.cardColors(
-//                containerColor = MaterialTheme.colorScheme.primaryContainer
-//            )
-//        ) {
-//            Column(
-//                modifier = Modifier.padding(16.dp)
-//            ) {
-//                Text("Valgt område")
-//                Text(chosenPosition.name)
-//            }
-//        }
     }
 }
 
-//@Preview(showBackground = true, showSystemUi = true)
-//@Composable
-//private fun MapScreenPreview() {
-//    MaterialTheme {
-//        ScreenScaffold(
-//            title = "Kart",
-//            goToHome = {},
-//            goToMap = {},
-//            goToFavorites = {},
-//            onOpenSettings = {},
-//            currentDestination = Route.MapDestination
-//        ) {
-//            MapScreen(
-//                selectedAreaName = "Bergen",
-//                onAreaSelected = { _, _, _ -> },
-//                onOpenDetails = { _, _, _ -> }
-//            )
-//        }
-//    }
-//}
+

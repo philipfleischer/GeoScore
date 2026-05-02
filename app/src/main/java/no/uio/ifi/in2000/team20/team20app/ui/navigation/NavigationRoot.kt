@@ -2,6 +2,8 @@ package no.uio.ifi.in2000.team20.team20app.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.lifecycle.viewmodel.initializer
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.NavKey
@@ -13,7 +15,6 @@ import no.uio.ifi.in2000.team20.team20app.ui.screens.details.ClimateStatsScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.GeoscoreScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
-import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModelFactory
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapScreen
@@ -50,7 +51,7 @@ fun NavigationRoot(
     }
 
     val onNavigate: (Screen) -> Unit = {
-        screen -> screen.route.let { backStack.add(it) }
+        screen -> backStack.add(screen.route as Route)
     }
 
     val goToSettings: () -> Unit = { backStack.add(Route.SettingsDestination) }
@@ -75,7 +76,9 @@ fun NavigationRoot(
         entryProvider = entryProvider {
             entry<Route.HomeDestination> { // Type parameter. Can't use Screen.XXX.route
                 val savedViewModel: SavedViewModel = viewModel(
-                    factory = SavedViewModelFactory(savedRepository)
+                    factory = viewModelFactory {
+                        initializer { SavedViewModel(savedRepository) }
+                    }
                 )
 
                 AdaptiveNavigationScaffold(
@@ -97,7 +100,9 @@ fun NavigationRoot(
 
             entry<Route.MapDestination> {
                 val savedViewModel: SavedViewModel = viewModel(
-                    factory = SavedViewModelFactory(savedRepository)
+                    factory = viewModelFactory {
+                        initializer { SavedViewModel(savedRepository) }
+                    }
                 )
 
                 AdaptiveNavigationScaffold(
@@ -111,14 +116,19 @@ fun NavigationRoot(
                         sharedViewModel = appViewModel,
                         savedViewModel = savedViewModel,
                         mapViewModel = mapViewModel,
-                        onOpenSearch = goToSearch
+                        onOpenSearch = goToSearch,
+                        onOpenReport = {
+                            backStack.add(Route.GeoscoreDestination(appViewModel.selectedLocation.value))
+                        }
                     )
                 }
             }
 
             entry<Route.SavedDestination> {
                 val savedViewModel: SavedViewModel = viewModel(
-                    factory = SavedViewModelFactory(savedRepository)
+                    factory = viewModelFactory {
+                        initializer { SavedViewModel(savedRepository) }
+                    }
                 )
 
                 AdaptiveNavigationScaffold(
@@ -141,7 +151,9 @@ fun NavigationRoot(
 
             entry<Route.GeoscoreDestination> { destination ->
                 val savedViewModel: SavedViewModel = viewModel(
-                    factory = SavedViewModelFactory(savedRepository)
+                    factory = viewModelFactory {
+                        initializer { SavedViewModel(savedRepository) }
+                    }
                 )
 
                 AdaptiveNavigationScaffold(
@@ -180,7 +192,7 @@ fun NavigationRoot(
                         onBackClick = goBack,
                         onLocationSelected = { location ->
                             appViewModel.setSelectedArea(location)
-                            backStack.add(Route.GeoscoreDestination(location))
+                            backStack.add(Route.MapDestination)
                         },
                         searchViewModel = searchViewModel,
                         modifier = modifier
@@ -229,7 +241,7 @@ fun NavigationRoot(
                             }
                         },
                         onRapportClick = {
-                            backStack.add(Route.GeoscoreDestination(destination.location))
+                            backStack.removeLastOrNull()
                         },
                         frostViewModel = frostViewModel
                     )

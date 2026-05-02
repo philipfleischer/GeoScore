@@ -1,15 +1,6 @@
 package no.uio.ifi.in2000.team20.team20app
 
-import junit.framework.TestCase.assertFalse
-import junit.framework.TestCase.assertNotNull
-import junit.framework.TestCase.assertNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runTest
-import no.uio.ifi.in2000.team20.team20app.domain.model.Location
-import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeViewModel
-import org.junit.Rule
-import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModelUnitTest {
