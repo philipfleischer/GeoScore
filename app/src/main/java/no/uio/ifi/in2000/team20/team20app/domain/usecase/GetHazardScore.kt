@@ -3,6 +3,7 @@ package no.uio.ifi.in2000.team20.team20app.domain.usecase
 import no.uio.ifi.in2000.team20.team20app.data.local.HazardCacheDao
 import no.uio.ifi.in2000.team20.team20app.data.local.HazardCacheEntity
 import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepository
+import no.uio.ifi.in2000.team20.team20app.domain.model.HazardScoreResult
 import no.uio.ifi.in2000.team20.team20app.util.Constants.EXTREME_PRECIPITATION_THRESHOLD
 import no.uio.ifi.in2000.team20.team20app.util.Constants.EXTREME_WIND_GUST_THRESHOLD
 import no.uio.ifi.in2000.team20.team20app.util.Constants.PRECIPITATION_WEIGHT
@@ -16,13 +17,17 @@ class GetHazardScore(
     private val frostRepository: FrostRepository,
     private val hazardScoreDAO: HazardCacheDao
 ) {
-    suspend fun calculateHazardScore(lat: Double, lon: Double): Double {
+    suspend fun calculateHazardScore(lat: Double, lon: Double): HazardScoreResult {
 
         //make lat and lon more vague and check if location is in the database
         val locationKey = "%.2f, %.2f".format(lat,lon)
         val cachedResult = hazardScoreDAO.getByKey(locationKey)
         if (cachedResult != null) {
-            return cachedResult.score
+            return HazardScoreResult(
+                precipitationScore = cachedResult.precipitationScore,
+                windScore = cachedResult.windScore,
+                hazardScore = cachedResult.score
+            )
         }
 
         val windAndPrecipitationObservationsResult = frostRepository.getWindAndPrecipitationObservations(lat, lon)
@@ -48,20 +53,27 @@ class GetHazardScore(
             windOverTheThreshold = extremeWindDays.map { it - EXTREME_WIND_GUST_THRESHOLD }.average()
         }
 
-        val precipitationScore = PRECIPITATION_WEIGHT * min(100.0, (precipOverTheThreshold / REF_MAX_PRECIP_OVER_THRESHOLD) * 100)
-        val windScore = WIND_WEIGHT * min(100.0, (windOverTheThreshold / REF_MAX_WIND_OVER_THRESHOLD) * 100)
-        val score = precipitationScore + windScore
+        //0-100 for wind and precipitation scores
+        val precipitationScore =  min(100.0, (precipOverTheThreshold / REF_MAX_PRECIP_OVER_THRESHOLD) * 100)
+        val windScore = min(100.0, (windOverTheThreshold / REF_MAX_WIND_OVER_THRESHOLD) * 100)
+        val score = PRECIPITATION_WEIGHT * precipitationScore + WIND_WEIGHT * windScore
+
+        val result = HazardScoreResult(
+            precipitationScore = precipitationScore,
+            windScore = windScore,
+            hazardScore = score
+        )
 
         hazardScoreDAO.insert(
             HazardCacheEntity(
                 locationKey = locationKey,
-                precipOverTheThreshold = precipOverTheThreshold,
-                windOverTheThreshold = windOverTheThreshold,
+                precipitationScore = precipitationScore,
+                windScore = windScore,
                 score = score
             )
         )
 
-        return score
+        return result
     }
 
 }

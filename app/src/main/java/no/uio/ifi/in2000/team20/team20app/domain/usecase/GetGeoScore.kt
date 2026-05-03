@@ -3,6 +3,7 @@ package no.uio.ifi.in2000.team20.team20app.domain.usecase
 import no.uio.ifi.in2000.team20.team20app.data.local.TotalScoreCacheDao
 import no.uio.ifi.in2000.team20.team20app.data.local.TotalScoreCacheEntity
 import no.uio.ifi.in2000.team20.team20app.domain.model.GeoScore
+import no.uio.ifi.in2000.team20.team20app.domain.model.HazardScoreResult
 import no.uio.ifi.in2000.team20.team20app.util.Constants.EXPOSURESCORE_WEIGHT
 import no.uio.ifi.in2000.team20.team20app.util.Constants.HAZARDSCORE_WEIGHT
 import no.uio.ifi.in2000.team20.team20app.util.Constants.VULNERABILITYSCORE_WEIGHT
@@ -32,7 +33,7 @@ class GetGeoScore(
         val vulnerabilityScore = getVulnerabilityScore.calculateVulnerabilityScore(lat, lon)
 
         val geoScore = GeoScore(
-            hazardScore = hazardScore,
+            hazardScore = hazardScore.hazardScore,
             exposureScore = exposureScore,
             vulnerabilityScore = vulnerabilityScore,
             geoScore = (hazardScore * HAZARDSCORE_WEIGHT) + (exposureScore * EXPOSURESCORE_WEIGHT) + (vulnerabilityScore * VULNERABILITYSCORE_WEIGHT)

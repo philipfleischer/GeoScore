@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "hazard_cache")
 data class HazardCacheEntity(
     @PrimaryKey val locationKey: String,
-    val precipOverTheThreshold: Double,
-    val windOverTheThreshold: Double,
+    val precipitationScore: Double,
+    val windScore: Double,
     val score: Double
 )
