@@ -49,6 +49,8 @@ import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import no.uio.ifi.in2000.team20.team20app.ui.theme.LocalTheme
+import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
+import no.uio.ifi.in2000.team20.team20app.util.Constants.LARGE_PADDING_DP
 
 @Composable
 fun HomeScreen(
@@ -79,7 +81,7 @@ fun HomeScreen(
         contentPadding = PaddingValues(
             start = 32.dp,
             end = if (compactScreenWidth) 32.dp else 80.dp,
-            top = if (compactScreenWidth) 80.dp else 32.dp,
+            top = 80.dp,
             bottom = 32.dp
         ),
         verticalArrangement = Arrangement.spacedBy(25.dp),
