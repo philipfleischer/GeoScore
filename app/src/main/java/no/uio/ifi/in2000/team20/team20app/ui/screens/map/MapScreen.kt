@@ -43,11 +43,14 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import com.google.maps.android.compose.wms.WmsTileOverlay
 import no.uio.ifi.in2000.team20.team20app.R
+import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MAX_ZOOM
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MIN_ZOOM
 import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -97,7 +100,20 @@ fun MapScreen(
                 maxZoomPreference = MAX_ZOOM,
                 minZoomPreference = MIN_ZOOM,
                 mapStyleOptions = mapStyleOptions
-            )
+            ),
+            onMapLongClick = {latlng ->
+                val lat = BigDecimal(latlng.latitude).setScale(5, RoundingMode.HALF_UP).toDouble()
+                val lon = BigDecimal(latlng.longitude).setScale(5, RoundingMode.HALF_UP).toDouble()
+                sharedViewModel.setSelectedArea(
+                    Location(
+                        address = "$lat, $lon",
+                        municipality = null,
+                        county = null,
+                        lat = lat,
+                        lon = lon
+                    )
+                )
+            }
         ) {
             layers.forEach { layer ->
                 WmsTileOverlay(
