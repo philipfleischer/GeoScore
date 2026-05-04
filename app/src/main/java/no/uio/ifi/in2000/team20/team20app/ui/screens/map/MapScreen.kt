@@ -45,6 +45,9 @@ import com.google.maps.android.compose.wms.WmsTileOverlay
 import no.uio.ifi.in2000.team20.team20app.R
 import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
+import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
+import no.uio.ifi.in2000.team20.team20app.util.Constants.DOUBLE_COMPACT_PADDING_DP
+import no.uio.ifi.in2000.team20.team20app.util.Constants.LARGE_PADDING_DP
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MAX_ZOOM
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MIN_ZOOM
 import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
@@ -116,10 +119,10 @@ fun MapScreen(
                 .align(Alignment.TopStart)
                 .fillMaxWidth()
                 .padding(
-                    top = if (compactScreenWidth) 48.dp else 16.dp,
-                    start = 16.dp,
-                    end = 16.dp,
-                    bottom = 16.dp
+                    top = (DEFAULT_PADDING_DP*2).dp,
+                    start = DEFAULT_PADDING_DP.dp,
+                    end = if (compactScreenWidth) DEFAULT_PADDING_DP.dp else (DEFAULT_PADDING_DP*4).dp,
+                    bottom = DEFAULT_PADDING_DP.dp
                 ),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {

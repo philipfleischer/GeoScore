@@ -70,6 +70,7 @@ object Constants {
 
     // UI DIMENSIONS
     const val DEFAULT_PADDING_DP = 16
+    const val DOUBLE_COMPACT_PADDING_DP = 32
     const val SMALL_PADDING_DP = 8
     const val LARGE_PADDING_DP = 24
 
