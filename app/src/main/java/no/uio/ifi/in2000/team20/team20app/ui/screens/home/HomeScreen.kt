@@ -48,6 +48,7 @@ import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
 import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import no.uio.ifi.in2000.team20.team20app.ui.theme.LocalTheme
 
 @Composable
 fun HomeScreen(
@@ -62,6 +63,7 @@ fun HomeScreen(
 
     // Calculates window width and returns true if the size width class is compact, and false for everything else.
     val compactScreenWidth = !LocalWindowSizeClass.current.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
+    val theme = LocalTheme.current
 
     LaunchedEffect(location) {
         frostViewModel.loadFrostStats(location)
@@ -76,7 +78,7 @@ fun HomeScreen(
         // Attemt to get the text slightly lower in portrait:
         contentPadding = PaddingValues(
             start = 32.dp,
-            end = 32.dp,
+            end = if (compactScreenWidth) 32.dp else 80.dp,
             top = if (compactScreenWidth) 80.dp else 32.dp,
             bottom = 32.dp
         ),
@@ -94,7 +96,7 @@ fun HomeScreen(
                     text = "Vit hva du kjøper - før du kjøper det",
                     fontSize = 40.sp,
                     lineHeight = 48.sp,
-                    color = Color.Blue,
+                    color = theme.tertiary,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.semantics{ heading() }
                 )
