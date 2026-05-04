@@ -64,8 +64,10 @@ fun HomeScreen(
     val compactScreenWidth = !LocalWindowSizeClass.current.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
 
     LaunchedEffect(location) {
-        frostViewModel.loadFrostStats(location)
-        savedViewModel.checkIfSaved(location)
+        if(location != null) {
+            frostViewModel.loadFrostStats(location!!)
+            savedViewModel.checkIfSaved(location!!)
+        }
     }
 
     LazyVerticalGrid(

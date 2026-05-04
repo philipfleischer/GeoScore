@@ -43,11 +43,16 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import com.google.maps.android.compose.wms.WmsTileOverlay
 import no.uio.ifi.in2000.team20.team20app.R
+import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
+import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_ZOOM
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MAX_ZOOM
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MIN_ZOOM
+import no.uio.ifi.in2000.team20.team20app.util.Constants.ZOOM_ON_LOCATION
 import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,19 +72,32 @@ fun MapScreen(
 
     val compactScreenWidth = !LocalWindowSizeClass.current.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
 
-    val cameraPosition = LatLng(chosenPosition.lat, chosenPosition.lon)
+    val cameraPosition =
+        if(chosenPosition != null) {
+            LatLng(chosenPosition!!.lat, chosenPosition!!.lon)
+        }else{
+            sharedViewModel.defaultCameraPosition
+        }
+    val cameraZoom =
+        if(chosenPosition!= null) {
+            ZOOM_ON_LOCATION
+        }else{
+            DEFAULT_ZOOM
+        }
     val markerPosition = rememberUpdatedMarkerState(position = cameraPosition)
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(cameraPosition, 10f)
+        position = CameraPosition.fromLatLngZoom(cameraPosition, cameraZoom)
     }
 
     LaunchedEffect(chosenPosition) {
-        savedViewModel.checkIfSaved(chosenPosition)
-        cameraPositionState.animate(
-            CameraUpdateFactory.newLatLngZoom(
-                LatLng(chosenPosition.lat, chosenPosition.lon), 12f
+        if(chosenPosition != null) {
+            savedViewModel.checkIfSaved(chosenPosition!!)
+            cameraPositionState.animate(
+                CameraUpdateFactory.newLatLngZoom(
+                    LatLng(chosenPosition!!.lat, chosenPosition!!.lon), cameraZoom
+                )
             )
-        )
+        }
     }
 
     Box(
@@ -97,7 +115,20 @@ fun MapScreen(
                 maxZoomPreference = MAX_ZOOM,
                 minZoomPreference = MIN_ZOOM,
                 mapStyleOptions = mapStyleOptions
-            )
+            ),
+            onMapLongClick = {latlng ->
+                val lat = BigDecimal(latlng.latitude).setScale(5, RoundingMode.HALF_UP).toDouble()
+                val lon = BigDecimal(latlng.longitude).setScale(5, RoundingMode.HALF_UP).toDouble()
+                sharedViewModel.setSelectedArea(
+                    Location(
+                        address = "$lat, $lon",
+                        municipality = null,
+                        county = null,
+                        lat = lat,
+                        lon = lon
+                    )
+                )
+            }
         ) {
             layers.forEach { layer ->
                 WmsTileOverlay(
@@ -105,11 +136,13 @@ fun MapScreen(
                     visible = layer.toggled
                 )
             }
-            Marker(
-                state = markerPosition,
-                title = chosenPosition.name,
-                snippet = "Markør for ${chosenPosition.name}"
-            )
+            if(chosenPosition != null) {
+                Marker(
+                    state = markerPosition,
+                    title = chosenPosition!!.name,
+                    snippet = "Markør for ${chosenPosition!!.name}"
+                )
+            }
         }
         Column(
             modifier = Modifier
@@ -146,15 +179,16 @@ fun MapScreen(
                     }
                 }
             }
-
-            Text(
-                text = chosenPosition.name,
-                style = MaterialTheme.typography.labelLarge,
-                fontSize = 30.sp,
-                color = Color.Black,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.semantics { heading() }
-            )
+            if (chosenPosition != null) {
+                Text(
+                    text = chosenPosition!!.name,
+                    style = MaterialTheme.typography.labelLarge,
+                    fontSize = 30.sp,
+                    color = Color.Black,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.semantics { heading() }
+                )
+            }
         }
     }
 }
