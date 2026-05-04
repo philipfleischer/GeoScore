@@ -31,7 +31,6 @@ fun AdaptiveNavigationScaffold (
     onNavigate: (Screen) -> Unit,
     onOpenSettings: () -> Unit = {},
     onBackClick: () -> Unit = {},
-    hasTopBar: Boolean = false,
     content: @Composable (Modifier) -> Unit
 ){
 
@@ -63,19 +62,6 @@ fun AdaptiveNavigationScaffold (
             navigationRailContainerColor = MaterialTheme.colorScheme.surface,
         ),
     ){
-        if (hasTopBar) {
-            Scaffold(
-                topBar = { SharedTopAppBar(
-                    title = title,
-                    onBackClick = onBackClick,
-                    onOpenSettings = onOpenSettings
-                )
-                }
-            ) { innerPadding ->
-                content(Modifier.padding(innerPadding))
-            }
-        } else {
-            content(Modifier.padding(0.dp))
-        }
+        content(Modifier.padding(0.dp))
     }
 }

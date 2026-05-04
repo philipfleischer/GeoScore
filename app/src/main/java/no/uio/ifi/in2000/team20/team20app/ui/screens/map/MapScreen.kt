@@ -46,9 +46,9 @@ import no.uio.ifi.in2000.team20.team20app.R
 import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
-import no.uio.ifi.in2000.team20.team20app.util.Constants.DOUBLE_COMPACT_PADDING_DP
 import no.uio.ifi.in2000.team20.team20app.util.Constants.LARGE_PADDING_DP
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MAX_ZOOM
+import no.uio.ifi.in2000.team20.team20app.util.Constants.MEDIUM_SCREEN_WIDTH
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MIN_ZOOM
 import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
 
@@ -68,7 +68,7 @@ fun MapScreen(
     val isCurrentSaved by savedViewModel.isCurrentSaved.collectAsStateWithLifecycle()
     val layers by mapViewModel.layers.collectAsStateWithLifecycle()
 
-    val compactScreenWidth = !LocalWindowSizeClass.current.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
+    val compactScreenWidth = !LocalWindowSizeClass.current.isWidthAtLeastBreakpoint(MEDIUM_SCREEN_WIDTH)
 
     val cameraPosition = LatLng(chosenPosition.lat, chosenPosition.lon)
     val markerPosition = rememberUpdatedMarkerState(position = cameraPosition)

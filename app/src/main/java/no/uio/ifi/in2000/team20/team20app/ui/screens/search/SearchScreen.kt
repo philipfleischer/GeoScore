@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -40,6 +41,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.components.ErrorState
 import no.uio.ifi.in2000.team20.team20app.ui.components.LoadingState
+import no.uio.ifi.in2000.team20.team20app.ui.components.SharedTopAppBar
+import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
 
 @Composable
 fun SearchBarObject(
@@ -53,7 +56,7 @@ fun SearchBarObject(
             .clip(RoundedCornerShape(28.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .clickable { onOpenSearch() }
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = DEFAULT_PADDING_DP.dp),
         contentAlignment = Alignment.CenterStart
     ) {
         Row(
@@ -95,119 +98,121 @@ fun SearchScreen(
         keyboardController?.show()
     }
 
-//    Scaffold(
-//        topBar = {
-//            SharedTopAppBar(
-//                title = "Søk etter adresse",
-//                onBackClick = onBackClick
-//            )
-//        }
-//    ) { innerPadding ->
-//
-//    }
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-//            .padding(innerPadding)
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Top
-    ) {
-        TextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .clip(RoundedCornerShape(28.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-                .padding(horizontal = 16.dp)
-                .focusRequester(focusRequester),
-            value = uiState.query,
-            onValueChange = { searchViewModel.updateInput(it) },
-            label = { Text("Sted") },
-            placeholder = { Text("Skriv inn adresse...") },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Søk"
-                )
-            },
-            isError = uiState.inputError != null,
-            singleLine = true,
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-                cursorColor = MaterialTheme.colorScheme.primary,
-            )
-        )
-
-        // her viser vi egen feilmelding hvis brukeren skriver ugyldig input.
-        if (uiState.inputError != null) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = uiState.inputError!!,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall
+    Scaffold(
+        topBar = {
+            SharedTopAppBar(
+                title = "Søk etter adresse",
+                onBackClick = onBackClick
             )
         }
+    ) { innerPadding ->
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(
+                    DEFAULT_PADDING_DP.dp
+                ),
+            verticalArrangement = Arrangement.Top
+        ) {
+            TextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .clip(RoundedCornerShape(28.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .padding(horizontal = 16.dp)
+                    .focusRequester(focusRequester),
+                value = uiState.query,
+                onValueChange = { searchViewModel.updateInput(it) },
+                label = { Text("Sted") },
+                placeholder = { Text("Skriv inn adresse...") },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Søk"
+                    )
+                },
+                isError = uiState.inputError != null,
+                singleLine = true,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    cursorColor = MaterialTheme.colorScheme.primary,
+                )
+            )
 
-        Spacer(modifier = Modifier.height(16.dp))
+            // her viser vi egen feilmelding hvis brukeren skriver ugyldig input.
+            if (uiState.inputError != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = uiState.inputError!!,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
 
-        when {
-            uiState.query.isBlank() -> {
+            Spacer(modifier = Modifier.height(16.dp))
 
-                if(uiState.recentlySearched.isEmpty()){
-                    Box(modifier = Modifier.fillMaxWidth()) {
-                        Text("Begynn å skrive for å se forslag")
+            when {
+                uiState.query.isBlank() -> {
+
+                    if(uiState.recentlySearched.isEmpty()){
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            Text("Begynn å skrive for å se forslag")
+                        }
+                    } else {
+                        Text(text = "Siste søk")
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f, fill = false)
+                        ) {
+                            items(uiState.recentlySearched) { location ->
+                                SearchResultItem(
+                                    location = location,
+                                    onSelect = {
+                                        onLocationSelected(location)
+                                    }
+                                )
+                            }
+                        }
                     }
-                } else {
-                    Text(text = "Siste søk")
+
+                }
+                uiState.isLoading -> LoadingState(modifier = Modifier.fillMaxWidth())
+                uiState.error != null -> ErrorState(message = uiState.error!!, modifier = Modifier.fillMaxWidth())
+                uiState.results.isEmpty() -> {
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        Text("Ingen resultater for \"${uiState.query}\"")
+                    }
+                }
+                else -> {
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f, fill = false)
                     ) {
-                        items(uiState.recentlySearched) { location ->
+                        items(uiState.results) { location ->
                             SearchResultItem(
                                 location = location,
                                 onSelect = {
+                                    searchViewModel.addRecentlySearched(location)
                                     onLocationSelected(location)
                                 }
                             )
+                            HorizontalDivider()
                         }
-                    }
-                }
-
-            }
-            uiState.isLoading -> LoadingState(modifier = Modifier.fillMaxWidth())
-            uiState.error != null -> ErrorState(message = uiState.error!!, modifier = Modifier.fillMaxWidth())
-            uiState.results.isEmpty() -> {
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    Text("Ingen resultater for \"${uiState.query}\"")
-                }
-            }
-            else -> {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f, fill = false)
-                ) {
-                    items(uiState.results) { location ->
-                        SearchResultItem(
-                            location = location,
-                            onSelect = {
-                                searchViewModel.addRecentlySearched(location)
-                                onLocationSelected(location)
-                            }
-                        )
-                        HorizontalDivider()
                     }
                 }
             }
         }
     }
+
 }
 
 @Composable

@@ -51,6 +51,7 @@ import androidx.compose.ui.semantics.semantics
 import no.uio.ifi.in2000.team20.team20app.ui.theme.LocalTheme
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
 import no.uio.ifi.in2000.team20.team20app.util.Constants.LARGE_PADDING_DP
+import no.uio.ifi.in2000.team20.team20app.util.Constants.MEDIUM_SCREEN_WIDTH
 
 @Composable
 fun HomeScreen(
@@ -64,7 +65,7 @@ fun HomeScreen(
     val location by sharedViewModel.selectedLocation.collectAsStateWithLifecycle()
 
     // Calculates window width and returns true if the size width class is compact, and false for everything else.
-    val compactScreenWidth = !LocalWindowSizeClass.current.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
+    val compactScreenWidth = !LocalWindowSizeClass.current.isWidthAtLeastBreakpoint(MEDIUM_SCREEN_WIDTH)
     val theme = LocalTheme.current
 
     LaunchedEffect(location) {
@@ -79,10 +80,10 @@ fun HomeScreen(
         // contentPadding = PaddingValues(horizontal = 32.dp, vertical = 32.dp),
         // Attemt to get the text slightly lower in portrait:
         contentPadding = PaddingValues(
-            start = 32.dp,
-            end = if (compactScreenWidth) 32.dp else 80.dp,
-            top = 80.dp,
-            bottom = 32.dp
+            start = (DEFAULT_PADDING_DP*2).dp,
+            end = if (compactScreenWidth) (DEFAULT_PADDING_DP*2).dp else (DEFAULT_PADDING_DP*5).dp,
+            top = (DEFAULT_PADDING_DP*5).dp,
+            bottom = (DEFAULT_PADDING_DP*2).dp,
         ),
         verticalArrangement = Arrangement.spacedBy(25.dp),
         horizontalArrangement = Arrangement.spacedBy(25.dp)

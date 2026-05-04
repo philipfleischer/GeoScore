@@ -54,11 +54,14 @@ import ir.ehsannarmani.compose_charts.models.ZeroLineProperties
 import ir.ehsannarmani.compose_charts.models.PopupProperties
 import androidx.compose.animation.core.tween
 import androidx.compose.ui.text.TextStyle
+import androidx.window.core.layout.WindowSizeClass
 import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
 import ir.ehsannarmani.compose_charts.models.IndicatorCount
 import ir.ehsannarmani.compose_charts.models.GridProperties
 import ir.ehsannarmani.compose_charts.models.GridProperties.AxisProperties
 import ir.ehsannarmani.compose_charts.models.StrokeStyle
+import no.uio.ifi.in2000.team20.team20app.util.Constants.MEDIUM_SCREEN_WIDTH
+import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,6 +73,7 @@ fun ClimateStatsScreen(
 ) {
     val frostUiState by frostViewModel.uiState.collectAsStateWithLifecycle()
     val theme = LocalTheme.current
+    val compactScreenWidth = !LocalWindowSizeClass.current.isWidthAtLeastBreakpoint(MEDIUM_SCREEN_WIDTH)
 
     LaunchedEffect(location) {
         frostViewModel.loadFrostStats(location)
