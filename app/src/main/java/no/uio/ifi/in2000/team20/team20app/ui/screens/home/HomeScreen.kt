@@ -69,8 +69,10 @@ fun HomeScreen(
     val theme = LocalTheme.current
 
     LaunchedEffect(location) {
-        frostViewModel.loadFrostStats(location)
-        savedViewModel.checkIfSaved(location)
+        if(location != null) {
+            frostViewModel.loadFrostStats(location!!)
+            savedViewModel.checkIfSaved(location!!)
+        }
     }
 
     LazyVerticalGrid(

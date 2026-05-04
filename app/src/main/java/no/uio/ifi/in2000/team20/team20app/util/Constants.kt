@@ -37,10 +37,11 @@ object Constants {
     const val FROST_CLIENT_SECRET = BuildConfig.FROST_V0_CLIENT_SECRET
 
     // MAP DEFAULT SETTINGS
-    const val DEFAULT_ZOOM = 6.5
-    const val DEFAULT_NAME = "Bergen"
-    const val DEFAULT_LATITUDE = 60.3913
-    const val DEFAULT_LONGITUDE = 5.3221
+    const val DEFAULT_ZOOM = 8f
+    const val ZOOM_ON_LOCATION = 15f
+    // IFI as default
+    const val DEFAULT_LATITUDE = 59.94376
+    const val DEFAULT_LONGITUDE = 10.71889
 
     const val MAX_ZOOM: Float = 19.0f
     const val MIN_ZOOM: Float = 4.0f

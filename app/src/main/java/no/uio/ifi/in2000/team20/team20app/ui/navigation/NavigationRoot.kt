@@ -118,7 +118,7 @@ fun NavigationRoot(
                         mapViewModel = mapViewModel,
                         onOpenSearch = goToSearch,
                         onOpenReport = {
-                            backStack.add(Route.GeoscoreDestination(appViewModel.selectedLocation.value))
+                            backStack.add(Route.GeoscoreDestination(appViewModel.selectedLocation.value!!))
                         }
                     )
                 }
