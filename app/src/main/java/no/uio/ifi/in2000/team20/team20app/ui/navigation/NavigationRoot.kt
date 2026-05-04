@@ -9,16 +9,19 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.ui.NavDisplay
 import no.uio.ifi.in2000.team20.team20app.data.repository.SavedRepository
+import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetGeoScore
 import no.uio.ifi.in2000.team20.team20app.ui.components.AdaptiveNavigationScaffold
 import no.uio.ifi.in2000.team20.team20app.ui.screens.details.AreaDetailsScreen
-import no.uio.ifi.in2000.team20.team20app.ui.screens.details.ClimateStatsScreen
-import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.GeoscoreScreen
+import no.uio.ifi.in2000.team20.team20app.ui.screens.result.ClimateStatsScreen
+import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GeoscoreScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GeoScoreViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GetAiReport
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.settings.SettingsScreen
@@ -38,7 +41,9 @@ fun NavigationRoot(
     homeViewModel: HomeViewModel,
     mapViewModel: MapViewModel,
     frostViewModel: FrostViewModel,
-    savedRepository: SavedRepository
+    savedRepository: SavedRepository,
+    getGeoScore: GetGeoScore,
+    getAiReport: GetAiReport
 ){
     //BackStack
     val backStack = rememberNavBackStack(Screen.HOME.route)
@@ -141,6 +146,8 @@ fun NavigationRoot(
                         modifier = modifier,
                         sharedViewModel = appViewModel,
                         savedViewModel = savedViewModel,
+                        getGeoScore = getGeoScore,
+                        getAiReport = getAiReport,
                         onSavedClick = { location ->
                             appViewModel.setSelectedArea(location)
                             backStack.add(Route.GeoscoreDestination(location))
@@ -153,6 +160,11 @@ fun NavigationRoot(
                 val savedViewModel: SavedViewModel = viewModel(
                     factory = viewModelFactory {
                         initializer { SavedViewModel(savedRepository) }
+                    }
+                )
+                val geoScoreViewModel: GeoScoreViewModel = viewModel(
+                    factory = viewModelFactory {
+                        initializer { GeoScoreViewModel(getGeoScore, getAiReport) }
                     }
                 )
 
@@ -169,7 +181,8 @@ fun NavigationRoot(
                             backStack.add(Route.ClimateStatsDestination(destination.location))
                         },
                         frostViewModel = frostViewModel,
-                        savedViewModel = savedViewModel
+                        savedViewModel = savedViewModel,
+                        geoScoreViewModel = geoScoreViewModel
                     )
                 }
             }

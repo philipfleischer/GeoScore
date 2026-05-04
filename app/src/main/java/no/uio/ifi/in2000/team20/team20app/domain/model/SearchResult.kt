@@ -13,5 +13,6 @@ data class Location(
     val municipality: String? = null,
     val county: String? = null,
     val lat: Double,
-    val lon: Double
+    val lon: Double,
+    val savedAt: Long = 0L
 )
