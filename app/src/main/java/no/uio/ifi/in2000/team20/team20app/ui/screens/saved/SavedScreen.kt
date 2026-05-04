@@ -31,6 +31,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetGeoScore
 import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GetAiReport
