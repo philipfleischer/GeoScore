@@ -50,7 +50,7 @@ data class VulnerabilityScoreResult (
 
 data class ExposureScoreResult (
     val eventCount: Int,
-    val exposureScore: Double,
+    val exposureScore: Double, //0-100
 )
 
 data class Report (

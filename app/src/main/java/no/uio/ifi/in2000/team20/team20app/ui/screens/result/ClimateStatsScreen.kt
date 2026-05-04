@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team20.team20app.ui.screens.details
+package no.uio.ifi.in2000.team20.team20app.ui.screens.result
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
