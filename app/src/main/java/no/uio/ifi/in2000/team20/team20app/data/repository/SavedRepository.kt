@@ -18,7 +18,8 @@ class SavedRepository(
                     municipality = entity.municipality,
                     county = entity.county,
                     lat = entity.lat,
-                    lon = entity.lon
+                    lon = entity.lon,
+                    savedAt = entity.savedAt
                 )
             }
         }
@@ -32,7 +33,8 @@ class SavedRepository(
                 municipality = location.municipality,
                 county = location.county,
                 lat = location.lat,
-                lon = location.lon
+                lon = location.lon,
+                savedAt = System.currentTimeMillis()
             )
         )
     }

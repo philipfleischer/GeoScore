@@ -11,15 +11,23 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.room.Room
 import no.uio.ifi.in2000.team20.team20app.data.api.FrostClientProvider
 import no.uio.ifi.in2000.team20.team20app.data.api.GeoSearchClientProvider
+import no.uio.ifi.in2000.team20.team20app.data.api.NveZonesClientProvider
 import no.uio.ifi.in2000.team20.team20app.data.datasource.AddressRemoteDataSource
 import no.uio.ifi.in2000.team20.team20app.data.datasource.FrostDataSource
+import no.uio.ifi.in2000.team20.team20app.data.datasource.NveZonesRemoteDataSource
 import no.uio.ifi.in2000.team20.team20app.data.local.AppDatabase
 import no.uio.ifi.in2000.team20.team20app.data.repository.SavedRepository
 import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepository
 import no.uio.ifi.in2000.team20.team20app.data.repository.GeoSearchRepository
+import no.uio.ifi.in2000.team20.team20app.data.repository.NveZonesRepository
+import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetExposureScore
+import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetGeoScore
+import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetHazardScore
+import no.uio.ifi.in2000.team20.team20app.domain.usecase.getVulnerabilityScore
 import no.uio.ifi.in2000.team20.team20app.ui.navigation.NavigationRoot
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GetAiReport
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
@@ -40,6 +48,7 @@ fun NaturhendelserApp() {
     val savedRepository = remember {
         SavedRepository(database.savedLocationDao())
     }
+    
     val geoSearchRepository = remember {
         GeoSearchRepository(
             addressDatasource = AddressRemoteDataSource(
@@ -56,6 +65,24 @@ fun NaturhendelserApp() {
             )
         )
     }
+    
+    val nveZonesRepository = remember {
+        NveZonesRepository(
+            NveZonesRemoteDataSource(NveZonesClientProvider.client)
+        )
+    }
+
+    val getGeoScore = remember {
+        GetGeoScore(
+            getExposureScore = GetExposureScore(frostRepository = frostRepository, exposureScoreDAO = database.exposureCacheDao()),
+            getHazardScore = GetHazardScore(frostRepository = frostRepository, hazardScoreDAO = database.hazardCacheDao()),
+            getVulnerabilityScore = getVulnerabilityScore(zonesRepository = nveZonesRepository, vulnerabilityScoreDAO = database.vulnerabilityCacheDao()),
+            geoScoreDAO = database.totalScoreCacheDao()
+
+        )
+    }
+
+    val getAiReport = remember{ GetAiReport() }
 
     val searchViewModel: SearchViewModel = viewModel(
         factory = viewModelFactory {
@@ -103,7 +130,9 @@ fun NaturhendelserApp() {
         homeViewModel = homeViewModel,
         mapViewModel = mapViewModel,
         frostViewModel = frostViewModel,
-        savedRepository = savedRepository
+        savedRepository = savedRepository,
+        getGeoScore = getGeoScore,
+        getAiReport = getAiReport
     )
 }
 

@@ -38,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.unit.dp
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
+import no.uio.ifi.in2000.team20.team20app.ui.components.LoadingState
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.ExpandableInfoBox
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.GeomarkingBadge
 import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
@@ -50,13 +51,16 @@ fun GeoscoreScreen(
     onBackClick: () -> Unit,
     onHistoricDataClick: () -> Unit,
     frostViewModel: FrostViewModel,
-    savedViewModel: SavedViewModel
+    savedViewModel: SavedViewModel,
+    geoScoreViewModel: GeoScoreViewModel
 ) {
     val isCurrentSaved by savedViewModel.isCurrentSaved.collectAsStateWithLifecycle()
+    val geoState by geoScoreViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(location) {
         frostViewModel.loadFrostStats(location)
         savedViewModel.checkIfSaved(location)
+        geoScoreViewModel.load(location)
     }
 
     Scaffold(
@@ -92,6 +96,16 @@ fun GeoscoreScreen(
             }
         }
     ) { paddingValues ->
+        if (geoState.isScoreLoading) {
+            LoadingState(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                message = "Beregner geoscore..."
+            )
+            return@Scaffold
+        }
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -102,6 +116,7 @@ fun GeoscoreScreen(
             item {
                 GeomarkingCard(
                     location = location,
+                    geoState = geoState,
                     isCurrentSaved = isCurrentSaved,
                     onSavedToggle = { saved ->
                         if (saved) {
@@ -153,6 +168,7 @@ fun GeoscoreScreen(
 @Composable
 private fun GeomarkingCard(
     location: Location,
+    geoState: GeoScoreUiState,
     isCurrentSaved: Boolean,
     onSavedToggle: (Boolean) -> Unit
 ) {
@@ -178,7 +194,7 @@ private fun GeomarkingCard(
                     style = MaterialTheme.typography.titleLarge
                 )
 
-                GeomarkingBadge(grade = "C")
+                GeomarkingBadge(grade = geoState.grade.ifEmpty { "?" })
 
                 IconButton(
                     onClick = { onSavedToggle(isCurrentSaved) }
@@ -197,7 +213,7 @@ private fun GeomarkingCard(
             )
 
             Text(
-                text = "Moderat risiko",
+                text = gradeToRiskLabel(geoState.grade),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -208,4 +224,14 @@ private fun GeomarkingCard(
             )
         }
     }
+}
+
+private fun gradeToRiskLabel(grade: String): String = when (grade) {
+    "A" -> "Svært lav risiko"
+    "B" -> "Lav risiko"
+    "C" -> "Moderat risiko"
+    "D" -> "Høy risiko"
+    "E" -> "Svært høy risiko"
+    "F" -> "Kritisk risiko"
+    else -> "Beregner..."
 }

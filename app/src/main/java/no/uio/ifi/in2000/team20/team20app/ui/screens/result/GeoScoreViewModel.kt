@@ -13,14 +13,16 @@ import no.uio.ifi.in2000.team20.team20app.domain.model.Report
 import no.uio.ifi.in2000.team20.team20app.domain.model.scoreToGrade
 import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetGeoScore
 
-data class GeoScoreUiState (
-        val geoScore: GeoScore? = null,
-        val grade: String = "",
-        val scoreError: String? = null,
+data class GeoScoreUiState(
+    val isScoreLoading: Boolean = false,
+    val geoScore: GeoScore? = null,
+    val grade: String = "",
+    val scoreError: String? = null,
 
-        val aiReport: Report? = null,
-        val reportError: String? = null
-    )
+    val isReportLoading: Boolean = false,
+    val aiReport: Report? = null,
+    val reportError: String? = null
+)
 
 class GeoScoreViewModel(
     private val getGeoScore: GetGeoScore,
@@ -32,11 +34,13 @@ class GeoScoreViewModel(
 
     fun load(location: Location) {
         viewModelScope.launch {
+            _uiState.update { it.copy(isScoreLoading = true, scoreError = null) }
             runCatching { getGeoScore.calculateGeoScore(location.lat, location.lon) }
                 .fold(
                     onSuccess = { score ->
                         _uiState.update {
                             it.copy(
+                                isScoreLoading = false,
                                 geoScore = score,
                                 grade = scoreToGrade(score.geoScore)
                             )
@@ -46,7 +50,7 @@ class GeoScoreViewModel(
                     onFailure = { e ->
                         _uiState.update {
                             //TODO noen exceptions kastes inne i GeoScore algoritmen sjekk hvordan det funker med denne onFailure funksjonen
-                            it.copy(scoreError = e.message ?: "Ukjent feil")
+                            it.copy(isScoreLoading = false, scoreError = e.message ?: "Ukjent feil")
                         }
                     }
                 )
@@ -54,6 +58,7 @@ class GeoScoreViewModel(
     }
 
     private suspend fun loadReport(score: GeoScore) {
+        _uiState.update { it.copy(isReportLoading = true, reportError = null) }
         runCatching {
             getAiReport.generateReport(
                 hazardScore = score.hazardScore,
@@ -62,11 +67,11 @@ class GeoScoreViewModel(
                 grade = scoreToGrade(score.geoScore)
             )
         }.fold(
-            onSuccess = { text ->
-                _uiState.update { it.copy(aiReport = text) }
+            onSuccess = { report ->
+                _uiState.update { it.copy(isReportLoading = false, aiReport = report) }
             },
             onFailure = { e ->
-                _uiState.update { it.copy(reportError = e.message) }
+                _uiState.update { it.copy(isReportLoading = false, reportError = e.message) }
             }
         )
     }
