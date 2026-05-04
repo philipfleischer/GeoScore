@@ -5,16 +5,23 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Layers
+import androidx.compose.material.icons.filled.LayersClear
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.twotone.Layers
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -69,6 +76,7 @@ fun MapScreen(
     val chosenPosition by sharedViewModel.selectedLocation.collectAsStateWithLifecycle()
     val isCurrentSaved by savedViewModel.isCurrentSaved.collectAsStateWithLifecycle()
     val layers by mapViewModel.layers.collectAsStateWithLifecycle()
+    val layersExpanded by mapViewModel.layersExpanded.collectAsStateWithLifecycle()
 
     val compactScreenWidth = !LocalWindowSizeClass.current.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
 
@@ -145,49 +153,95 @@ fun MapScreen(
             }
         }
         Column(
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .fillMaxWidth()
-                .padding(
-                    top = if (compactScreenWidth) 48.dp else 16.dp,
-                    start = 16.dp,
-                    end = 16.dp,
-                    bottom = 16.dp
-                ),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            Modifier.align(Alignment.TopStart)
+                .fillMaxHeight()
+        ){
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        top = if (compactScreenWidth) 48.dp else 16.dp,
+                        start = 16.dp,
+                        end = 16.dp,
+                        bottom = 16.dp
+                    ),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                FloatingActionButton(
-                    onClick = onOpenSearch,
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(48.dp)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Søk etter adresse",
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
+                    FloatingActionButton(
+                        onClick = onOpenSearch,
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Søk etter adresse",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
 
-                if (chosenPosition != null) {
-                    Button(onClick = onOpenReport) {
-                        Text("Vis rapport")
+                    if (chosenPosition != null) {
+                        Button(onClick = onOpenReport) {
+                            Text("Vis rapport")
+                        }
+                    }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (chosenPosition != null) {
+                        Text(
+                            text = chosenPosition!!.name,
+                            style = MaterialTheme.typography.labelLarge,
+                            fontSize = 30.sp,
+                            color = Color.Black,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.semantics { heading() }
+                        )
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
+                    IconButton(
+                        onClick = mapViewModel::toggleLayersExpanded,
+                        colors = IconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                            disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                            disabledContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    ) {
+                        Icon(
+                            imageVector = if(!layersExpanded) Icons.Filled.Layers else Icons.Filled.LayersClear,
+                            contentDescription = "Vis lag"
+                        )
                     }
                 }
             }
-            if (chosenPosition != null) {
-                Text(
-                    text = chosenPosition!!.name,
-                    style = MaterialTheme.typography.labelLarge,
-                    fontSize = 30.sp,
-                    color = Color.Black,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.semantics { heading() }
-                )
+            Spacer(modifier = Modifier.weight(1f))
+            Column(){
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.primary)
+                ) {
+                    Column(
+                    ) {
+                        if (layersExpanded) {
+                            layers.forEach { layer ->
+                                Button(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    onClick = { mapViewModel.toggleLayer(layer.layerId) },
+                                ){
+                                    Text(text = layer.name)
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }

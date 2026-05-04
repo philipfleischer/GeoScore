@@ -21,13 +21,20 @@ class MapViewModel(): ViewModel() {
     private val _layers: MutableStateFlow<List<MapLayer>> = MutableStateFlow(MapLayers.layers)
     val layers: StateFlow<List<MapLayer>> = _layers.asStateFlow()
 
+    private val _layersExpanded: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val layersExpanded: StateFlow<Boolean> = _layersExpanded.asStateFlow()
+
+    fun toggleLayersExpanded() {
+        _layersExpanded.value = !_layersExpanded.value
+    }
+
     fun toggleLayer(layerId: Int){
         _layers.update { layers ->
             layers.map { layer ->
                 if (layer.layerId == layerId) {
                     layer.copy(toggled = !layer.toggled)
                 } else {
-                    layer
+                    layer.copy(toggled = false)
                 }
             }
         }
