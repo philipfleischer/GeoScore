@@ -30,8 +30,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.window.core.layout.WindowSizeClass
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
+import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
+import no.uio.ifi.in2000.team20.team20app.util.Constants.LARGE_PADDING_DP
+import no.uio.ifi.in2000.team20.team20app.util.Constants.MEDIUM_SCREEN_WIDTH
+import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
 
 @Composable
 fun SavedScreen(
@@ -41,12 +46,18 @@ fun SavedScreen(
     onSavedClick: (Location) -> Unit
 ) {
     val saved by savedViewModel.saved.collectAsStateWithLifecycle()
+    val compactScreenWidth = !LocalWindowSizeClass.current.isWidthAtLeastBreakpoint(MEDIUM_SCREEN_WIDTH)
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .padding(
+                top = if (compactScreenWidth) (DEFAULT_PADDING_DP*3).dp else (DEFAULT_PADDING_DP*2).dp,
+                start = if (compactScreenWidth) DEFAULT_PADDING_DP.dp else LARGE_PADDING_DP.dp,
+                end = if (compactScreenWidth) DEFAULT_PADDING_DP.dp else (DEFAULT_PADDING_DP*5).dp,
+                bottom = if(compactScreenWidth) (DEFAULT_PADDING_DP*2).dp else LARGE_PADDING_DP.dp
+            ),
+        verticalArrangement = Arrangement.spacedBy(DEFAULT_PADDING_DP.dp)
     ) {
         if (saved.isEmpty()) {
             Text(

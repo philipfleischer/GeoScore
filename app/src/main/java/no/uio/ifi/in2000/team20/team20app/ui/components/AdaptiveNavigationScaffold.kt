@@ -15,6 +15,9 @@ import androidx.window.core.layout.WindowSizeClass
 import no.uio.ifi.in2000.team20.team20app.util.Screen
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.unit.dp
+import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
+import no.uio.ifi.in2000.team20.team20app.util.Constants.LARGE_PADDING_DP
+import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
 
 /*
 Main changes done (24.04.2026 adaptive-navigation-impl):
@@ -28,12 +31,10 @@ fun AdaptiveNavigationScaffold (
     onNavigate: (Screen) -> Unit,
     onOpenSettings: () -> Unit = {},
     onBackClick: () -> Unit = {},
-    hasTopBar: Boolean = false,
     content: @Composable (Modifier) -> Unit
 ){
 
-    val windowWidthClass = currentWindowAdaptiveInfo()
-        .windowSizeClass
+    val compactScreenWidth = !LocalWindowSizeClass.current
         .isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
 
     NavigationSuiteScaffold(
@@ -48,7 +49,7 @@ fun AdaptiveNavigationScaffold (
             }
         },
 
-        layoutType = if (windowWidthClass) {
+        layoutType = if (!compactScreenWidth) {
             NavigationSuiteType.NavigationRail
         } else {
             NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(currentWindowAdaptiveInfo())
@@ -61,19 +62,6 @@ fun AdaptiveNavigationScaffold (
             navigationRailContainerColor = MaterialTheme.colorScheme.surface,
         ),
     ){
-        if (hasTopBar) {
-            Scaffold(
-                topBar = { SharedTopAppBar(
-                    title = title,
-                    onBackClick = onBackClick,
-                    onOpenSettings = onOpenSettings
-                )
-                }
-            ) { innerPadding ->
-                content(Modifier.padding(innerPadding))
-            }
-        } else {
-            content(Modifier.padding(0.dp))
-        }
+        content(Modifier.padding(0.dp))
     }
 }

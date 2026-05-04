@@ -46,8 +46,11 @@ import no.uio.ifi.in2000.team20.team20app.R
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
+import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
+import no.uio.ifi.in2000.team20.team20app.util.Constants.LARGE_PADDING_DP
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_ZOOM
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MAX_ZOOM
+import no.uio.ifi.in2000.team20.team20app.util.Constants.MEDIUM_SCREEN_WIDTH
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MIN_ZOOM
 import no.uio.ifi.in2000.team20.team20app.util.Constants.ZOOM_ON_LOCATION
 import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
@@ -70,7 +73,7 @@ fun MapScreen(
     val isCurrentSaved by savedViewModel.isCurrentSaved.collectAsStateWithLifecycle()
     val layers by mapViewModel.layers.collectAsStateWithLifecycle()
 
-    val compactScreenWidth = !LocalWindowSizeClass.current.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
+    val compactScreenWidth = !LocalWindowSizeClass.current.isWidthAtLeastBreakpoint(MEDIUM_SCREEN_WIDTH)
 
     val cameraPosition =
         if(chosenPosition != null) {
@@ -149,10 +152,10 @@ fun MapScreen(
                 .align(Alignment.TopStart)
                 .fillMaxWidth()
                 .padding(
-                    top = if (compactScreenWidth) 48.dp else 16.dp,
-                    start = 16.dp,
-                    end = 16.dp,
-                    bottom = 16.dp
+                    top = (DEFAULT_PADDING_DP*2).dp,
+                    start = DEFAULT_PADDING_DP.dp,
+                    end = if (compactScreenWidth) DEFAULT_PADDING_DP.dp else (DEFAULT_PADDING_DP*4).dp,
+                    bottom = DEFAULT_PADDING_DP.dp
                 ),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {

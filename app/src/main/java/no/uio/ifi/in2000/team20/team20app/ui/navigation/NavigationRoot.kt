@@ -186,7 +186,6 @@ fun NavigationRoot(
                     highlightedDest = Screen.HOME.route,
                     onNavigate = onNavigate,
                     onBackClick = goBack,
-                    hasTopBar = true
                 ) { modifier ->
                     SearchScreen(
                         onBackClick = goBack,
