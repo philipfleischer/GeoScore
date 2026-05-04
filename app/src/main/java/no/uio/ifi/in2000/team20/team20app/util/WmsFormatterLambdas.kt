@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team20.team20app.util
 
+import android.util.Log
 import androidx.core.net.toUri
 //TODO: Move base-urls to constants file
 //TODO: Figure out if lambdas should have a static resolution based on what suits their dataset or if this should be a parameter
@@ -21,6 +22,26 @@ object WmsFormatterLambdas {
             .build()
             .toString()
     }
+
+    val LandslideAwareness = { xMin: Double, yMin: Double, xMax: Double, yMax: Double, zoom: Int ->
+        "https://kart.nve.no/enterprise/services/JordFlomskredAktsomhet/MapServer/WMSServer?".toUri()
+            .buildUpon()
+            .appendQueryParameter("SERVICE", "WMS")
+            .appendQueryParameter("VERSION", "1.3.0")
+            .appendQueryParameter("REQUEST", "GetMap")
+            .appendQueryParameter("LAYERS", "Jord_flomskred_aktsomhetsomrader58338")
+            .appendQueryParameter("STYLES", "")
+            .appendQueryParameter("CRS", "EPSG:3857")
+            .appendQueryParameter("BBOX", "$xMin,$yMin,$xMax,$yMax")
+            .appendQueryParameter("WIDTH", "256")
+            .appendQueryParameter("HEIGHT", "256")
+            .appendQueryParameter("FORMAT", "image/png")
+            .appendQueryParameter("TRANSPARENT", "true")
+            .build()
+            .toString()
+
+    }
+
     val QuickClayUrlFormatter = { xMin: Double, yMin: Double, xMax: Double, yMax: Double, zoom: Int ->
         "https://kart.nve.no/enterprise/services/SkredKvikkleire2/MapServer/WMSServer".toUri()
             .buildUpon()

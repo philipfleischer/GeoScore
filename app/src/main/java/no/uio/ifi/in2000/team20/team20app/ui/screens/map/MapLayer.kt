@@ -20,6 +20,13 @@ object MapLayers {
             formatter = WmsFormatterLambdas.RadonUrlFormatter
         ),
         MapLayer(
+            name = "Skred-varsomhet",
+            layerId = 23,
+            iconId = 0,
+            toggled = false,
+            formatter = WmsFormatterLambdas.LandslideAwareness
+        ),
+        MapLayer(
             name = "Kvikkleire",
             layerId = 1,
             iconId = 0,
