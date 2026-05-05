@@ -54,9 +54,9 @@ data class ExposureScoreResult (
 )
 
 data class Report (
-    val extremePrecipitationText: String,
-    val extremeWindText: String,
-    val floodText: String,
-    val landslideText: String,
+    val extremePrecipitationText: String?,
+    val extremeWindText: String?,
+    val floodText: String?,
+    val landslideText: String?,
 
 )

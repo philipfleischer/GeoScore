@@ -151,7 +151,8 @@ fun GeoscoreScreen(
                     }
                 ) {
                     Text(
-                        "Innhold kommer snart",
+                        text = if (geoState.isReportLoading) "Laster rapport..."
+                               else geoState.aiReport?.extremeWindText ?: "Chat kallet funket ikke",
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -167,7 +168,8 @@ fun GeoscoreScreen(
                     }
                 ) {
                     Text(
-                        "Innhold kommer snart",
+                        text = if (geoState.isReportLoading) "Laster rapport..."
+                               else geoState.aiReport?.landslideText ?: "Chat kallet funket ikke",
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -183,7 +185,8 @@ fun GeoscoreScreen(
                     }
                 ) {
                     Text(
-                        "Innhold kommer snart",
+                        text = if (geoState.isReportLoading) "Laster rapport..."
+                               else geoState.aiReport?.floodText ?: "Chat kallet funket ikke",
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -199,7 +202,8 @@ fun GeoscoreScreen(
                     }
                 ) {
                     Text(
-                        "Innhold kommer snart",
+                        text = if (geoState.isReportLoading) "Laster rapport..."
+                               else geoState.aiReport?.extremePrecipitationText ?: "",
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }

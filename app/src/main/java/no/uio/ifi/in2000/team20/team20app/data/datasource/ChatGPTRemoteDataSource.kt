@@ -40,10 +40,10 @@ class ChatGPTRemoteDataSource {
                             "Hvert avsnitt skal:\n" +
                             "- Være 2-3 setninger langt\n" +
                             "- Beskrive risikonivået basert på scoren\n" +
-                            "- Forklare hva risikoen innebærer for området\n" +
+                            "- Forklare hva risikoen innebærer for området og boliger\n" +
                             "- Være skrevet på norsk i en saklig, informativ tone\n" +
-                            "- IKKE inneholde overskrifter, punktlister, tall eller emojis\n" +
-                            "- IKKE nevne selve scoren eller karakteren\n" +
+                            "- Kan ikke inneholde overskrifter. men kan inneholde punktlister, tall eller emojis\n" +
+                            "- Kan nevne karakteren men ikke scoren\n" +
                             "\n" +
                             "VIKTIG FORMATERING:\n" +
                             "Separer de fire avsnittene med nøyaktig denne separatoren på en egen linje:\n" +
