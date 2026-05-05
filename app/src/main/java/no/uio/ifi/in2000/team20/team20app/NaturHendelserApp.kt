@@ -13,9 +13,11 @@ import no.uio.ifi.in2000.team20.team20app.data.api.FrostClientProvider
 import no.uio.ifi.in2000.team20.team20app.data.api.GeoSearchClientProvider
 import no.uio.ifi.in2000.team20.team20app.data.api.NveZonesClientProvider
 import no.uio.ifi.in2000.team20.team20app.data.datasource.AddressRemoteDataSource
+import no.uio.ifi.in2000.team20.team20app.data.datasource.ChatGPTRemoteDataSource
 import no.uio.ifi.in2000.team20.team20app.data.datasource.FrostDataSource
 import no.uio.ifi.in2000.team20.team20app.data.datasource.NveZonesRemoteDataSource
 import no.uio.ifi.in2000.team20.team20app.data.local.AppDatabase
+import no.uio.ifi.in2000.team20.team20app.data.repository.ChatGPTRepository
 import no.uio.ifi.in2000.team20.team20app.data.repository.SavedRepository
 import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepository
 import no.uio.ifi.in2000.team20.team20app.data.repository.GeoSearchRepository
@@ -89,7 +91,11 @@ fun NaturhendelserApp() {
         )
     }
 
-    val getAiReport = remember{ GetAiReport() }
+    val chatGPTRepository = remember {
+        ChatGPTRepository(ChatGPTRemoteDataSource())
+    }
+
+    val getAiReport = remember { GetAiReport(chatGPTRepository) }
 
     val searchViewModel: SearchViewModel = viewModel(
         factory = viewModelFactory {

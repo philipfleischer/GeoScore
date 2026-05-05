@@ -4,10 +4,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -34,10 +36,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.unit.dp
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
+import no.uio.ifi.in2000.team20.team20app.domain.model.scoreToGrade
 import no.uio.ifi.in2000.team20.team20app.ui.components.LoadingState
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.ExpandableInfoBox
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.GeomarkingBadge
@@ -64,6 +66,7 @@ fun GeoscoreScreen(
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
         topBar = {
             Box(
                 modifier = Modifier
@@ -106,6 +109,7 @@ fun GeoscoreScreen(
             return@Scaffold
         }
 
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -129,34 +133,82 @@ fun GeoscoreScreen(
             }
 
             item {
+                Text(
+                    text = "Detaljert analyse",
+                    style = MaterialTheme.typography.titleLarge
+
+                )
+            }
+
+            item {
                 ExpandableInfoBox(
-                    title = "Risikofaktorer"
-                ) {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        // TODO: Replace with real risk factor rows (Flom, Skred, Radon, with progress bars and grade badges
-                        // Data source: Jurius algorithm
-                        Text(
-                            "Innhold kommer snart",
-                            style = MaterialTheme.typography.bodyMedium
+                    title = "☁\uFE0F Storm",
+
+                    rightContent = {
+                        GeomarkingBadge(
+                            grade = geoState.geoScore?.let { scoreToGrade(it.windScore) } ?: "?"
                         )
                     }
+                ) {
+                    Text(
+                        text = if (geoState.isReportLoading) "Laster rapport..."
+                               else geoState.aiReport?.extremeWindText ?: "Chat kallet funket ikke",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
 
             item {
                 ExpandableInfoBox(
-                    title = "Detaljert analyse"
+                    title = "⛰\uFE0F Skredfare",
+                    rightContent = {
+                        GeomarkingBadge(
+                            grade = geoState.geoScore?.let { scoreToGrade(it.landslideScore) } ?: "?"
+                        )
+                    }
                 ) {
-                    // TODO: Add accordion cards per risk factor with expandable
-                    // descriptions and bullet point data
                     Text(
-                        "Innhold kommer snart",
+                        text = if (geoState.isReportLoading) "Laster rapport..."
+                               else geoState.aiReport?.landslideText ?: "Chat kallet funket ikke",
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
             }
+
+            item {
+                ExpandableInfoBox(
+                    title = "\uD83C\uDF0A Flomrisiko",
+                    rightContent = {
+                        GeomarkingBadge(
+                            grade = geoState.geoScore?.let { scoreToGrade(it.floodScore) } ?: "?"
+                        )
+                    }
+                ) {
+                    Text(
+                        text = if (geoState.isReportLoading) "Laster rapport..."
+                               else geoState.aiReport?.floodText ?: "Chat kallet funket ikke",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+
+            item {
+                ExpandableInfoBox(
+                    title = "\uD83C\uDF27\uFE0F Nedbør",
+                    rightContent = {
+                        GeomarkingBadge(
+                            grade = geoState.geoScore?.let { scoreToGrade(it.precipitationScore) } ?: "?"
+                        )
+                    }
+                ) {
+                    Text(
+                        text = if (geoState.isReportLoading) "Laster rapport..."
+                               else geoState.aiReport?.extremePrecipitationText ?: "",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+
 
             item {
                 Spacer(modifier = Modifier.height(8.dp))
@@ -175,53 +227,45 @@ private fun GeomarkingCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
+            containerColor = MaterialTheme.colorScheme.surface
         )
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+                .padding(16.dp)
+                .height(IntrinsicSize.Min),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            GeomarkingBadge(
+                grade = geoState.grade.ifEmpty { "?" },
+            )
+
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 12.dp)
             ) {
                 Text(
                     text = location.name,
                     style = MaterialTheme.typography.titleLarge
                 )
-
-                GeomarkingBadge(grade = geoState.grade.ifEmpty { "?" })
-
-                IconButton(
-                    onClick = { onSavedToggle(isCurrentSaved) }
-                ) {
-                    Icon(
-                        imageVector = if (isCurrentSaved) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
-                        contentDescription = if (isCurrentSaved) "Fjern fra lagrede" else "Lagre"
-                    )
-                }
+                Text(
+                    text = gradeToRiskLabel(geoState.grade),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.75f)
+                )
             }
 
-            Text(
-                text = "Samlet vurdering",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.75f)
-            )
-
-            Text(
-                text = gradeToRiskLabel(geoState.grade),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-
-            Text(
-                text = "Geomerkingen er basert på en samlet vurdering av historiske forhold i området. Dette kan inkludere terreng, nedbørsmønstre, lokal eksponering og andre forhold som påvirker naturfare over tid.",
-                style = MaterialTheme.typography.bodyMedium
-            )
+            IconButton(
+                onClick = { onSavedToggle(isCurrentSaved) }
+            ) {
+                Icon(
+                    imageVector = if (isCurrentSaved) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+                    contentDescription = if (isCurrentSaved) "Fjern fra lagrede" else "Lagre"
+                )
+            }
         }
     }
 }

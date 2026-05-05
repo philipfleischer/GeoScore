@@ -127,7 +127,10 @@ dependencies {
     implementation("androidx.compose.material3:material3-adaptive-navigation-suite")
 
     // Compose charts
-    implementation("io.github.ehsannarmani:compose-charts:0.2.5")
+    implementation(libs.compose.charts)
+
+    //ChatGpt
+    implementation(libs.openai.client)
 
 
 }
