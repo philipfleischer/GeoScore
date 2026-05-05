@@ -36,19 +36,6 @@ sealed interface Route: NavKey {
     @Serializable
     object MapDestination : Route, NavKey
 
-
-    /*
-     * Dette er Detaljskjerm for et spesifikt område.
-     *
-     * Denne destinasjonen mottar informasjon om området brukeren har valgt.
-     * Disse verdiene brukes senere til å hente data fra API-er
-     * (for eksempel klimadata eller risikodata).
-     */
-    @Serializable
-    data class AreaDetailsDestination(
-        val location: Location
-    ) : Route, NavKey
-
     /*
      * Dette er Lagret-skjermen.
      * Det viser områder brukeren har lagret.
