@@ -146,218 +146,218 @@ fun ClimateStatsScreen(
                 }
             }
 
-            // Temperature
-            item {
-                ExpandableInfoBox(
-                    title = "Temperatur",
-                    initiallyExpanded = true,
-                    cardColor = theme.secondary
-                ) {
-                    Text(
-                        text = "Dette diagrammet viser gjennomsnittlig temperatur per måned, basert på målinger fra 1991–2020. " +
-                                "Snittkurven viser den typiske månedstemperaturen i perioden. " +
-                                "Maks-kurven viser gjennomsnittet av dagens høyeste temperaturer i hver måned, " +
-                                "og min-kurven viser gjennomsnittet av dagens laveste temperaturer. " +
-                                "Til sammen gir dette et bilde av hvor varme dagene og hvor kalde nettene vanligvis er.",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
+                // Temperature
+                item {
+                    ExpandableInfoBox(
+                        title = "Temperatur",
+                        initiallyExpanded = true,
+                        cardColor = theme.secondary
+                    ) {
+                        Text(
+                            text = "Dette diagrammet viser gjennomsnittlig temperatur per måned, basert på målinger fra 1991–2020. " +
+                                    "Snittkurven viser den typiske månedstemperaturen i perioden. " +
+                                    "Maks-kurven viser gjennomsnittet av dagens høyeste temperaturer i hver måned, " +
+                                    "og min-kurven viser gjennomsnittet av dagens laveste temperaturer. " +
+                                    "Til sammen gir dette et bilde av hvor varme dagene og hvor kalde nettene vanligvis er.",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
 
-                    when {
-                        frostUiState.isLoading -> {
-                            Text("Laster klimadata...")
-                        }
+                        when {
+                            frostUiState.isLoading -> {
+                                Text("Laster klimadata...")
+                            }
 
-                        frostUiState.temperatureError != null -> {
-                            ErrorState(
-                                message = friendlyErrorMessage(frostUiState.temperatureError),
-                                onRetry = { frostViewModel.loadFrostStats(location) },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
+                            frostUiState.temperatureError != null -> {
+                                ErrorState(
+                                    message = friendlyErrorMessage(frostUiState.temperatureError),
+                                    onRetry = { frostViewModel.loadFrostStats(location) },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
 
-                        frostUiState.temperatureMean != null -> {
-                            TemperatureChart(
-                                meanTemperatures = frostUiState.temperatureMean ?: emptyList(),
-                                maxTemperatures = frostUiState.temperatureMax ?: emptyList(),
-                                minTemperatures = frostUiState.temperatureMin ?: emptyList()
-                            )
-                        }
+                            frostUiState.temperatureMean != null -> {
+                                TemperatureChart(
+                                    meanTemperatures = frostUiState.temperatureMean ?: emptyList(),
+                                    maxTemperatures = frostUiState.temperatureMax ?: emptyList(),
+                                    minTemperatures = frostUiState.temperatureMin ?: emptyList()
+                                )
+                            }
 
-                        else -> {
-                            Text("Ingen klimadata tilgjengelig.")
-                        }
-                    }
-                }
-            }
-
-            // Snow
-            item {
-                ExpandableInfoBox(title = "Snø", cardColor = theme.secondary) {
-                    Text(
-                        text = "Diagrammet viser gjennomsnittlig og høyeste målte snødybde per måned, basert på målinger fra 1991–2020. " +
-                                "Høye verdier kan påvirke fremkommelighet, behov for snørydding og belastning på tak.",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    when {
-                        frostUiState.isLoading -> {
-                            Text("Laster klimadata...")
-                        }
-
-                        frostUiState.snowError != null -> {
-                            ErrorState(
-                                message = friendlyErrorMessage(frostUiState.snowError),
-                                onRetry = { frostViewModel.loadFrostStats(location) },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-
-                        frostUiState.snowMean != null && frostUiState.snowMax != null -> {
-                            SnowChart(
-                                meanSnowDepth = frostUiState.snowMean!!,
-                                maxSnowDepth = frostUiState.snowMax!!
-                            )
-                        }
-
-                        else -> {
-                            Text("Ingen snødata tilgjengelig.")
+                            else -> {
+                                Text("Ingen klimadata tilgjengelig.")
+                            }
                         }
                     }
                 }
-            }
 
-            // Rain
-            item {
-                ExpandableInfoBox(title = "Nedbør", cardColor = theme.secondary) {
-                    Text(
-                        text = "Nedbørsdager viser typisk antall dager per måned med minst 1,0 mm målbar nedbør. " +
-                                "Merk at i vintermånedene kan nedbøren komme som snø. " +
-                                "Høyeste daglige nedbør per måned viser hvor kraftige regn eller snøværet typisk er. " +
-                                "Høye verdier indikerer økt risiko for styrtregn, overvann og lokale oversvømmelser.",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
+                // Wind
+                item {
+                    ExpandableInfoBox(
+                        title = "Vind",
+                        initiallyExpanded = false,
+                        cardColor = theme.secondary
+                    ) {
+                        Text(
+                            text = "Gjennomsnittlig vindstyrke per måned viser hvor mye det vanligvis blåser i perioden. " +
+                                    "Høyeste målte middelvind per måned viser hvor kraftig og vedvarende vinden kan bli, " +
+                                    "typisk opp mot stormstyrke i de mest utsatte månedene. " +
+                                    "Høyeste målte vindkast per måned viser hvor kraftige de kortvarige kastene kan være, " +
+                                    "noe som er viktig for vurdering av for eksempel vindutsatt infrastruktur, skog og bygg.",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
 
-                    when {
-                        frostUiState.isLoading -> {
-                            Text("Laster klimadata...")
-                        }
+                        when {
+                            frostUiState.isLoading -> {
+                                Text("Laster klimadata...")
+                            }
 
-                        frostUiState.precipitationError != null -> {
-                            ErrorState(
-                                message = friendlyErrorMessage(frostUiState.precipitationError),
-                                onRetry = { frostViewModel.loadFrostStats(location) },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
+                            frostUiState.windError != null -> {
+                                ErrorState(
+                                    message = friendlyErrorMessage(frostUiState.windError),
+                                    onRetry = { frostViewModel.loadFrostStats(location) },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
 
-                        frostUiState.precipitationDays != null && frostUiState.precipitationMean != null -> {
-                            PrecipitationChart(
-                                rainyDays = frostUiState.precipitationDays!!,
-                                maxDailyPrecip = frostUiState.precipitationMean!!
-                            )
-                        }
+                            frostUiState.windMean != null -> {
+                                WindChart(
+                                    windMean = frostUiState.windMean!!,
+                                    windMaxSpeed = frostUiState.windMaxSpeed!!,
+                                    windMaxGust = frostUiState.windMaxGust!!
+                                )
+                            }
 
-                        else -> {
-                            Text("Ingen nedbørsdata tilgjengelig.")
-                        }
-                    }
-                }
-            }
-
-            // Wind
-            item {
-                ExpandableInfoBox(
-                    title = "Vind",
-                    initiallyExpanded = false,
-                    cardColor = theme.secondary
-                ) {
-                    Text(
-                        text = "Gjennomsnittlig vindstyrke per måned viser hvor mye det vanligvis blåser i perioden. " +
-                                "Høyeste målte middelvind per måned viser hvor kraftig og vedvarende vinden kan bli, " +
-                                "typisk opp mot stormstyrke i de mest utsatte månedene. " +
-                                "Høyeste målte vindkast per måned viser hvor kraftige de kortvarige kastene kan være, " +
-                                "noe som er viktig for vurdering av for eksempel vindutsatt infrastruktur, skog og bygg.",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    when {
-                        frostUiState.isLoading -> {
-                            Text("Laster klimadata...")
-                        }
-
-                        frostUiState.windError != null -> {
-                            ErrorState(
-                                message = friendlyErrorMessage(frostUiState.windError),
-                                onRetry = { frostViewModel.loadFrostStats(location) },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-
-                        frostUiState.windMean != null -> {
-                            WindChart(
-                                windMean = frostUiState.windMean!!,
-                                windMaxSpeed = frostUiState.windMaxSpeed!!,
-                                windMaxGust = frostUiState.windMaxGust!!
-                            )
-                        }
-
-                        else -> {
-                            Text("Ingen vinddata tilgjengelig.")
+                            else -> {
+                                Text("Ingen vinddata tilgjengelig.")
+                            }
                         }
                     }
                 }
-            }
 
-            // Sunshine
-            item {
-                ExpandableInfoBox(
-                    title = "Soltimer",
-                    initiallyExpanded = false,
-                    cardColor = theme.secondary
-                ) {
-                    Text(
-                        text = "Diagrammet viser hvor mange timer solen i gjennomsnitt skinner direkte på målestasjonen per dag i hver måned. " +
-                                "Det handler om solskinn, ikke om hvor lenge det er lyst. " +
-                                "Tallene er beregnet ut fra målinger i perioden 1991–2020.",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
+                // Sunshine
+                item {
+                    ExpandableInfoBox(
+                        title = "Soltimer",
+                        initiallyExpanded = false,
+                        cardColor = theme.secondary
+                    ) {
+                        Text(
+                            text = "Diagrammet viser hvor mange timer solen i gjennomsnitt skinner direkte på målestasjonen per dag i hver måned. " +
+                                    "Det handler om solskinn, ikke om hvor lenge det er lyst. " +
+                                    "Tallene er beregnet ut fra målinger i perioden 1991–2020.",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
 
-                    when {
-                        frostUiState.isLoading -> {
-                            Text("Laster klimadata...")
-                        }
+                        when {
+                            frostUiState.isLoading -> {
+                                Text("Laster klimadata...")
+                            }
 
-                        frostUiState.sunshineError != null -> {
-                            ErrorState(
-                                message = friendlyErrorMessage(frostUiState.sunshineError),
-                                onRetry = { frostViewModel.loadFrostStats(location) },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
+                            frostUiState.sunshineError != null -> {
+                                ErrorState(
+                                    message = friendlyErrorMessage(frostUiState.sunshineError),
+                                    onRetry = { frostViewModel.loadFrostStats(location) },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
 
-                        frostUiState.sunshineHours != null -> {
-                            SunshineChart(sunshineHours = frostUiState.sunshineHours!!)
-                            Spacer(modifier = Modifier.height(8.dp))
-                            val distanceText = frostUiState.sunshineDistanceKm
-                                ?.let { " (${it.toInt()} km unna)" } ?: ""
-                            Text(
-                                text = "Data fra ${frostUiState.sunshineStationName}$distanceText",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
+                            frostUiState.sunshineHours != null -> {
+                                SunshineChart(sunshineHours = frostUiState.sunshineHours!!)
+                                Spacer(modifier = Modifier.height(8.dp))
+                                val distanceText = frostUiState.sunshineDistanceKm
+                                    ?.let { " (${it.toInt()} km unna)" } ?: ""
+                                Text(
+                                    text = "Data fra ${frostUiState.sunshineStationName}$distanceText",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
 
-                        else -> {
-                            Text("Ingen data om soltimer tilgjengelig.")
+                            else -> {
+                                Text("Ingen data om soltimer tilgjengelig.")
+                            }
                         }
                     }
                 }
-            }
+
+                // Rain
+                item {
+                    ExpandableInfoBox(title = "Nedbør", cardColor = theme.secondary) {
+                        Text(
+                            text = "Nedbørsdager viser typisk antall dager per måned med minst 1,0 mm målbar nedbør. " +
+                                    "Merk at i vintermånedene kan nedbøren komme som snø. " +
+                                    "Høyeste daglige nedbør per måned viser hvor kraftige regn eller snøværet typisk er. " +
+                                    "Høye verdier indikerer økt risiko for styrtregn, overvann og lokale oversvømmelser.",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        when {
+                            frostUiState.isLoading -> {
+                                Text("Laster klimadata...")
+                            }
+
+                            frostUiState.precipitationError != null -> {
+                                ErrorState(
+                                    message = friendlyErrorMessage(frostUiState.precipitationError),
+                                    onRetry = { frostViewModel.loadFrostStats(location) },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+
+                            frostUiState.precipitationDays != null && frostUiState.precipitationMean != null -> {
+                                PrecipitationChart(
+                                    rainyDays = frostUiState.precipitationDays!!,
+                                    maxDailyPrecip = frostUiState.precipitationMean!!
+                                )
+                            }
+
+                            else -> {
+                                Text("Ingen nedbørsdata tilgjengelig.")
+                            }
+                        }
+                    }
+                }
+
+                // Snow
+                item {
+                    ExpandableInfoBox(title = "Snø", cardColor = theme.secondary) {
+                        Text(
+                            text = "Diagrammet viser gjennomsnittlig og høyeste målte snødybde per måned, basert på målinger fra 1991–2020. " +
+                                    "Høye verdier kan påvirke fremkommelighet, behov for snørydding og belastning på tak.",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        when {
+                            frostUiState.isLoading -> {
+                                Text("Laster klimadata...")
+                            }
+
+                            frostUiState.snowError != null -> {
+                                ErrorState(
+                                    message = friendlyErrorMessage(frostUiState.snowError),
+                                    onRetry = { frostViewModel.loadFrostStats(location) },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+
+                            frostUiState.snowMean != null && frostUiState.snowMax != null -> {
+                                SnowChart(
+                                    meanSnowDepth = frostUiState.snowMean!!,
+                                    maxSnowDepth = frostUiState.snowMax!!
+                                )
+                            }
+
+                            else -> {
+                                Text("Ingen snødata tilgjengelig.")
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -450,8 +450,9 @@ fun TemperatureChart(
             ),
             popupProperties = PopupProperties(
                 enabled = true,
+                mode = PopupProperties.Mode.PointMode(), // "snaps" to next month
                 animationSpec = tween(300),
-                duration = 2000L,
+                duration = 3000L,
                 textStyle = TextStyle(
                     color = BrightWhite,
                     fontSize = 11.sp
@@ -581,8 +582,9 @@ fun WindChart(
             ),
             popupProperties = PopupProperties(
                 enabled = true,
+                mode = PopupProperties.Mode.PointMode(), // "snaps" to next month
                 animationSpec = tween(300),
-                duration = 2000L,
+                duration = 3000L,
                 textStyle = TextStyle(
                     color = BrightWhite,
                     fontSize = 11.sp
@@ -652,7 +654,7 @@ fun SunshineChart(
                 enabled = true,
                 mode = PopupProperties.Mode.PointMode(), // "snaps" to next month
                 animationSpec = tween(300),
-                duration = 2000L,
+                duration = 3000L,
                 textStyle = TextStyle(
                     color = BrightWhite,
                     fontSize = 11.sp
@@ -664,7 +666,7 @@ fun SunshineChart(
                 contentBuilder = { popup ->
                     val monthNames = listOf("Jan", "Feb", "Mar", "Apr", "Mai", "Jun",
                         "Jul", "Aug", "Sep", "Okt", "Nov", "Des")
-                    "${monthNames[popup.valueIndex]}: ${"%.1f".format(popup.value)} dager"
+                    "${monthNames[popup.valueIndex]}: ${"%.1f".format(popup.value)} timer"
                 }
             ),
             indicatorProperties = HorizontalIndicatorProperties(
@@ -747,7 +749,7 @@ fun PrecipitationChart(
                     enabled = true,
                     mode = PopupProperties.Mode.PointMode(), // "snaps" to next month
                     animationSpec = tween(300),
-                    duration = 2000L,
+                    duration = 3000L,
                     textStyle = TextStyle(
                         color = BrightWhite,
                         fontSize = 11.sp
@@ -833,7 +835,7 @@ fun PrecipitationChart(
                     enabled = true,
                     mode = PopupProperties.Mode.PointMode(), // "snaps" to next month
                     animationSpec = tween(300),
-                    duration = 2000L,
+                    duration = 3000L,
                     textStyle = TextStyle(
                         color = BrightWhite,
                         fontSize = 11.sp
@@ -941,7 +943,7 @@ fun SnowChart(
                 enabled = true,
                 mode = PopupProperties.Mode.PointMode(), // "snaps" to next month
                 animationSpec = tween(300),
-                duration = 2000L,
+                duration = 3000L,
                 textStyle = TextStyle(
                     color = BrightWhite,
                     fontSize = 11.sp
