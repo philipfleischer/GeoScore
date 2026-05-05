@@ -62,7 +62,12 @@ fun NaturhendelserApp() {
             dataSource = FrostDataSource(
                 client = FrostClientProvider.client,
                 credentials = "${Constants.FROST_CLIENT_ID}:${Constants.FROST_CLIENT_SECRET}"
-            )
+            ),
+            temperatureCacheDao   = database.temperatureCacheDao(),
+            windCacheDao          = database.windCacheDao(),
+            sunshineCacheDao      = database.sunshineCacheDao(),
+            snowCacheDao          = database.snowCacheDao(),
+            precipitationCacheDao = database.precipitationCacheDao()
         )
     }
     
