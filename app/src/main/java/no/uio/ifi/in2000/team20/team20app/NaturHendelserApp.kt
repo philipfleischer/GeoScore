@@ -57,6 +57,8 @@ fun NaturhendelserApp() {
         )
     }
 
+    // The 5 cache DAOs give FrostRepository a Room-backed cache layer so that
+    // historical climate data is only fetched from the network once per location.
     val frostRepository = remember {
         FrostRepository(
             dataSource = FrostDataSource(

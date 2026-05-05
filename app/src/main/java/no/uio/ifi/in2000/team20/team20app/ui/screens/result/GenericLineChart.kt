@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -30,6 +29,7 @@ import no.uio.ifi.in2000.team20.team20app.ui.theme.Charcoal
 import no.uio.ifi.in2000.team20.team20app.ui.theme.SlateGray
 import androidx.compose.animation.core.tween
 import ir.ehsannarmani.compose_charts.models.GridProperties.AxisProperties
+import kotlin.math.abs
 
 @Composable
 fun GenericLineChart(
@@ -43,8 +43,12 @@ fun GenericLineChart(
     modifier: Modifier = Modifier,
     showZeroLine: Boolean = false,
     zeroLineColor: Color = Color.Transparent,
-    yAxisLineCount: Int = 12 // 12 for 12 months
+    // Controls the number of vertical grid lines drawn across the chart (one per month by default)
+    // Confusing name, yAxisProperties.lineCount draws vertical lines
+    verticalGridLineCount: Int = 12
 ) {
+    // Only odd months are shown as labels to avoid crowding on narrow screens.
+    // Even-month slots use a single space so the library still spaces all 12 positions evenly.
     val months = listOf("Jan", " ", "Mar", " ", "Mai", " ",
         "Jul", " ", "Sep", " ", "Nov", " ")
 
@@ -62,7 +66,7 @@ fun GenericLineChart(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(chartHeight),
-            data = remember(data) { data },
+            data = data,
             zeroLineProperties = if (showZeroLine) {
                 ZeroLineProperties(
                     enabled = true,
@@ -78,7 +82,7 @@ fun GenericLineChart(
             ),
             popupProperties = PopupProperties(
                 enabled = true,
-                mode = PopupProperties.Mode.PointMode(),
+                mode = PopupProperties.Mode.PointMode(threshold = 8.dp),
                 animationSpec = tween(300),
                 duration = 3000L,
                 textStyle = TextStyle(
@@ -92,7 +96,15 @@ fun GenericLineChart(
                 contentBuilder = { popup ->
                     val monthNames = listOf("Jan", "Feb", "Mar", "Apr", "Mai", "Jun",
                         "Jul", "Aug", "Sep", "Okt", "Nov", "Des")
-                    "${monthNames.getOrElse(popup.valueIndex) { monthNames.last() }}: ${"%.1f".format(popup.value)}$unitSuffix"
+                    // The library's valueIndex can be unreliable in portrait, so we
+                    // find the correct month by matching the closest value in the data instead.
+                    val values = data.getOrNull(popup.dataIndex)?.values
+                    val monthIndex = values
+                        ?.mapIndexed { i, v -> i to abs(v - popup.value) }
+                        ?.minByOrNull { it.second }
+                        ?.first
+                        ?: popup.valueIndex
+                    "${monthNames.getOrElse(monthIndex) { monthNames.last() }}: ${"%.1f".format(popup.value)}$unitSuffix"
                 }
             ),
             indicatorProperties = HorizontalIndicatorProperties(
@@ -107,7 +119,7 @@ fun GenericLineChart(
                     style = StrokeStyle.Dashed(intervals = floatArrayOf(6f, 6f))
                 ),
                 yAxisProperties = AxisProperties(
-                    lineCount = yAxisLineCount,
+                    lineCount = verticalGridLineCount,
                     color = SolidColor(SlateGray.copy(alpha = 0.2f)),
                     style = StrokeStyle.Dashed(intervals = floatArrayOf(6f, 6f))
                 )

@@ -291,9 +291,11 @@ class FrostRepository(
     private fun formatLocationKey(lat: Double, lon: Double): String =
         "%.2f, %.2f".format(lat, lon)
 
+    // Serializes a list of monthly values to a JSON string for storage in Room.
     private fun toJson(values: List<Double>): String =
         Json.encodeToString(values)
 
+    // Deserializes a JSON string from Room back into a list of monthly values.
     private fun fromJson(json: String): List<Double> =
         Json.decodeFromString(json)
 

@@ -156,7 +156,7 @@ fun ClimateStatsScreen(
                                             color = SolidColor(MayaBlue),
                                             firstGradientFillColor = Color.Transparent,
                                             secondGradientFillColor = Color.Transparent,
-                                            curvedEdges = true,
+                                            curvedEdges = false,
                                             dotProperties = DotProperties(
                                                 enabled = true,
                                                 color = SolidColor(BrightWhite),
@@ -171,7 +171,7 @@ fun ClimateStatsScreen(
                                             color = SolidColor(DustyBlue),
                                             firstGradientFillColor = DustyBlue.copy(alpha = .2f),
                                             secondGradientFillColor = Color.Transparent,
-                                            curvedEdges = true,
+                                            curvedEdges = false,
                                             dotProperties = DotProperties(
                                                 enabled = true,
                                                 color = SolidColor(BrightWhite),
@@ -186,7 +186,7 @@ fun ClimateStatsScreen(
                                             color = SolidColor(Salmon),
                                             firstGradientFillColor = Color.Transparent,
                                             secondGradientFillColor = Color.Transparent,
-                                            curvedEdges = true,
+                                            curvedEdges = false,
                                             dotProperties = DotProperties(
                                                 enabled = true,
                                                 color = SolidColor(BrightWhite),
@@ -236,7 +236,7 @@ fun ClimateStatsScreen(
                                             color = SolidColor(TrafficGreen),
                                             firstGradientFillColor = TrafficGreen.copy(alpha = .2f),
                                             secondGradientFillColor = Color.Transparent,
-                                            curvedEdges = true,
+                                            curvedEdges = false,
                                             dotProperties = DotProperties(
                                                 enabled = true,
                                                 color = SolidColor(BrightWhite),
@@ -249,7 +249,7 @@ fun ClimateStatsScreen(
                                             color = SolidColor(RoyalGold),
                                             firstGradientFillColor = Color.Transparent,
                                             secondGradientFillColor = Color.Transparent,
-                                            curvedEdges = true,
+                                            curvedEdges = false,
                                             dotProperties = DotProperties(
                                                 enabled = true,
                                                 color = SolidColor(BrightWhite),
@@ -262,7 +262,7 @@ fun ClimateStatsScreen(
                                             color = SolidColor(TrafficRed),
                                             firstGradientFillColor = Color.Transparent,
                                             secondGradientFillColor = Color.Transparent,
-                                            curvedEdges = true,
+                                            curvedEdges = false,
                                             dotProperties = DotProperties(
                                                 enabled = true,
                                                 color = SolidColor(BrightWhite),
@@ -307,7 +307,7 @@ fun ClimateStatsScreen(
                                             color = SolidColor(RoyalGold),
                                             firstGradientFillColor = RoyalGold.copy(alpha = .3f),
                                             secondGradientFillColor = Color.Transparent,
-                                            curvedEdges = true,
+                                            curvedEdges = false,
                                             dotProperties = DotProperties(
                                                 enabled = true,
                                                 color = SolidColor(BrightWhite),
@@ -361,7 +361,7 @@ fun ClimateStatsScreen(
                                                 color = SolidColor(MayaBlue),
                                                 firstGradientFillColor = MayaBlue.copy(alpha = .2f),
                                                 secondGradientFillColor = Color.Transparent,
-                                                curvedEdges = true,
+                                                curvedEdges = false,
                                                 dotProperties = DotProperties(
                                                     enabled = true,
                                                     color = SolidColor(BrightWhite),
@@ -389,7 +389,7 @@ fun ClimateStatsScreen(
                                                 color = SolidColor(TrafficGreen),
                                                 firstGradientFillColor = TrafficGreen.copy(alpha = .2f),
                                                 secondGradientFillColor = Color.Transparent,
-                                                curvedEdges = true,
+                                                curvedEdges = false,
                                                 dotProperties = DotProperties(
                                                     enabled = true,
                                                     color = SolidColor(BrightWhite),
@@ -435,7 +435,7 @@ fun ClimateStatsScreen(
                                             color = SolidColor(MayaBlue),
                                             firstGradientFillColor = MayaBlue.copy(alpha = .2f),
                                             secondGradientFillColor = Color.Transparent,
-                                            curvedEdges = true,
+                                            curvedEdges = false,
                                             dotProperties = DotProperties(
                                                 enabled = true,
                                                 color = SolidColor(BrightWhite),
@@ -450,7 +450,7 @@ fun ClimateStatsScreen(
                                             color = SolidColor(DarkBlue),
                                             firstGradientFillColor = Color.Transparent,
                                             secondGradientFillColor = Color.Transparent,
-                                            curvedEdges = true,
+                                            curvedEdges = false,
                                             dotProperties = DotProperties(
                                                 enabled = true,
                                                 color = SolidColor(BrightWhite),
