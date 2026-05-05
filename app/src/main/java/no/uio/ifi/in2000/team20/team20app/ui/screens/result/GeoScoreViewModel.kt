@@ -60,12 +60,7 @@ class GeoScoreViewModel(
     private suspend fun loadReport(score: GeoScore) {
         _uiState.update { it.copy(isReportLoading = true, reportError = null) }
         runCatching {
-            getAiReport.generateReport(
-                hazardScore = score.hazardScore,
-                exposureScore = score.exposureScore,
-                vulnerabilityScore = score.vulnerabilityScore,
-                grade = scoreToGrade(score.geoScore)
-            )
+            getAiReport.generateReport(score)
         }.fold(
             onSuccess = { report ->
                 _uiState.update { it.copy(isReportLoading = false, aiReport = report) }

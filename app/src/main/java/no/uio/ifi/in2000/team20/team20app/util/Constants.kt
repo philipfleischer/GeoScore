@@ -35,6 +35,7 @@ object Constants {
     const val TIMEOUT_SECONDS = 30L
     const val FROST_CLIENT_ID = BuildConfig.FROST_V0_CLIENT_ID
     const val FROST_CLIENT_SECRET = BuildConfig.FROST_V0_CLIENT_SECRET
+    const val CHATGPT_API_KEY = BuildConfig.CHATGPT_API_KEY
 
     // MAP DEFAULT SETTINGS
     const val DEFAULT_ZOOM = 8f
