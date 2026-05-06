@@ -36,6 +36,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.toggleableState
+import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.unit.dp
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
@@ -74,13 +84,22 @@ fun GeoscoreScreen(
                     .background(MaterialTheme.colorScheme.surface)
                     .windowInsetsPadding(WindowInsets.statusBars)
             ) {
-                SecondaryTabRow(selectedTabIndex = 0, modifier = Modifier.fillMaxWidth()) {
+                SecondaryTabRow(selectedTabIndex = 0, modifier = Modifier.fillMaxWidth().semantics{isTraversalGroup = true}) {
                     Tab(
+                        modifier = Modifier
+                            .semantics{ onClick(label = "See geo-score rapport for ${location.name}", action = { true })},
                         selected = true,
                         onClick = { },
                         text = { Text("Rapport") }
                     )
                     Tab(
+                        modifier = Modifier
+                            .semantics{ onClick(
+                                label = "See historic climate data for ${location.name}",
+                                action = {
+                                    onHistoricDataClick()
+                                    true
+                                })},
                         selected = false,
                         onClick = onHistoricDataClick,
                         text = { Text("Historisk klimadata") }
@@ -225,7 +244,9 @@ private fun GeomarkingCard(
     onSavedToggle: (Boolean) -> Unit
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .semantics(mergeDescendants = true){},
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         )
@@ -258,13 +279,22 @@ private fun GeomarkingCard(
                 )
             }
 
-            IconButton(
-                onClick = { onSavedToggle(isCurrentSaved) }
-            ) {
-                Icon(
-                    imageVector = if (isCurrentSaved) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
-                    contentDescription = if (isCurrentSaved) "Fjern fra lagrede" else "Lagre"
-                )
+                IconButton(
+                    modifier = Modifier.semantics{
+                        onClick(
+                            label = if (isCurrentSaved) "Remove address from saved" else "Save address",
+                            action = {
+                                onSavedToggle(isCurrentSaved)
+                                true
+                            })
+                    },
+                    onClick = { onSavedToggle(isCurrentSaved) }
+                ) {
+                    Icon(
+                        imageVector = if (isCurrentSaved) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+                        contentDescription = if (isCurrentSaved) "Address saved" else "Address not saved"
+                    )
+                }
             }
         }
     }

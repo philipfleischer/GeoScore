@@ -35,6 +35,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -42,6 +44,7 @@ import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.components.ErrorState
 import no.uio.ifi.in2000.team20.team20app.ui.components.LoadingState
 import no.uio.ifi.in2000.team20.team20app.ui.components.SharedTopAppBar
+import no.uio.ifi.in2000.team20.team20app.ui.theme.LocalTheme
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
 
 @Composable
@@ -49,13 +52,14 @@ fun SearchBarObject(
     onOpenSearch: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val theme = LocalTheme.current
     Box(
         modifier = modifier
             .fillMaxWidth()
             .height(56.dp)
             .clip(RoundedCornerShape(28.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .clickable { onOpenSearch() }
+            .background(theme.primary)
+            .clickable (onClickLabel = "Search address") { onOpenSearch() }
             .padding(horizontal = DEFAULT_PADDING_DP.dp),
         contentAlignment = Alignment.CenterStart
     ) {
@@ -130,7 +134,7 @@ fun SearchScreen(
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Search,
-                        contentDescription = "Søk"
+                        contentDescription = "Search"
                     )
                 },
                 isError = uiState.inputError != null,
@@ -222,8 +226,9 @@ private fun SearchResultItem(
 ) {
     Column(
         modifier = Modifier
+            .semantics(mergeDescendants = true){}
             .fillMaxWidth()
-            .clickable { onSelect() }
+            .clickable(onClickLabel = "Select this address") { onSelect() }
             .padding(vertical = 12.dp, horizontal = 4.dp),
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {

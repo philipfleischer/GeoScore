@@ -48,7 +48,9 @@ import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
 import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.traversalIndex
 import no.uio.ifi.in2000.team20.team20app.ui.theme.LocalTheme
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
 import no.uio.ifi.in2000.team20.team20app.util.Constants.LARGE_PADDING_DP
@@ -78,7 +80,9 @@ fun HomeScreen(
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(if(compactScreenWidth) 1 else 2),
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+        ,
         // Orginal:
         // contentPadding = PaddingValues(horizontal = 32.dp, vertical = 32.dp),
         // Attemt to get the text slightly lower in portrait:
@@ -94,9 +98,14 @@ fun HomeScreen(
         //TODO: Update InfoBox component (rename to WelcomeInfoBox) so it fit current design
         //TODO: Remove hardcoded info box section and replace with updated InfoBox component
         item {
+            //Column for header and infotext
             Column(
                 verticalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier.fillMaxWidth(if (compactScreenWidth) 1f else 0.5f)
+                modifier = Modifier
+                    .fillMaxWidth(if (compactScreenWidth) 1f else 0.5f)
+                    .semantics{
+                        isTraversalGroup = !compactScreenWidth
+                    }
             ){
                 Text(
                     text = "Vit hva du kjøper - før du kjøper det",
@@ -111,6 +120,7 @@ fun HomeScreen(
                             "basert på geologisk og meterologisk data.",
                     style = MaterialTheme.typography.bodyMedium,
                     fontSize = 20.sp,
+                    color = theme.onBackground
                 )
             }
         }
@@ -134,7 +144,7 @@ fun ExpandableInfoBox(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { isExpanded = !isExpanded },
+            .clickable(onClickLabel = if(!isExpanded) "expand information box" else "close information box") { isExpanded = !isExpanded },
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = cardColor),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -158,7 +168,7 @@ fun ExpandableInfoBox(
 
                 Icon(
                     imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                    contentDescription = null,
+                    contentDescription = if (isExpanded) "Opened $title information box" else "Closed $title information box",
                     modifier = Modifier.size(28.dp)
                 )
             }
