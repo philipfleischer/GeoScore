@@ -48,6 +48,18 @@ import ir.ehsannarmani.compose_charts.models.Line
 import ir.ehsannarmani.compose_charts.models.DotProperties
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.unit.sp
+import ir.ehsannarmani.compose_charts.models.ZeroLineProperties
+import ir.ehsannarmani.compose_charts.models.PopupProperties
+import androidx.compose.animation.core.tween
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.hideFromAccessibility
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.text.TextStyle
+import androidx.window.core.layout.WindowSizeClass
+import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
 import ir.ehsannarmani.compose_charts.models.IndicatorCount
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -72,6 +84,15 @@ fun ClimateStatsScreen(
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.surface)
                     .windowInsetsPadding(WindowInsets.statusBars)
+                    .semantics{
+                        onClick(
+                            label = "See geo-score report",
+                            action = {
+                                onRapportClick()
+                                true
+                            }
+                        )
+                    }
             ) {
                 SecondaryTabRow(selectedTabIndex = 1, modifier = Modifier.fillMaxWidth()) {
                     Tab(
