@@ -11,6 +11,7 @@ import no.uio.ifi.in2000.team20.team20app.domain.model.GeoScore
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.domain.model.Report
 import no.uio.ifi.in2000.team20.team20app.domain.model.scoreToGrade
+import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetAiReport
 import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetGeoScore
 
 data class GeoScoreUiState(

@@ -25,6 +25,7 @@ data class WindAndPrecipitationObservationsResult(
 )
 
 data class GeoScore (
+    val locationKey: String,
     val hazardScore: Double,
     val exposureScore: Double,
     val vulnerabilityScore: Double,
@@ -54,6 +55,7 @@ data class ExposureScoreResult (
 )
 
 data class Report (
+    val locationKey: String,
     val extremePrecipitationText: String?,
     val extremeWindText: String?,
     val floodText: String?,

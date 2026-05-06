@@ -12,6 +12,7 @@ class ChatGPTRepository (
         val result = DataSource.getReport(geoScore)
         val parts = result?.split("---")
         return Report(
+            locationKey = geoScore.locationKey,
             extremePrecipitationText = parts?.getOrNull(0)?.trim() ?: "",
             extremeWindText = parts?.getOrNull(1)?.trim() ?: "",
             floodText = parts?.getOrNull(2)?.trim() ?: "",

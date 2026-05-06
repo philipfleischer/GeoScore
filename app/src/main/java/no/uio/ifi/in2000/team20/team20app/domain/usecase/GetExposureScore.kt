@@ -1,7 +1,7 @@
 package no.uio.ifi.in2000.team20.team20app.domain.usecase
 
-import no.uio.ifi.in2000.team20.team20app.data.local.ExposureCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.ExposureCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.Dao.ExposureCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.Entity.ExposureCacheEntity
 import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepository
 import no.uio.ifi.in2000.team20.team20app.domain.model.ExposureScoreResult
 import no.uio.ifi.in2000.team20.team20app.util.Constants.EXTREME_PRECIPITATION_THRESHOLD

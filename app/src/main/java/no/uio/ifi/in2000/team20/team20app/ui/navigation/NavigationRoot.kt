@@ -11,7 +11,6 @@ import androidx.navigation3.ui.NavDisplay
 import no.uio.ifi.in2000.team20.team20app.data.repository.SavedRepository
 import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetGeoScore
 import no.uio.ifi.in2000.team20.team20app.ui.components.AdaptiveNavigationScaffold
-import no.uio.ifi.in2000.team20.team20app.ui.screens.details.AreaDetailsScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.result.ClimateStatsScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GeoscoreScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedScreen
@@ -21,10 +20,9 @@ import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GeoScoreViewModel
-import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GetAiReport
+import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetAiReport
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchViewModel
-import no.uio.ifi.in2000.team20.team20app.ui.screens.settings.SettingsScreen
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Screen
@@ -187,12 +185,6 @@ fun NavigationRoot(
                 }
             }
 
-            entry<Route.SettingsDestination> {
-                SettingsScreen(
-                    onBackClick = goBack
-                )
-            }
-
             entry<Route.SearchDestination> {
                 AdaptiveNavigationScaffold(
                     title = "Søk etter en adresse",
@@ -210,20 +202,6 @@ fun NavigationRoot(
                         modifier = modifier
                     )
                 }
-            }
-
-            entry<Route.AreaDetailsDestination> { destination ->
-                AreaDetailsScreen(
-                    location = destination.location,
-                    onBackClick = goBack,
-                    onOpenClimateStats = {
-                        backStack.add(
-                            Route.ClimateStatsDestination(
-                                destination.location
-                            )
-                        )
-                    }
-                )
             }
 
             entry<Route.ClimateStatsDestination> { destination ->
