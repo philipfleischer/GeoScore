@@ -1,7 +1,7 @@
 package no.uio.ifi.in2000.team20.team20app.domain.usecase
 
-import no.uio.ifi.in2000.team20.team20app.data.local.TotalScoreCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.TotalScoreCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.Dao.TotalScoreCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.Entity.TotalScoreCacheEntity
 import no.uio.ifi.in2000.team20.team20app.domain.model.GeoScore
 import no.uio.ifi.in2000.team20.team20app.util.Constants.EXPOSURESCORE_WEIGHT
 import no.uio.ifi.in2000.team20.team20app.util.Constants.HAZARDSCORE_WEIGHT
@@ -24,6 +24,7 @@ class GetGeoScore(
         if (cachedTotal != null) {
             val exposureResult = getExposureScore.calculateExposureScore(lat, lon)
             return GeoScore(
+                locationKey             = locationKey,
                 precipitationScore      = hazardResult.precipitationScore,
                 windScore               = hazardResult.windScore,
                 floodScore              = vulnerabilityResult.floodScore,
@@ -39,6 +40,7 @@ class GetGeoScore(
         val exposureResult = getExposureScore.calculateExposureScore(lat, lon)
 
         val geoScore = GeoScore(
+            locationKey             = locationKey,
             precipitationScore      = hazardResult.precipitationScore,
             windScore               = hazardResult.windScore,
             floodScore              = vulnerabilityResult.floodScore,
