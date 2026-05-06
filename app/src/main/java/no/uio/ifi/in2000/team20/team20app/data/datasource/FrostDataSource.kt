@@ -10,10 +10,10 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.isSuccess
 import io.ktor.util.encodeBase64
 import no.uio.ifi.in2000.team20.team20app.data.api.FrostRoutes
-import no.uio.ifi.in2000.team20.team20app.data.model.FrostV0AvailableTimeSeriesResponseDto
-import no.uio.ifi.in2000.team20.team20app.data.model.FrostV0ObservationResponseDto
-import no.uio.ifi.in2000.team20.team20app.data.model.FrostV0SourceResponseDto
-import no.uio.ifi.in2000.team20.team20app.data.model.FrostV1ResponseDto
+import no.uio.ifi.in2000.team20.team20app.data.dto.FrostV0AvailableTimeSeriesResponseDto
+import no.uio.ifi.in2000.team20.team20app.data.dto.FrostV0ObservationResponseDto
+import no.uio.ifi.in2000.team20.team20app.data.dto.FrostV0SourceResponseDto
+import no.uio.ifi.in2000.team20.team20app.data.dto.FrostV1ResponseDto
 
 /**
  * For sunshine data we must do a separate station lookup to find the nearest station

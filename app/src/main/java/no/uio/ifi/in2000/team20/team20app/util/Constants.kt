@@ -33,9 +33,19 @@ object Constants {
     const val FROST_BASE_URL = "https://frost.met.no/"
     const val NVE_BASE_URL = "https://api.nve.no/"
     const val TIMEOUT_SECONDS = 30L
+
+    val ADDRESS_URL_FORMATTER = {encodedQuery:String -> "https://ws.geonorge.no/adresser/v1/sok?sok=$encodedQuery&fuzzy=false&utkoordsys=4258&treffPerSide=10&side=0&asciiKompatibel=true"}
+
     const val FROST_CLIENT_ID = BuildConfig.FROST_V0_CLIENT_ID
     const val FROST_CLIENT_SECRET = BuildConfig.FROST_V0_CLIENT_SECRET
     const val CHATGPT_API_KEY = BuildConfig.CHATGPT_API_KEY
+
+    // SEARCH RESULT STATUS CODES
+    const val HTTP_OK = 200
+    const val HTTP_CLIENT_ERROR = 400
+    const val HTTP_SERVER_ERROR = 500
+    const val NO_INTERNET = -100
+    const val CANCELLED_SEARCH = -200
 
     // MAP DEFAULT SETTINGS
     const val DEFAULT_ZOOM = 8f

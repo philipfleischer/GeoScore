@@ -4,8 +4,8 @@ import android.util.Log
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import no.uio.ifi.in2000.team20.team20app.data.datasource.FrostDataSourceService
-import no.uio.ifi.in2000.team20.team20app.data.model.FrostV0ObservationResponseDto
-import no.uio.ifi.in2000.team20.team20app.data.model.FrostV1ResponseDto
+import no.uio.ifi.in2000.team20.team20app.data.dto.FrostV0ObservationResponseDto
+import no.uio.ifi.in2000.team20.team20app.data.dto.FrostV1ResponseDto
 import no.uio.ifi.in2000.team20.team20app.domain.model.WindAndPrecipitationObservationsResult
 
 /**
