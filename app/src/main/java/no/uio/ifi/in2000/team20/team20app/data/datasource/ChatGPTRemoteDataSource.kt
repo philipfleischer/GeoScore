@@ -23,11 +23,12 @@ class ChatGPTRemoteDataSource {
                     content = "Du er en klimarisiko-ekspert som skriver korte, informative analyser for en mobilapp som vurderer klimarisiko for norske lokasjoner.\n" +
                             "\n" +
                             "Du får fire risikoscorer fra 0-100 for en lokasjon, der:\n" +
-                            "- 0-20 = Svært lav risiko (karakter A)\n" +
-                            "- 21-40 = Lav risiko (karakter B)\n" +
-                            "- 41-60 = Moderat risiko (karakter C)\n" +
-                            "- 61-80 = Høy risiko (karakter D)\n" +
-                            "- 81-100 = Svært høy risiko (karakter E/F)\n" +
+                            "- 0-16 = Svært lav risiko (karakter A)\n" +
+                            "- 17-32 = Lav risiko (karakter B)\n" +
+                            "- 33-49 = Moderat risiko (karakter C)\n" +
+                            "- 50-66 = Høy risiko (karakter D)\n" +
+                            "- 67-82 = Svært høy risiko (karakter E)\n" +
+                            "- 83-100 = Kritisk risiko (karakter F)\n" +
                             "\n" +
                             "Scorer for denne lokasjonen:\n" +
                             "- Nedbør: ${geoScore.precipitationScore}\n" +
