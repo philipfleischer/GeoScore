@@ -279,22 +279,21 @@ private fun GeomarkingCard(
                 )
             }
 
-                IconButton(
-                    modifier = Modifier.semantics{
-                        onClick(
-                            label = if (isCurrentSaved) "Remove address from saved" else "Save address",
-                            action = {
-                                onSavedToggle(isCurrentSaved)
-                                true
-                            })
-                    },
-                    onClick = { onSavedToggle(isCurrentSaved) }
-                ) {
-                    Icon(
-                        imageVector = if (isCurrentSaved) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
-                        contentDescription = if (isCurrentSaved) "Address saved" else "Address not saved"
-                    )
-                }
+            IconButton(
+                modifier = Modifier.semantics {
+                    onClick(
+                        label = if (isCurrentSaved) "Remove address from saved" else "Save address",
+                        action = {
+                            onSavedToggle(isCurrentSaved)
+                            true
+                        })
+                },
+                onClick = { onSavedToggle(isCurrentSaved) }
+            ) {
+                Icon(
+                    imageVector = if (isCurrentSaved) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+                    contentDescription = if (isCurrentSaved) "Address saved" else "Address not saved"
+                )
             }
         }
     }
