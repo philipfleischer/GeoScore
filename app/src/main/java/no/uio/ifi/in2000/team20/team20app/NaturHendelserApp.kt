@@ -95,7 +95,7 @@ fun NaturhendelserApp() {
         ChatGPTRepository(ChatGPTRemoteDataSource())
     }
 
-    val getAiReport = remember { GetAiReport(chatGPTRepository) }
+    val getAiReport = remember { GetAiReport(chatGPTRepository, database.ReportCacheDao()) }
 
     val searchViewModel: SearchViewModel = viewModel(
         factory = viewModelFactory {

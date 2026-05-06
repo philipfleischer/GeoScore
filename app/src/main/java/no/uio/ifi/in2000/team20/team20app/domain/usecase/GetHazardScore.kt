@@ -1,7 +1,7 @@
 package no.uio.ifi.in2000.team20.team20app.domain.usecase
 
-import no.uio.ifi.in2000.team20.team20app.data.local.HazardCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.HazardCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.Dao.HazardCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.Entity.HazardCacheEntity
 import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepository
 import no.uio.ifi.in2000.team20.team20app.domain.model.HazardScoreResult
 import no.uio.ifi.in2000.team20.team20app.util.Constants.EXTREME_PRECIPITATION_THRESHOLD

@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team20.team20app.data.local
+package no.uio.ifi.in2000.team20.team20app.data.local.Entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
