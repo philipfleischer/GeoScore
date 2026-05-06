@@ -1,7 +1,6 @@
-package no.uio.ifi.in2000.team20.team20app.ui.screens.result
+package no.uio.ifi.in2000.team20.team20app.domain.usecase
 
 import no.uio.ifi.in2000.team20.team20app.data.local.Dao.ReportCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.TotalScoreCacheDao
 import no.uio.ifi.in2000.team20.team20app.data.local.Entity.ReportCacheEntity
 import no.uio.ifi.in2000.team20.team20app.data.repository.ChatGPTRepository
 import no.uio.ifi.in2000.team20.team20app.domain.model.GeoScore

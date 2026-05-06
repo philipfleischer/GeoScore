@@ -20,10 +20,9 @@ import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GeoScoreViewModel
-import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GetAiReport
+import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetAiReport
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchViewModel
-import no.uio.ifi.in2000.team20.team20app.ui.screens.settings.SettingsScreen
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Screen
@@ -184,12 +183,6 @@ fun NavigationRoot(
                         geoScoreViewModel = geoScoreViewModel
                     )
                 }
-            }
-
-            entry<Route.SettingsDestination> {
-                SettingsScreen(
-                    onBackClick = goBack
-                )
             }
 
             entry<Route.SearchDestination> {

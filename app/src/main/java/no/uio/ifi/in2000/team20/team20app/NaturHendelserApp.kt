@@ -29,7 +29,7 @@ import no.uio.ifi.in2000.team20.team20app.domain.usecase.getVulnerabilityScore
 import no.uio.ifi.in2000.team20.team20app.ui.navigation.NavigationRoot
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapViewModel
-import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GetAiReport
+import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetAiReport
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
