@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team20.team20app.data.model
+package no.uio.ifi.in2000.team20.team20app.data.dto
 
 import kotlinx.serialization.Serializable
 

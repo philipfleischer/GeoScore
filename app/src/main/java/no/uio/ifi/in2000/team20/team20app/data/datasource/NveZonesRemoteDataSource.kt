@@ -5,7 +5,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import no.uio.ifi.in2000.team20.team20app.data.api.NveRoutes
-import no.uio.ifi.in2000.team20.team20app.data.model.ArcGisResponseDto
+import no.uio.ifi.in2000.team20.team20app.data.dto.ArcGisResponseDto
 
 interface NveZonesRemoteDataSourceService {
     suspend fun getLandslideZoneData(lon:Double, lat:Double): ArcGisResponseDto
