@@ -1,8 +1,8 @@
 package no.uio.ifi.in2000.team20.team20app.domain.usecase
 
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.ExposureCacheDao
 import no.uio.ifi.in2000.team20.team20app.data.local.Entity.ExposureCacheEntity
 import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepositoryService
+import no.uio.ifi.in2000.team20.team20app.data.repository.ScoreCacheRepository
 import no.uio.ifi.in2000.team20.team20app.domain.model.ExposureScoreResult
 import no.uio.ifi.in2000.team20.team20app.util.Constants.EXTREME_PRECIPITATION_THRESHOLD
 import no.uio.ifi.in2000.team20.team20app.util.Constants.EXTREME_WIND_GUST_THRESHOLD
@@ -14,12 +14,12 @@ import kotlin.math.min
 
 class GetExposureScore @Inject constructor(
     private val frostRepository: FrostRepositoryService,
-    private val exposureScoreDAO: ExposureCacheDao
+    private val scoreCacheRepository: ScoreCacheRepository
 ) {
     suspend fun calculateExposureScore(lat: Double, lon: Double): ExposureScoreResult {
 
-        val locationKey = "%.2f, %.2f".format(lat,lon)
-        val cachedResult = exposureScoreDAO.getByKey(locationKey)
+        val locationKey = "%.2f, %.2f".format(lat, lon)
+        val cachedResult = scoreCacheRepository.getExposureCache(locationKey)
         if (cachedResult != null) {
             return ExposureScoreResult(
                 eventCount = cachedResult.eventCount,
@@ -41,7 +41,7 @@ class GetExposureScore @Inject constructor(
 
         val score = max(0.0, min(100.0, exposure))
 
-        exposureScoreDAO.insert(
+        scoreCacheRepository.saveExposureScore(
             ExposureCacheEntity(
                 locationKey = locationKey,
                 eventCount = sumOfextremeWeatherDates,

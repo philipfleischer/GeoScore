@@ -12,10 +12,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import no.uio.ifi.in2000.team20.team20app.data.datasource.FrostDataSource
 import no.uio.ifi.in2000.team20.team20app.data.datasource.NveZonesRemoteDataSource
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.ExposureCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.ExposureCacheEntity
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.HazardCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.HazardCacheEntity
 import no.uio.ifi.in2000.team20.team20app.data.local.Dao.PrecipitationCacheDao
 import no.uio.ifi.in2000.team20.team20app.data.local.Entity.PrecipitationCacheEntity
 import no.uio.ifi.in2000.team20.team20app.data.local.Dao.SnowCacheDao
@@ -24,14 +20,15 @@ import no.uio.ifi.in2000.team20.team20app.data.local.Dao.SunshineCacheDao
 import no.uio.ifi.in2000.team20.team20app.data.local.Entity.SunshineCacheEntity
 import no.uio.ifi.in2000.team20.team20app.data.local.Dao.TemperatureCacheDao
 import no.uio.ifi.in2000.team20.team20app.data.local.Entity.TemperatureCacheEntity
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.TotalScoreCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.TotalScoreCacheEntity
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.VulnerabilityCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.VulnerabilityCacheEntity
 import no.uio.ifi.in2000.team20.team20app.data.local.Dao.WindCacheDao
 import no.uio.ifi.in2000.team20.team20app.data.local.Entity.WindCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.Entity.ExposureCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.Entity.HazardCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.Entity.TotalScoreCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.Entity.VulnerabilityCacheEntity
 import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepository
 import no.uio.ifi.in2000.team20.team20app.data.repository.NveZonesRepository
+import no.uio.ifi.in2000.team20.team20app.data.repository.ScoreCacheRepository
 import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetExposureScore
 import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetGeoScore
 import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetHazardScore
@@ -61,7 +58,7 @@ class GeoScoreTest {
             defaultRequest { header(HttpHeaders.Accept, "application/json") }
         }
 
-        // Fake in-memory DAOs — no Room dependency needed in unit/integration tests
+        // Fake in-memory DAOs for FrostRepository — no Room dependency needed in tests
         private val fakeTemperatureDao = object : TemperatureCacheDao {
             private val cache = mutableMapOf<String, TemperatureCacheEntity>()
             override suspend fun getByKey(locationKey: String) = cache[locationKey]
@@ -87,25 +84,25 @@ class GeoScoreTest {
             override suspend fun getByKey(locationKey: String) = cache[locationKey]
             override suspend fun insert(entity: PrecipitationCacheEntity) { cache[entity.locationKey] = entity }
         }
-        private val fakeHazardDao = object : HazardCacheDao {
-            private val cache = mutableMapOf<String, HazardCacheEntity>()
-            override suspend fun getByKey(locationKey: String) = cache[locationKey]
-            override suspend fun insert(entity: HazardCacheEntity) { cache[entity.locationKey] = entity }
-        }
-        private val fakeExposureDao = object : ExposureCacheDao {
-            private val cache = mutableMapOf<String, ExposureCacheEntity>()
-            override suspend fun getByKey(locationKey: String) = cache[locationKey]
-            override suspend fun insert(entity: ExposureCacheEntity) { cache[entity.locationKey] = entity }
-        }
-        private val fakeVulnerabilityDao = object : VulnerabilityCacheDao {
-            private val cache = mutableMapOf<String, VulnerabilityCacheEntity>()
-            override suspend fun getByKey(locationKey: String) = cache[locationKey]
-            override suspend fun insert(entity: VulnerabilityCacheEntity) { cache[entity.locationKey] = entity }
-        }
-        private val fakeTotalScoreDao = object : TotalScoreCacheDao {
-            private val cache = mutableMapOf<String, TotalScoreCacheEntity>()
-            override suspend fun getByKey(locationKey: String) = cache[locationKey]
-            override suspend fun insert(entity: TotalScoreCacheEntity) { cache[entity.locationKey] = entity }
+
+        // Single fake ScoreCacheRepository — replaces the 4 individual score DAO fakes
+        private val fakeScoreCacheRepository = object : ScoreCacheRepository {
+            private val hazardCache = mutableMapOf<String, HazardCacheEntity>()
+            private val exposureCache = mutableMapOf<String, ExposureCacheEntity>()
+            private val vulnerabilityCache = mutableMapOf<String, VulnerabilityCacheEntity>()
+            private val totalScoreCache = mutableMapOf<String, TotalScoreCacheEntity>()
+
+            override suspend fun getHazardCache(locationKey: String) = hazardCache[locationKey]
+            override suspend fun saveHazardScore(entity: HazardCacheEntity) { hazardCache[entity.locationKey] = entity }
+
+            override suspend fun getExposureCache(locationKey: String) = exposureCache[locationKey]
+            override suspend fun saveExposureScore(entity: ExposureCacheEntity) { exposureCache[entity.locationKey] = entity }
+
+            override suspend fun getVulnerabilityCache(locationKey: String) = vulnerabilityCache[locationKey]
+            override suspend fun saveVulnerabilityScore(entity: VulnerabilityCacheEntity) { vulnerabilityCache[entity.locationKey] = entity }
+
+            override suspend fun getGeoScoreCache(locationKey: String) = totalScoreCache[locationKey]
+            override suspend fun saveGeoScore(entity: TotalScoreCacheEntity) { totalScoreCache[entity.locationKey] = entity }
         }
 
         private val frostRepo = FrostRepository(
@@ -121,10 +118,10 @@ class GeoScoreTest {
         )
 
         val geoScore = GetGeoScore(
-            getExposureScore = GetExposureScore(frostRepo, fakeExposureDao),
-            getHazardScore = GetHazardScore(frostRepo, fakeHazardDao),
-            getVulnerabilityScore = GetVulnerabilityScore(nveRepo, fakeVulnerabilityDao),
-            geoScoreDAO = fakeTotalScoreDao
+            getExposureScore = GetExposureScore(frostRepo, fakeScoreCacheRepository),
+            getHazardScore = GetHazardScore(frostRepo, fakeScoreCacheRepository),
+            getVulnerabilityScore = GetVulnerabilityScore(nveRepo, fakeScoreCacheRepository),
+            scoreCacheRepository = fakeScoreCacheRepository
         )
     }
 

@@ -22,25 +22,13 @@ import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Screen
 
-/*
-Main changes (24.04.2026 adaptive-navigation-impl):
-- Replaced goToHome, goToMap and goToSaved with a general onNavigate to reduce repetition (I commented out old code).
-- Replaced ScreenScaffold with AdaptiveNavigationScaffold
-
-Hilt refactor:
-- Removed all ViewModel, repository, and use-case parameters.
-- All ViewModels are now obtained via hiltViewModel() at each nav entry.
-*/
 @Composable
 fun NavigationRoot() {
-    // Shared ViewModels — obtained once here and passed down where needed.
-    // hiltViewModel() scopes them to the activity's ViewModelStore, so they
-    // survive navigation and are the same instance across all entries.
+    // Shared ViewModels, activity-scoped, single instance across all nav entries
     val appViewModel: AppViewModel = hiltViewModel()
     val frostViewModel: FrostViewModel = hiltViewModel()
-    val homeViewModel: HomeViewModel = hiltViewModel()
-    val mapViewModel: MapViewModel = hiltViewModel()
-    val searchViewModel: SearchViewModel = hiltViewModel()
+    // SavedViewModel is shared so that isCurrentSaved stays consistent across all screens
+    val savedViewModel: SavedViewModel = hiltViewModel()
 
     //BackStack
     val backStack = rememberNavBackStack(Screen.HOME.route)
@@ -77,7 +65,8 @@ fun NavigationRoot() {
         onBack = goBack,
         entryProvider = entryProvider {
             entry<Route.HomeDestination> {
-                val savedViewModel: SavedViewModel = hiltViewModel()
+                // Screen-specific ViewModel scoped to this nav entry
+                val homeViewModel: HomeViewModel = hiltViewModel()
 
                 AdaptiveNavigationScaffold(
                     title = Screen.HOME.title,
@@ -97,7 +86,8 @@ fun NavigationRoot() {
             }
 
             entry<Route.MapDestination> {
-                val savedViewModel: SavedViewModel = hiltViewModel()
+                // Screen-specific ViewModel scoped to this nav entry
+                val mapViewModel: MapViewModel = hiltViewModel()
 
                 AdaptiveNavigationScaffold(
                     title = Screen.MAP.title,
@@ -119,8 +109,6 @@ fun NavigationRoot() {
             }
 
             entry<Route.SavedDestination> {
-                val savedViewModel: SavedViewModel = hiltViewModel()
-
                 AdaptiveNavigationScaffold(
                     title = Screen.SAVED.title,
                     onNavigate = onNavigate,
@@ -140,7 +128,6 @@ fun NavigationRoot() {
             }
 
             entry<Route.GeoscoreDestination> { destination ->
-                val savedViewModel: SavedViewModel = hiltViewModel()
                 val geoScoreViewModel: GeoScoreViewModel = hiltViewModel()
 
                 AdaptiveNavigationScaffold(
@@ -163,6 +150,9 @@ fun NavigationRoot() {
             }
 
             entry<Route.SearchDestination> {
+                // Screen-specific ViewModel scoped to this nav entry
+                val searchViewModel: SearchViewModel = hiltViewModel()
+
                 AdaptiveNavigationScaffold(
                     title = "Søk etter en adresse",
                     highlightedDest = Screen.HOME.route,
