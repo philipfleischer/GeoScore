@@ -2,7 +2,7 @@ package no.uio.ifi.in2000.team20.team20app.domain.usecase
 
 import no.uio.ifi.in2000.team20.team20app.data.local.Dao.HazardCacheDao
 import no.uio.ifi.in2000.team20.team20app.data.local.Entity.HazardCacheEntity
-import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepository
+import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepositoryService
 import no.uio.ifi.in2000.team20.team20app.domain.model.HazardScoreResult
 import no.uio.ifi.in2000.team20.team20app.util.Constants.EXTREME_PRECIPITATION_THRESHOLD
 import no.uio.ifi.in2000.team20.team20app.util.Constants.EXTREME_WIND_GUST_THRESHOLD
@@ -10,11 +10,11 @@ import no.uio.ifi.in2000.team20.team20app.util.Constants.PRECIPITATION_WEIGHT
 import no.uio.ifi.in2000.team20.team20app.util.Constants.REF_MAX_PRECIP_OVER_THRESHOLD
 import no.uio.ifi.in2000.team20.team20app.util.Constants.REF_MAX_WIND_OVER_THRESHOLD
 import no.uio.ifi.in2000.team20.team20app.util.Constants.WIND_WEIGHT
-
+import javax.inject.Inject
 import kotlin.math.min
 
-class GetHazardScore(
-    private val frostRepository: FrostRepository,
+class GetHazardScore @Inject constructor(
+    private val frostRepository: FrostRepositoryService,
     private val hazardScoreDAO: HazardCacheDao
 ) {
     suspend fun calculateHazardScore(lat: Double, lon: Double): HazardScoreResult {

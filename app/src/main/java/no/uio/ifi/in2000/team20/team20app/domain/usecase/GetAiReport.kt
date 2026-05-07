@@ -5,8 +5,9 @@ import no.uio.ifi.in2000.team20.team20app.data.local.Entity.ReportCacheEntity
 import no.uio.ifi.in2000.team20.team20app.data.repository.ChatGPTRepository
 import no.uio.ifi.in2000.team20.team20app.domain.model.GeoScore
 import no.uio.ifi.in2000.team20.team20app.domain.model.Report
+import javax.inject.Inject
 
-class GetAiReport(
+class GetAiReport @Inject constructor(
     private val chatGPTRepository: ChatGPTRepository,
     private val reportCacheDao: ReportCacheDao
 )

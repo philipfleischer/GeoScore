@@ -7,10 +7,11 @@ import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.OpenAI
 import no.uio.ifi.in2000.team20.team20app.domain.model.GeoScore
 import no.uio.ifi.in2000.team20.team20app.domain.model.Report
-import no.uio.ifi.in2000.team20.team20app.util.Constants
+import javax.inject.Inject
 
-class ChatGPTRemoteDataSource {
-    val openAI = OpenAI(Constants.CHATGPT_API_KEY)
+class ChatGPTRemoteDataSource @Inject constructor(
+    private val openAI: OpenAI
+) {
 
     suspend fun getReport(geoScore: GeoScore): String? {
 

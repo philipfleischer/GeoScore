@@ -1,15 +1,11 @@
 package no.uio.ifi.in2000.team20.team20app.ui.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.viewModelFactory
-import androidx.lifecycle.viewmodel.initializer
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.ui.NavDisplay
-import no.uio.ifi.in2000.team20.team20app.data.repository.SavedRepository
-import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetGeoScore
 import no.uio.ifi.in2000.team20.team20app.ui.components.AdaptiveNavigationScaffold
 import no.uio.ifi.in2000.team20.team20app.ui.screens.result.ClimateStatsScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GeoscoreScreen
@@ -20,7 +16,6 @@ import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GeoScoreViewModel
-import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetAiReport
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
@@ -31,18 +26,22 @@ import no.uio.ifi.in2000.team20.team20app.util.Screen
 Main changes (24.04.2026 adaptive-navigation-impl):
 - Replaced goToHome, goToMap and goToSaved with a general onNavigate to reduce repetition (I commented out old code).
 - Replaced ScreenScaffold with AdaptiveNavigationScaffold
+
+Hilt refactor:
+- Removed all ViewModel, repository, and use-case parameters.
+- All ViewModels are now obtained via hiltViewModel() at each nav entry.
 */
 @Composable
-fun NavigationRoot(
-    appViewModel: AppViewModel,
-    searchViewModel: SearchViewModel,
-    homeViewModel: HomeViewModel,
-    mapViewModel: MapViewModel,
-    frostViewModel: FrostViewModel,
-    savedRepository: SavedRepository,
-    getGeoScore: GetGeoScore,
-    getAiReport: GetAiReport
-){
+fun NavigationRoot() {
+    // Shared ViewModels — obtained once here and passed down where needed.
+    // hiltViewModel() scopes them to the activity's ViewModelStore, so they
+    // survive navigation and are the same instance across all entries.
+    val appViewModel: AppViewModel = hiltViewModel()
+    val frostViewModel: FrostViewModel = hiltViewModel()
+    val homeViewModel: HomeViewModel = hiltViewModel()
+    val mapViewModel: MapViewModel = hiltViewModel()
+    val searchViewModel: SearchViewModel = hiltViewModel()
+
     //BackStack
     val backStack = rememberNavBackStack(Screen.HOME.route)
 
@@ -77,12 +76,8 @@ fun NavigationRoot(
         backStack = backStack,
         onBack = goBack,
         entryProvider = entryProvider {
-            entry<Route.HomeDestination> { // Type parameter. Can't use Screen.XXX.route
-                val savedViewModel: SavedViewModel = viewModel(
-                    factory = viewModelFactory {
-                        initializer { SavedViewModel(savedRepository) }
-                    }
-                )
+            entry<Route.HomeDestination> {
+                val savedViewModel: SavedViewModel = hiltViewModel()
 
                 AdaptiveNavigationScaffold(
                     title = Screen.HOME.title,
@@ -102,11 +97,7 @@ fun NavigationRoot(
             }
 
             entry<Route.MapDestination> {
-                val savedViewModel: SavedViewModel = viewModel(
-                    factory = viewModelFactory {
-                        initializer { SavedViewModel(savedRepository) }
-                    }
-                )
+                val savedViewModel: SavedViewModel = hiltViewModel()
 
                 AdaptiveNavigationScaffold(
                     title = Screen.MAP.title,
@@ -128,11 +119,7 @@ fun NavigationRoot(
             }
 
             entry<Route.SavedDestination> {
-                val savedViewModel: SavedViewModel = viewModel(
-                    factory = viewModelFactory {
-                        initializer { SavedViewModel(savedRepository) }
-                    }
-                )
+                val savedViewModel: SavedViewModel = hiltViewModel()
 
                 AdaptiveNavigationScaffold(
                     title = Screen.SAVED.title,
@@ -144,8 +131,6 @@ fun NavigationRoot(
                         modifier = modifier,
                         sharedViewModel = appViewModel,
                         savedViewModel = savedViewModel,
-                        getGeoScore = getGeoScore,
-                        getAiReport = getAiReport,
                         onSavedClick = { location ->
                             appViewModel.setSelectedArea(location)
                             backStack.add(Route.GeoscoreDestination(location))
@@ -155,16 +140,8 @@ fun NavigationRoot(
             }
 
             entry<Route.GeoscoreDestination> { destination ->
-                val savedViewModel: SavedViewModel = viewModel(
-                    factory = viewModelFactory {
-                        initializer { SavedViewModel(savedRepository) }
-                    }
-                )
-                val geoScoreViewModel: GeoScoreViewModel = viewModel(
-                    factory = viewModelFactory {
-                        initializer { GeoScoreViewModel(getGeoScore, getAiReport) }
-                    }
-                )
+                val savedViewModel: SavedViewModel = hiltViewModel()
+                val geoScoreViewModel: GeoScoreViewModel = hiltViewModel()
 
                 AdaptiveNavigationScaffold(
                     title = destination.location.name,

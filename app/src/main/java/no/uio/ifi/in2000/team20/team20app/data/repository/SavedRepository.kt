@@ -5,8 +5,9 @@ import kotlinx.coroutines.flow.map
 import no.uio.ifi.in2000.team20.team20app.data.local.Dao.SavedLocationDao
 import no.uio.ifi.in2000.team20.team20app.data.local.Entity.SavedLocationEntity
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
+import javax.inject.Inject
 
-class SavedRepository(
+class SavedRepository @Inject constructor(
     private val dao: SavedLocationDao
 ) {
     fun getAllSaved(): Flow<List<Location>> {

@@ -6,14 +6,16 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import no.uio.ifi.in2000.team20.team20app.data.api.NveRoutes
 import no.uio.ifi.in2000.team20.team20app.data.dto.ArcGisResponseDto
+import no.uio.ifi.in2000.team20.team20app.di.NveZonesClient
+import javax.inject.Inject
 
 interface NveZonesRemoteDataSourceService {
     suspend fun getLandslideZoneData(lon:Double, lat:Double): ArcGisResponseDto
     suspend fun getFloodZoneData(lon:Double, lat:Double): ArcGisResponseDto
 }
 
-class NveZonesRemoteDataSource (
-    private val client: HttpClient,
+class NveZonesRemoteDataSource @Inject constructor(
+    @NveZonesClient private val client: HttpClient
 ) : NveZonesRemoteDataSourceService {
     override suspend fun getLandslideZoneData(lon:Double, lat:Double): ArcGisResponseDto {
         val response: ArcGisResponseDto = client.get(

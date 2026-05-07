@@ -3,8 +3,9 @@ package no.uio.ifi.in2000.team20.team20app.data.repository
 import no.uio.ifi.in2000.team20.team20app.data.datasource.ChatGPTRemoteDataSource
 import no.uio.ifi.in2000.team20.team20app.domain.model.GeoScore
 import no.uio.ifi.in2000.team20.team20app.domain.model.Report
+import javax.inject.Inject
 
-class ChatGPTRepository (
+class ChatGPTRepository @Inject constructor(
     private val DataSource: ChatGPTRemoteDataSource
 )
 {

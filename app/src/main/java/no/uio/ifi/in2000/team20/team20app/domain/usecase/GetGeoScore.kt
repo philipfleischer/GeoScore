@@ -3,14 +3,16 @@ package no.uio.ifi.in2000.team20.team20app.domain.usecase
 import no.uio.ifi.in2000.team20.team20app.data.local.Dao.TotalScoreCacheDao
 import no.uio.ifi.in2000.team20.team20app.data.local.Entity.TotalScoreCacheEntity
 import no.uio.ifi.in2000.team20.team20app.domain.model.GeoScore
+import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetVulnerabilityScore
 import no.uio.ifi.in2000.team20.team20app.util.Constants.EXPOSURESCORE_WEIGHT
 import no.uio.ifi.in2000.team20.team20app.util.Constants.HAZARDSCORE_WEIGHT
 import no.uio.ifi.in2000.team20.team20app.util.Constants.VULNERABILITYSCORE_WEIGHT
+import javax.inject.Inject
 
-class GetGeoScore(
+class GetGeoScore @Inject constructor(
     private val getExposureScore: GetExposureScore,
     private val getHazardScore: GetHazardScore,
-    private val getVulnerabilityScore: getVulnerabilityScore,
+    private val getVulnerabilityScore: GetVulnerabilityScore,
     private val geoScoreDAO: TotalScoreCacheDao
 ) {
     suspend fun calculateGeoScore(lat: Double, lon: Double): GeoScore {

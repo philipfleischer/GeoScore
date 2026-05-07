@@ -2,17 +2,18 @@ package no.uio.ifi.in2000.team20.team20app.domain.usecase
 
 import no.uio.ifi.in2000.team20.team20app.data.local.Dao.ExposureCacheDao
 import no.uio.ifi.in2000.team20.team20app.data.local.Entity.ExposureCacheEntity
-import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepository
+import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepositoryService
 import no.uio.ifi.in2000.team20.team20app.domain.model.ExposureScoreResult
 import no.uio.ifi.in2000.team20.team20app.util.Constants.EXTREME_PRECIPITATION_THRESHOLD
 import no.uio.ifi.in2000.team20.team20app.util.Constants.EXTREME_WIND_GUST_THRESHOLD
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MAX_EXTREME_WEATHER_COUNT
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MIN_EXTREME_WEATHER_COUNT
+import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.min
 
-class GetExposureScore(
-    private val frostRepository: FrostRepository,
+class GetExposureScore @Inject constructor(
+    private val frostRepository: FrostRepositoryService,
     private val exposureScoreDAO: ExposureCacheDao
 ) {
     suspend fun calculateExposureScore(lat: Double, lon: Double): ExposureScoreResult {

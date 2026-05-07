@@ -1,17 +1,18 @@
 package no.uio.ifi.in2000.team20.team20app.data.repository
 
-import no.uio.ifi.in2000.team20.team20app.data.datasource.AddressRemoteDataSource
+import no.uio.ifi.in2000.team20.team20app.data.datasource.AddressApiService
 import no.uio.ifi.in2000.team20.team20app.data.dto.Address
 import no.uio.ifi.in2000.team20.team20app.domain.model.AddressResponseWrapper
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.domain.model.SearchResult
+import javax.inject.Inject
 
 interface GeoSearchRepositoryService {
     suspend fun getSearchResults(query: String, lat: Double? = null, lon: Double? = null): SearchResult
 }
 
-class GeoSearchRepository(
-    private val addressDatasource: AddressRemoteDataSource
+class GeoSearchRepository @Inject constructor(
+    private val addressDatasource: AddressApiService
 ) : GeoSearchRepositoryService {
 
     private fun Address.toDomain(): Location? {

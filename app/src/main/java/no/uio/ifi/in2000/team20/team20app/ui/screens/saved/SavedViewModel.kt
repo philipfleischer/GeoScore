@@ -2,6 +2,7 @@ package no.uio.ifi.in2000.team20.team20app.ui.screens.saved
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -10,8 +11,10 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team20.team20app.data.repository.SavedRepository
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
+import javax.inject.Inject
 
-class SavedViewModel(
+@HiltViewModel
+class SavedViewModel @Inject constructor(
     private val repository: SavedRepository
 ) : ViewModel() {
 

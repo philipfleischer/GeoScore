@@ -5,6 +5,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.json.Json
 import no.uio.ifi.in2000.team20.team20app.data.datasource.FrostDataSourceService
+import javax.inject.Inject
 import no.uio.ifi.in2000.team20.team20app.data.dto.FrostV0ObservationResponseDto
 import no.uio.ifi.in2000.team20.team20app.data.dto.FrostV1ResponseDto
 import no.uio.ifi.in2000.team20.team20app.data.local.Dao.PrecipitationCacheDao
@@ -34,6 +35,7 @@ interface FrostRepositoryService {
     suspend fun getSunshineData(lat: Double, lon: Double): Result<Triple<List<Double>, String?, Double?>>
     suspend fun getSnowData(lat: Double, lon: Double): Result<Pair<List<Double>, List<Double>>>
     suspend fun getPrecipitationData(lat: Double, lon: Double): Result<Pair<List<Double>, List<Double>>>
+    suspend fun getWindAndPrecipitationObservations(lat: Double, lon: Double): WindAndPrecipitationObservationsResult
 }
 
 /**
@@ -54,7 +56,7 @@ interface FrostRepositoryService {
  * Why:
  * Separates concerns: UI should not care about endpoints or DTO structure.
  */
-class FrostRepository(
+class FrostRepository @Inject constructor(
     private val dataSource: FrostDataSourceService,
     private val temperatureCacheDao: TemperatureCacheDao,
     private val windCacheDao: WindCacheDao,
@@ -258,7 +260,7 @@ class FrostRepository(
             Pair(rainyDaysList, maxDailyList)
         }
 
-    suspend fun getWindAndPrecipitationObservations(
+    override suspend fun getWindAndPrecipitationObservations(
         lat: Double,
         lon: Double
     ): WindAndPrecipitationObservationsResult {
