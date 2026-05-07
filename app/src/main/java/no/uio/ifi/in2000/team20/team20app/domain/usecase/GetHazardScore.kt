@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team20.team20app.domain.usecase
 
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.HazardCacheEntity
 import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepositoryService
 import no.uio.ifi.in2000.team20.team20app.data.repository.ScoreCacheRepository
 import no.uio.ifi.in2000.team20.team20app.domain.model.HazardScoreResult
@@ -23,11 +22,7 @@ class GetHazardScore @Inject constructor(
         val locationKey = "%.2f, %.2f".format(lat, lon)
         val cachedResult = scoreCacheRepository.getHazardCache(locationKey)
         if (cachedResult != null) {
-            return HazardScoreResult(
-                precipitationScore = cachedResult.precipitationScore,
-                windScore = cachedResult.windScore,
-                hazardScore = cachedResult.score
-            )
+            return cachedResult
         }
 
         val windAndPrecipitationObservationsResult = frostRepository.getWindAndPrecipitationObservations(lat, lon)
@@ -64,14 +59,7 @@ class GetHazardScore @Inject constructor(
             hazardScore = score
         )
 
-        scoreCacheRepository.saveHazardScore(
-            HazardCacheEntity(
-                locationKey = locationKey,
-                precipitationScore = precipitationScore,
-                windScore = windScore,
-                score = score
-            )
-        )
+        scoreCacheRepository.saveHazardScore(locationKey, result)
 
         return result
     }

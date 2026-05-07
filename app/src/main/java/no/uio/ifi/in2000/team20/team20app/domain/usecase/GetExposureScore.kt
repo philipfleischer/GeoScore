@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team20.team20app.domain.usecase
 
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.ExposureCacheEntity
 import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepositoryService
 import no.uio.ifi.in2000.team20.team20app.data.repository.ScoreCacheRepository
 import no.uio.ifi.in2000.team20.team20app.domain.model.ExposureScoreResult
@@ -21,10 +20,7 @@ class GetExposureScore @Inject constructor(
         val locationKey = "%.2f, %.2f".format(lat, lon)
         val cachedResult = scoreCacheRepository.getExposureCache(locationKey)
         if (cachedResult != null) {
-            return ExposureScoreResult(
-                eventCount = cachedResult.eventCount,
-                exposureScore = cachedResult.score
-            )
+            return cachedResult
         }
 
         val result = frostRepository.getWindAndPrecipitationObservations(lat, lon)
@@ -41,17 +37,13 @@ class GetExposureScore @Inject constructor(
 
         val score = max(0.0, min(100.0, exposure))
 
-        scoreCacheRepository.saveExposureScore(
-            ExposureCacheEntity(
-                locationKey = locationKey,
-                eventCount = sumOfextremeWeatherDates,
-                score = score
-            )
-        )
-
-        return ExposureScoreResult(
+        val exposureResult = ExposureScoreResult(
             eventCount = sumOfextremeWeatherDates,
             exposureScore = score
         )
+
+        scoreCacheRepository.saveExposureScore(locationKey, exposureResult)
+
+        return exposureResult
     }
 }

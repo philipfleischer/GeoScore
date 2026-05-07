@@ -128,6 +128,7 @@ fun NavigationRoot() {
             }
 
             entry<Route.GeoscoreDestination> { destination ->
+                // Screen-specific ViewModel scoped to this nav entry
                 val geoScoreViewModel: GeoScoreViewModel = hiltViewModel()
 
                 AdaptiveNavigationScaffold(
