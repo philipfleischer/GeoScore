@@ -6,9 +6,9 @@ import androidx.compose.ui.graphics.Color
 // Light mode
 // TODO: Remove any unused colors and add all relevant colors
 // TODO: Rename colors to simple names such as LightBlue and DarkGray for easier use
-val BrightWhite = Color(255, 255, 255)
-val Platinum = Color(243, 245, 246)
-val PaleSky = Color(213, 236, 248)
+val White = Color(255, 255, 255)
+val OffWhite = Color(243, 245, 246)
+val LightBlue = Color(213, 236, 248)
 val CloudySky = Color(200, 220, 233)
 val MayaBlue = Color(110, 189, 254)
 val DustyBlue = Color(75, 151, 202)
@@ -30,6 +30,6 @@ val SteelGray = Color(0xFF9BA3AE)
 
 // Dark mode
 
-val Midnight = Color(8, 8, 12)
+val Black = Color(8, 8, 12)
 val Charcoal = Color(36, 38, 51)
-val DarkLake = Color(63, 70, 89)
+val DarkGray = Color(63, 70, 89)

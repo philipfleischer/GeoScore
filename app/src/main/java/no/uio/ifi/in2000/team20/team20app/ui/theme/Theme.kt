@@ -37,14 +37,14 @@ data class CustomTheme (
 
 //TODO: Change light theme colors
 val lightThemeColors = CustomTheme(
-    background = PaleSky,
-    onBackground = DarkLake,
+    background = LightBlue,
+    onBackground = DarkGray,
     tertiary = DarkBlue,
 //    onTertiary = Platinum,
     secondary = MayaBlue,
-    onSecondary = Midnight,
-    primary = Platinum, // Cards, boxes, columns
-    onPrimary = Midnight, // Main text color on card, boxes, columns
+    onSecondary = Black,
+    primary = OffWhite, // Cards, boxes, columns
+    onPrimary = Black, // Main text color on card, boxes, columns
     detail = CloudySky,
     button = MayaBlue,
     selected = MayaBlue,
@@ -62,21 +62,21 @@ val lightThemeColors = CustomTheme(
 
 //TODO: Change dark theme colors
 val darkThemeColors = CustomTheme(
-    background = Midnight,
-    onBackground = Platinum,
-    tertiary = PaleSky,
+    background = Black,
+    onBackground = OffWhite,
+    tertiary = LightBlue,
 //    onTertiary = ,
     secondary = Charcoal,
-    primary = DarkLake,
-    detail = Midnight,
+    primary = DarkGray,
+    detail = Black,
     button = MayaBlue,
 //    buttonDetail = DustyBlue,
 //    disabledButton = AliceBlue,
 //    disabledButtonDetail = Charcoal,
-    selected = DarkLake,
-    onPrimary = Platinum,
-    onSecondary = Platinum,
-    onSelected = Platinum,
+    selected = DarkGray,
+    onPrimary = OffWhite,
+    onSecondary = OffWhite,
+    onSelected = OffWhite,
     error = Salmon,
     warning = RoyalGold,
     trafficGreen = TrafficGreen,
@@ -87,39 +87,27 @@ val darkThemeColors = CustomTheme(
 
 // Material3 Color Schemes
 val LightColorScheme = lightColorScheme(
-    primary = DarkBlue,
-    onPrimary = BrightWhite,
-    primaryContainer = PaleSky,
-    onPrimaryContainer = DarkBlue,
-    secondary = MayaBlue,
-    onSecondary = BrightWhite,
-    secondaryContainer = AliceBlue,
-    onSecondaryContainer = DarkBlue,
-    background = Platinum,
-    onBackground = DarkBlue,
-    surface = BrightWhite,
-    onSurface = DarkBlue,
-    surfaceVariant = PaleSky,
-    onSurfaceVariant = SlateGray,
+    surface = LightBlue, // Essentially background
+    onSurface = Charcoal, // Text on background
+    surfaceContainerHigh = White, // Cards
+    surfaceContainerLow = OffWhite, // Bars/rails
+    onSurfaceVariant = Charcoal, // Text/ icons on bars/rails and cards
+    primary = MayaBlue, // Buttons/selected
+    onPrimary = Charcoal,
+    secondary = DarkBlue,
     error = Salmon,
-    onError = BrightWhite,
 )
 
 val DarkColorScheme = darkColorScheme(
+    surface = Black, // Essentially background
+    onSurface = White, // Text on background
+    surfaceContainerHigh = DarkGray, // Cards
+    surfaceContainerLow = DarkGray, // Bars/rails
+    onSurfaceVariant = White, //
     primary = MayaBlue,
-    onPrimary = Midnight,
-    primaryContainer = DarkLake,
-    onPrimaryContainer = MayaBlue,
+    onPrimary = White,
     secondary = MayaBlue,
-    onSecondary = Midnight,
-    background = Midnight,
-    onBackground = BrightWhite,
-    surface = Charcoal,
-    onSurface = BrightWhite,
-    surfaceVariant = DarkLake,
-    onSurfaceVariant = SteelGray,
-    error = Salmon,
-    onError = Midnight,
+    error = Salmon
 )
 
 val LocalTheme = staticCompositionLocalOf<CustomTheme> {

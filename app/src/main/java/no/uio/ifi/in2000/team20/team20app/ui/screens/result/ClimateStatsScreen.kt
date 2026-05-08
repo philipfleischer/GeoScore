@@ -48,18 +48,8 @@ import ir.ehsannarmani.compose_charts.models.Line
 import ir.ehsannarmani.compose_charts.models.DotProperties
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.unit.sp
-import ir.ehsannarmani.compose_charts.models.ZeroLineProperties
-import ir.ehsannarmani.compose_charts.models.PopupProperties
-import androidx.compose.animation.core.tween
-import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.text.TextStyle
-import androidx.window.core.layout.WindowSizeClass
-import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
 import ir.ehsannarmani.compose_charts.models.IndicatorCount
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -180,7 +170,7 @@ fun ClimateStatsScreen(
                                             curvedEdges = false,
                                             dotProperties = DotProperties(
                                                 enabled = true,
-                                                color = SolidColor(BrightWhite),
+                                                color = SolidColor(White),
                                                 radius = 4.dp,
                                                 strokeWidth = 2.dp,
                                                 strokeColor = SolidColor(MayaBlue)
@@ -195,7 +185,7 @@ fun ClimateStatsScreen(
                                             curvedEdges = false,
                                             dotProperties = DotProperties(
                                                 enabled = true,
-                                                color = SolidColor(BrightWhite),
+                                                color = SolidColor(White),
                                                 radius = 4.dp,
                                                 strokeWidth = 2.dp,
                                                 strokeColor = SolidColor(DustyBlue)
@@ -210,7 +200,7 @@ fun ClimateStatsScreen(
                                             curvedEdges = false,
                                             dotProperties = DotProperties(
                                                 enabled = true,
-                                                color = SolidColor(BrightWhite),
+                                                color = SolidColor(White),
                                                 radius = 4.dp,
                                                 strokeWidth = 2.dp,
                                                 strokeColor = SolidColor(Salmon)
@@ -260,7 +250,7 @@ fun ClimateStatsScreen(
                                             curvedEdges = false,
                                             dotProperties = DotProperties(
                                                 enabled = true,
-                                                color = SolidColor(BrightWhite),
+                                                color = SolidColor(White),
                                                 strokeColor = SolidColor(TrafficGreen)
                                             )
                                         ),
@@ -273,7 +263,7 @@ fun ClimateStatsScreen(
                                             curvedEdges = false,
                                             dotProperties = DotProperties(
                                                 enabled = true,
-                                                color = SolidColor(BrightWhite),
+                                                color = SolidColor(White),
                                                 strokeColor = SolidColor(RoyalGold)
                                             )
                                         ),
@@ -286,7 +276,7 @@ fun ClimateStatsScreen(
                                             curvedEdges = false,
                                             dotProperties = DotProperties(
                                                 enabled = true,
-                                                color = SolidColor(BrightWhite),
+                                                color = SolidColor(White),
                                                 strokeColor = SolidColor(TrafficRed)
                                             )
                                         )
@@ -331,7 +321,7 @@ fun ClimateStatsScreen(
                                             curvedEdges = false,
                                             dotProperties = DotProperties(
                                                 enabled = true,
-                                                color = SolidColor(BrightWhite),
+                                                color = SolidColor(White),
                                                 strokeColor = SolidColor(RoyalGold)
                                             )
                                         )
@@ -385,7 +375,7 @@ fun ClimateStatsScreen(
                                                 curvedEdges = false,
                                                 dotProperties = DotProperties(
                                                     enabled = true,
-                                                    color = SolidColor(BrightWhite),
+                                                    color = SolidColor(White),
                                                     radius = 4.dp,
                                                     strokeWidth = 2.dp,
                                                     strokeColor = SolidColor(MayaBlue)
@@ -413,7 +403,7 @@ fun ClimateStatsScreen(
                                                 curvedEdges = false,
                                                 dotProperties = DotProperties(
                                                     enabled = true,
-                                                    color = SolidColor(BrightWhite),
+                                                    color = SolidColor(White),
                                                     radius = 4.dp,
                                                     strokeWidth = 2.dp,
                                                     strokeColor = SolidColor(TrafficGreen)
@@ -459,7 +449,7 @@ fun ClimateStatsScreen(
                                             curvedEdges = false,
                                             dotProperties = DotProperties(
                                                 enabled = true,
-                                                color = SolidColor(BrightWhite),
+                                                color = SolidColor(White),
                                                 radius = 4.dp,
                                                 strokeWidth = 2.dp,
                                                 strokeColor = SolidColor(MayaBlue)
@@ -474,7 +464,7 @@ fun ClimateStatsScreen(
                                             curvedEdges = false,
                                             dotProperties = DotProperties(
                                                 enabled = true,
-                                                color = SolidColor(BrightWhite),
+                                                color = SolidColor(White),
                                                 radius = 4.dp,
                                                 strokeWidth = 2.dp,
                                                 strokeColor = SolidColor(DarkBlue)
