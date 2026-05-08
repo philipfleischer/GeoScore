@@ -2,6 +2,7 @@ package no.uio.ifi.in2000.team20.team20app.data.datasource
 
 import android.util.Log
 import io.ktor.client.HttpClient
+import io.ktor.client.call.DoubleReceiveException
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -9,6 +10,9 @@ import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.isSuccess
 import io.ktor.util.encodeBase64
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import no.uio.ifi.in2000.team20.team20app.data.api.FrostRoutes
 import no.uio.ifi.in2000.team20.team20app.data.dto.FrostV0AvailableTimeSeriesResponseDto
 import no.uio.ifi.in2000.team20.team20app.data.dto.FrostV0ObservationResponseDto
@@ -45,8 +49,8 @@ interface FrostDataSourceService {
     suspend fun getSnowDepthHistory(lat: Double, lon: Double): FrostV0ObservationResponseDto
     suspend fun getWindHistory(lat: Double, lon: Double): FrostV0ObservationResponseDto
     suspend fun getSunshineNormals(lat: Double, lon: Double): SunshineRawResult
-    suspend fun getRankedObservationsForPrecipitation(lat: Double, lon: Double, startYear: Int = 1980, endYear: Int = 2025, maxDist: Double = 10.0, maxCount: Int = 5): FrostV1ResponseDto
-    suspend fun getRankedObservationsForWind(lat: Double, lon: Double, startYear: Int = 1980, endYear: Int = 2025, maxDist: Double = 10.0, maxCount: Int = 5): FrostV1ResponseDto
+    suspend fun getRankedObservationsForPrecipitation(lat: Double, lon: Double, startYear: Int = 1990, endYear: Int = 2020, maxDist: Double = 10.0, maxCount: Int = 5): FrostV1ResponseDto
+    suspend fun getRankedObservationsForWind(lat: Double, lon: Double, startYear: Int = 19990, endYear: Int = 2020, maxDist: Double = 10.0, maxCount: Int = 5): FrostV1ResponseDto
 }
 
 class FrostDataSource @Inject constructor(
@@ -242,7 +246,7 @@ class FrostDataSource @Inject constructor(
     }
 
     // V1 ranked observation methods (used by GeoScore algorithm)
-    // Includes fallback to wider search radius if no stations found nearby
+    // Radii (10, 20, 30 km) are tried in parallel to avoid sequential fallback latency
 
     override suspend fun getRankedObservationsForPrecipitation(
         lat: Double,
@@ -251,19 +255,12 @@ class FrostDataSource @Inject constructor(
         endYear: Int,
         maxDist: Double,
         maxCount: Int
-    ): FrostV1ResponseDto {
-        for (dist in listOf(10.0, 20.0, 30.0)) {
-            val response: FrostV1ResponseDto = client.get(FrostRoutes.OBSERVATIONS_V1) {
-                parameter("nearest", buildNearest(lat, lon, dist, maxCount))
-                parameter("time", buildTime(startYear, endYear))
-                parameter("elementids", "sum(precipitation_amount P1D)")
-                parameter("incobs", true)
-                header("Authorization", authHeader)
-            }.body()
-            if (response.data.tseries.isNotEmpty()) return response
-        }
-        return FrostV1ResponseDto()
-    }
+    ): FrostV1ResponseDto = coroutineScope {
+        listOf(10.0, 20.0, 30.0)
+            .map { dist -> async { fetchV1(lat, lon, dist, maxCount, startYear, endYear, "sum(precipitation_amount P1D)") } }
+            .awaitAll()
+            .firstOrNull { it.data.tseries.isNotEmpty() }
+    } ?: FrostV1ResponseDto()
 
     override suspend fun getRankedObservationsForWind(
         lat: Double,
@@ -273,23 +270,41 @@ class FrostDataSource @Inject constructor(
         maxDist: Double,
         maxCount: Int
     ): FrostV1ResponseDto {
-        val windElementIds = listOf("max(wind_speed_of_gust P1D)", "mean(wind_speed P1D)")
-        for (dist in listOf(10.0, 20.0, 30.0)) {
-            for (elementId in windElementIds) {
-                val response: FrostV1ResponseDto = client.get(FrostRoutes.OBSERVATIONS_V1) {
-                    parameter("nearest", buildNearest(lat, lon, dist, maxCount))
-                    parameter("time", buildTime(startYear, endYear))
-                    parameter("elementids", elementId)
-                    parameter("incobs", true)
-                    header("Authorization", authHeader)
-                }.body()
-                if (response.data.tseries.isNotEmpty()) return response
-            }
+        // Round 1: wind gust at all radiuses in parallel
+        val gustResult = coroutineScope {
+            listOf(10.0, 20.0, 30.0)
+                .map { dist -> async { fetchV1(lat, lon, dist, maxCount, startYear, endYear, "max(wind_speed_of_gust P1D)") } }
+                .awaitAll()
+                .firstOrNull { it.data.tseries.isNotEmpty() }
         }
-        return FrostV1ResponseDto()
+        if (gustResult != null) return gustResult
+
+        // Round 2: fallback to mean wind speed at all radiuses in parallel
+        return coroutineScope {
+            listOf(10.0, 20.0, 30.0)
+                .map { dist -> async { fetchV1(lat, lon, dist, maxCount, startYear, endYear, "mean(wind_speed P1D)") } }
+                .awaitAll()
+                .firstOrNull { it.data.tseries.isNotEmpty() }
+        } ?: FrostV1ResponseDto()
     }
 
-    private fun buildNearest(lat: Double, lon: Double, maxDist: Double = 10.0, maxCount: Int = 5): String {
+    private suspend fun fetchV1(
+        lat: Double,
+        lon: Double,
+        dist: Double,
+        maxCount: Int,
+        startYear: Int,
+        endYear: Int,
+        elementId: String
+    ): FrostV1ResponseDto = client.get(FrostRoutes.OBSERVATIONS_V1) {
+        parameter("nearest", buildNearest(lat, lon, dist, maxCount))
+        parameter("referencetime", buildTime(startYear, endYear))
+        parameter("elementids", elementId)
+        parameter("incobs", true)
+        header("Authorization", authHeader)
+    }.body()
+
+    private fun buildNearest(lat: Double, lon: Double, maxDist: Double = 10.0, maxCount: Int = 2): String {
         return """{"maxdist":$maxDist,"maxcount":$maxCount,"points":[{"lon":$lon,"lat":$lat}]}"""
     }
 
