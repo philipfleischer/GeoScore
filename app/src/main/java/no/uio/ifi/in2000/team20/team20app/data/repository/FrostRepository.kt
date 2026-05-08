@@ -3,21 +3,21 @@ package no.uio.ifi.in2000.team20.team20app.data.repository
 import android.util.Log
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import no.uio.ifi.in2000.team20.team20app.data.datasource.FrostDataSourceService
+import javax.inject.Inject
+import no.uio.ifi.in2000.team20.team20app.data.dto.FrostV0ObservationResponseDto
+import no.uio.ifi.in2000.team20.team20app.data.dto.FrostV1ResponseDto
 import no.uio.ifi.in2000.team20.team20app.data.local.Dao.PrecipitationCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.PrecipitationCacheEntity
 import no.uio.ifi.in2000.team20.team20app.data.local.Dao.SnowCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.SnowCacheEntity
 import no.uio.ifi.in2000.team20.team20app.data.local.Dao.SunshineCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.SunshineCacheEntity
 import no.uio.ifi.in2000.team20.team20app.data.local.Dao.TemperatureCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.TemperatureCacheEntity
 import no.uio.ifi.in2000.team20.team20app.data.local.Dao.WindCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.Entity.PrecipitationCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.Entity.SnowCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.Entity.SunshineCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.Entity.TemperatureCacheEntity
 import no.uio.ifi.in2000.team20.team20app.data.local.Entity.WindCacheEntity
-import no.uio.ifi.in2000.team20.team20app.data.model.FrostV0ObservationResponseDto
-import no.uio.ifi.in2000.team20.team20app.data.model.FrostV1ResponseDto
 import no.uio.ifi.in2000.team20.team20app.domain.model.WindAndPrecipitationObservationsResult
 
 /**
@@ -35,6 +35,7 @@ interface FrostRepositoryService {
     suspend fun getSunshineData(lat: Double, lon: Double): Result<Triple<List<Double>, String?, Double?>>
     suspend fun getSnowData(lat: Double, lon: Double): Result<Pair<List<Double>, List<Double>>>
     suspend fun getPrecipitationData(lat: Double, lon: Double): Result<Pair<List<Double>, List<Double>>>
+    suspend fun getWindAndPrecipitationObservations(lat: Double, lon: Double): WindAndPrecipitationObservationsResult
 }
 
 /**
@@ -55,7 +56,7 @@ interface FrostRepositoryService {
  * Why:
  * Separates concerns: UI should not care about endpoints or DTO structure.
  */
-class FrostRepository(
+class FrostRepository @Inject constructor(
     private val dataSource: FrostDataSourceService,
     private val temperatureCacheDao: TemperatureCacheDao,
     private val windCacheDao: WindCacheDao,
@@ -259,7 +260,7 @@ class FrostRepository(
             Pair(rainyDaysList, maxDailyList)
         }
 
-    suspend fun getWindAndPrecipitationObservations(
+    override suspend fun getWindAndPrecipitationObservations(
         lat: Double,
         lon: Double
     ): WindAndPrecipitationObservationsResult {

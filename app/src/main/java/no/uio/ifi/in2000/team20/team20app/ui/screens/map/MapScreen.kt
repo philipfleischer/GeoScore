@@ -24,13 +24,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.window.core.layout.WindowSizeClass
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -62,9 +65,9 @@ import java.math.RoundingMode
 @Composable
 fun MapScreen(
     modifier: Modifier = Modifier,
-    sharedViewModel: AppViewModel = viewModel(),
+    sharedViewModel: AppViewModel = hiltViewModel(),
     savedViewModel: SavedViewModel,
-    mapViewModel: MapViewModel = viewModel(),
+    mapViewModel: MapViewModel = hiltViewModel(),
     onOpenSearch: () -> Unit = {},
     onOpenReport: () -> Unit = {}
 ) {
@@ -103,10 +106,7 @@ fun MapScreen(
         }
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
         val context = LocalContext.current
         val mapStyleOptions = MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style)
         GoogleMap(
@@ -152,9 +152,9 @@ fun MapScreen(
                 .align(Alignment.TopStart)
                 .fillMaxWidth()
                 .padding(
-                    top = (DEFAULT_PADDING_DP*2).dp,
+                    top = (DEFAULT_PADDING_DP * 2).dp,
                     start = DEFAULT_PADDING_DP.dp,
-                    end = if (compactScreenWidth) DEFAULT_PADDING_DP.dp else (DEFAULT_PADDING_DP*4).dp,
+                    end = if (compactScreenWidth) DEFAULT_PADDING_DP.dp else (DEFAULT_PADDING_DP * 4).dp,
                     bottom = DEFAULT_PADDING_DP.dp
                 ),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -171,7 +171,7 @@ fun MapScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Search,
-                        contentDescription = "Søk etter adresse",
+                        contentDescription = "Search",
                         modifier = Modifier.size(24.dp)
                     )
                 }

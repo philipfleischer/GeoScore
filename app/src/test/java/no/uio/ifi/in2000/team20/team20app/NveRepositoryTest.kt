@@ -1,7 +1,14 @@
 package no.uio.ifi.in2000.team20.team20app
 
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.request.header
+import io.ktor.http.HttpHeaders
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.runBlocking
-import no.uio.ifi.in2000.team20.team20app.data.api.NveZonesClientProvider
+import kotlinx.serialization.json.Json
 import no.uio.ifi.in2000.team20.team20app.data.datasource.NveZonesRemoteDataSource
 import no.uio.ifi.in2000.team20.team20app.data.repository.NveZonesRepository
 import org.junit.Assert.assertFalse
@@ -14,7 +21,11 @@ import org.junit.Test
  */
 class NveRepositoryTest {
 
-    private val dataSource = NveZonesRemoteDataSource(NveZonesClientProvider.client)
+    private val client = HttpClient(CIO) {
+        install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
+        defaultRequest { header(HttpHeaders.Accept, "application/json") }
+    }
+    private val dataSource = NveZonesRemoteDataSource(client)
     private val repo = NveZonesRepository(dataSource)
 
     // Koordinater i flomsone, ikke skredsone

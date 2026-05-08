@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team20.team20app.ui.screens.saved
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,13 +31,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.CollectionInfo
+import androidx.compose.ui.semantics.CollectionItemInfo
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.collectionInfo
+import androidx.compose.ui.semantics.collectionItemInfo
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetAiReport
 import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetGeoScore
@@ -55,8 +64,6 @@ fun SavedScreen(
     modifier: Modifier = Modifier,
     sharedViewModel: AppViewModel,
     savedViewModel: SavedViewModel,
-    getGeoScore: GetGeoScore,
-    getAiReport: GetAiReport,
     onSavedClick: (Location) -> Unit
 ) {
     val saved by savedViewModel.saved.collectAsStateWithLifecycle()
@@ -89,12 +96,7 @@ fun SavedScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(saved) { area ->
-                    val geoScoreViewModel: GeoScoreViewModel = viewModel(
-                        key = area.address,
-                        factory = viewModelFactory {
-                            initializer { GeoScoreViewModel(getGeoScore, getAiReport) }
-                        }
-                    )
+                    val geoScoreViewModel: GeoScoreViewModel = hiltViewModel(key = area.address)
                     SavedLocationCard(
                         location = area,
                         geoScoreViewModel = geoScoreViewModel,
@@ -121,7 +123,7 @@ private fun SavedLocationCard(
     location: Location,
     geoScoreViewModel: GeoScoreViewModel,
     onOpenReport: () -> Unit,
-    onSavedToggle: (Boolean) -> Unit
+    onSavedToggle: (Boolean) -> Unit,
 ) {
     val geoState by geoScoreViewModel.uiState.collectAsStateWithLifecycle()
 
@@ -140,9 +142,30 @@ private fun SavedLocationCard(
     LaunchedEffect(location) {
         geoScoreViewModel.load(location)
     }
+
+    // Saved geo-score result cards
     Card(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .semantics(mergeDescendants = true) {
+                customActions = listOf(
+                    CustomAccessibilityAction(
+                        label = "Delete saved address",
+                        action = {
+                            onSavedToggle(true)
+                            true
+                        }
+                    ),
+                    CustomAccessibilityAction(
+                        label = "Open geoscore repport",
+                        action = {
+                            onOpenReport()
+                            true
+                        }
+                    )
+                )
+            }
+        ,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         ),
@@ -160,7 +183,9 @@ private fun SavedLocationCard(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .semantics{ isTraversalGroup = true }
+                ,
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
@@ -225,7 +250,9 @@ private fun SavedLocationCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = 16.dp, vertical = 12.dp)
+                .clearAndSetSemantics{},
+
             horizontalArrangement = Arrangement.End
         ) {
             Button(

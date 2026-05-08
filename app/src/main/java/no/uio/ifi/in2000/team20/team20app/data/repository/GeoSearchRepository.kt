@@ -1,17 +1,18 @@
 package no.uio.ifi.in2000.team20.team20app.data.repository
 
-import android.util.Log
-import no.uio.ifi.in2000.team20.team20app.data.datasource.AddressRemoteDataSource
-import no.uio.ifi.in2000.team20.team20app.data.model.Address
+import no.uio.ifi.in2000.team20.team20app.data.datasource.AddressApiService
+import no.uio.ifi.in2000.team20.team20app.data.dto.Address
+import no.uio.ifi.in2000.team20.team20app.domain.model.AddressResponseWrapper
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.domain.model.SearchResult
+import javax.inject.Inject
 
 interface GeoSearchRepositoryService {
     suspend fun getSearchResults(query: String, lat: Double? = null, lon: Double? = null): SearchResult
 }
 
-class GeoSearchRepository(
-    private val addressDatasource: AddressRemoteDataSource
+class GeoSearchRepository @Inject constructor(
+    private val addressDatasource: AddressApiService
 ) : GeoSearchRepositoryService {
 
     private fun Address.toDomain(): Location? {
@@ -31,20 +32,12 @@ class GeoSearchRepository(
         lat: Double?,
         lon: Double?
     ): SearchResult {
+        // SearchResult now contains the (potentially empty) list of locations and a status code
+        val response: AddressResponseWrapper = addressDatasource.searchAddress(query)
 
-        //Geonorge-adresse-API returns error eror on short queryes, catch the error here and return an emtpty list
-        val addresses = try {
-            addressDatasource.searchAddress(query).adresser.mapNotNull { it.toDomain() }
-        } catch (e: Exception) {
-            Log.d("GeoSearch", "Address API failed for query \"$query\": ${e.message}")
-            emptyList()
-        }
-
-
-        Log.d("GeoSearch", "addresses: ${addresses.size}")
-
-        return SearchResult(addresses)
-
-
+       return SearchResult(
+           locations = response.addresses.mapNotNull { it.toDomain() },
+           status = response.status
+       )
     }
 }
