@@ -45,7 +45,7 @@ class ChatGPTRemoteDataSource @Inject constructor(
                             "- Forklare hva risikoen innebærer for området og boliger\n" +
                             "- Være skrevet på norsk i en saklig, informativ tone\n" +
                             "- Kan ikke inneholde overskrifter.\n" +
-                            "- Skal inneholde en punktliste av tiltak for boliger\n" +
+                            "- Skal inneholde en punktliste av tiltak for boliger dersom karakteren for avsnittet er lavere enn en B\n" +
                             "- Kan nevne karakteren men ikke scoren\n" +
                             "\n" +
                             "VIKTIG FORMATERING:\n" +
