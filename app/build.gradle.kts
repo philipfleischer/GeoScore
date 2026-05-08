@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
+    alias(libs.plugins.kotlin.parcelize)
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
