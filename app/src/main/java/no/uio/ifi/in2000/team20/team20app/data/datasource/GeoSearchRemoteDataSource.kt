@@ -7,6 +7,7 @@ import io.ktor.client.request.get
 import io.ktor.http.takeFrom
 import io.ktor.utils.io.CancellationException
 import no.uio.ifi.in2000.team20.team20app.data.dto.AddressResponse
+import no.uio.ifi.in2000.team20.team20app.di.GeoSearchClient
 import no.uio.ifi.in2000.team20.team20app.domain.model.AddressResponseWrapper
 import no.uio.ifi.in2000.team20.team20app.util.Constants.ADDRESS_URL_FORMATTER
 import no.uio.ifi.in2000.team20.team20app.util.Constants.CANCELLED_SEARCH
@@ -15,15 +16,16 @@ import no.uio.ifi.in2000.team20.team20app.util.Constants.HTTP_OK
 import no.uio.ifi.in2000.team20.team20app.util.Constants.HTTP_SERVER_ERROR
 import no.uio.ifi.in2000.team20.team20app.util.Constants.NO_INTERNET
 import java.net.URLEncoder
+import javax.inject.Inject
 
 
 interface AddressApiService {
     suspend fun searchAddress(query: String): AddressResponseWrapper
 }
 
-class AddressRemoteDataSource(
-    private val client: HttpClient
-): AddressApiService {
+class AddressRemoteDataSource @Inject constructor(
+    @GeoSearchClient private val client: HttpClient
+) : AddressApiService {
     override suspend fun searchAddress(query: String): AddressResponseWrapper {
 
         // TODO(Is this a blocking call?)

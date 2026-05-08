@@ -41,13 +41,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
-import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetGeoScore
-import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetAiReport
 import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GeoScoreViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
@@ -63,8 +59,6 @@ fun SavedScreen(
     modifier: Modifier = Modifier,
     sharedViewModel: AppViewModel,
     savedViewModel: SavedViewModel,
-    getGeoScore: GetGeoScore,
-    getAiReport: GetAiReport,
     onSavedClick: (Location) -> Unit
 ) {
     val saved by savedViewModel.saved.collectAsStateWithLifecycle()
@@ -97,12 +91,7 @@ fun SavedScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(saved) { area ->
-                    val geoScoreViewModel: GeoScoreViewModel = viewModel(
-                        key = area.address,
-                        factory = viewModelFactory {
-                            initializer { GeoScoreViewModel(getGeoScore, getAiReport) }
-                        }
-                    )
+                    val geoScoreViewModel: GeoScoreViewModel = hiltViewModel(key = area.address)
                     SavedLocationCard(
                         location = area,
                         geoScoreViewModel = geoScoreViewModel,

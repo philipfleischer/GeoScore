@@ -6,6 +6,7 @@ plugins {
     //Serialization
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt.android)
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
@@ -132,5 +133,8 @@ dependencies {
     //ChatGpt
     implementation(libs.openai.client)
 
-
+    // Hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+    implementation(libs.hilt.navigation.compose)
 }

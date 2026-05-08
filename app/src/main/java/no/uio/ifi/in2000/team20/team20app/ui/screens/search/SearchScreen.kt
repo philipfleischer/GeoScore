@@ -38,8 +38,8 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.components.ErrorState
 import no.uio.ifi.in2000.team20.team20app.ui.components.LoadingState
@@ -87,7 +87,7 @@ fun SearchBarObject(
 fun SearchScreen(
     onBackClick: () -> Unit,
     onLocationSelected: (Location) -> Unit,
-    searchViewModel: SearchViewModel = viewModel(),
+    searchViewModel: SearchViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
 ) {
     val uiState by searchViewModel.uiState.collectAsStateWithLifecycle()

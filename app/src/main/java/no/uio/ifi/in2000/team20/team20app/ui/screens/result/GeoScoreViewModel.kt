@@ -2,6 +2,7 @@ package no.uio.ifi.in2000.team20.team20app.ui.screens.result
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,6 +14,7 @@ import no.uio.ifi.in2000.team20.team20app.domain.model.Report
 import no.uio.ifi.in2000.team20.team20app.domain.model.scoreToGrade
 import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetAiReport
 import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetGeoScore
+import javax.inject.Inject
 
 data class GeoScoreUiState(
     val isScoreLoading: Boolean = false,
@@ -25,7 +27,8 @@ data class GeoScoreUiState(
     val reportError: String? = null
 )
 
-class GeoScoreViewModel(
+@HiltViewModel
+class GeoScoreViewModel @Inject constructor(
     private val getGeoScore: GetGeoScore,
     private val getAiReport: GetAiReport
 ) : ViewModel() {

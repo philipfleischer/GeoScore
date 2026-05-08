@@ -2,6 +2,7 @@ package no.uio.ifi.in2000.team20.team20app.ui.screens.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,8 +17,10 @@ import no.uio.ifi.in2000.team20.team20app.util.Constants.HTTP_CLIENT_ERROR
 import no.uio.ifi.in2000.team20.team20app.util.Constants.HTTP_OK
 import no.uio.ifi.in2000.team20.team20app.util.Constants.HTTP_SERVER_ERROR
 import no.uio.ifi.in2000.team20.team20app.util.Constants.NO_INTERNET
+import javax.inject.Inject
 
-class SearchViewModel(
+@HiltViewModel
+class SearchViewModel @Inject constructor(
     private val repository: GeoSearchRepositoryService
 ) : ViewModel() {
 
