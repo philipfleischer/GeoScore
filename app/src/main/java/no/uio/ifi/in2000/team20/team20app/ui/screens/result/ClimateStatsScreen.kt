@@ -61,18 +61,18 @@ fun ClimateStatsScreen(
     frostViewModel: FrostViewModel
 ) {
     val frostUiState by frostViewModel.uiState.collectAsStateWithLifecycle()
-    val theme = LocalTheme.current
 
     LaunchedEffect(location) {
         frostViewModel.loadFrostStats(location)
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surface)
+                    .background(MaterialTheme.colorScheme.surfaceContainerLow)
                     .windowInsetsPadding(WindowInsets.statusBars)
                     .semantics{
                         onClick(
@@ -84,13 +84,21 @@ fun ClimateStatsScreen(
                         )
                     }
             ) {
-                SecondaryTabRow(selectedTabIndex = 1, modifier = Modifier.fillMaxWidth()) {
+                SecondaryTabRow(
+                    selectedTabIndex = 1,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.surfaceContainerLow)
+                ) {
                     Tab(
+                        modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainerLow),
                         selected = false,
                         onClick = onRapportClick,
-                        text = { Text("Rapport") }
+                        text = { Text("Rapport") },
+
                     )
                     Tab(
+                        modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainerLow),
                         selected = true,
                         onClick = { },
                         text = { Text("Historisk klimadata") }
@@ -109,11 +117,7 @@ fun ClimateStatsScreen(
             }
         }
     ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(theme.background)
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {  // Why box?
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -129,7 +133,7 @@ fun ClimateStatsScreen(
                     Icon(
                         imageVector = Icons.Outlined.Home,
                         contentDescription = null,
-                        tint = theme.tertiary,
+                        tint = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier
                             .size(36.dp)
                             .padding(end = 8.dp)
@@ -138,7 +142,7 @@ fun ClimateStatsScreen(
                         text = location.name,
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
-                        color = theme.tertiary
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 }
             }
@@ -502,11 +506,12 @@ private fun ChartSection(
 ) {
     SectionCard(
         title = title,
-        cardColor = LocalTheme.current.secondary
+        cardColor = MaterialTheme.colorScheme.surfaceContainerHigh
     ) {
         Text(
             text = description,
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f)
         )
         Spacer(modifier = Modifier.height(12.dp))
 

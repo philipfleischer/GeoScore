@@ -95,6 +95,7 @@ val LightColorScheme = lightColorScheme(
     primary = MayaBlue, // Buttons/selected
     onPrimary = Charcoal,
     secondary = DarkBlue,
+    onSecondary = White,
     error = Salmon,
 )
 
@@ -107,6 +108,7 @@ val DarkColorScheme = darkColorScheme(
     primary = MayaBlue,
     onPrimary = White,
     secondary = MayaBlue,
+    onSecondary = White,
     error = Salmon
 )
 

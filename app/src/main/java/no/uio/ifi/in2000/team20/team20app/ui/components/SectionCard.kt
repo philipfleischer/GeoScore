@@ -46,7 +46,8 @@ fun SectionCard(
                 text = title,
                 style = if (isCompact) MaterialTheme.typography.titleLarge
                         else MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.secondary
             )
             Spacer(modifier = Modifier.height(12.dp))
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)

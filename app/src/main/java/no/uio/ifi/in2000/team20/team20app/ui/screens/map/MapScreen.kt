@@ -9,9 +9,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -22,6 +25,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.CustomAccessibilityAction
@@ -50,6 +54,7 @@ import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
+import no.uio.ifi.in2000.team20.team20app.util.Constants.SMALL_PADDING_DP
 import no.uio.ifi.in2000.team20.team20app.util.Constants.LARGE_PADDING_DP
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_ZOOM
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MAX_ZOOM
@@ -166,27 +171,34 @@ fun MapScreen(
             ) {
                 FloatingActionButton(
                     onClick = onOpenSearch,
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(48.dp)
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.clip(CircleShape)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Search,
                         contentDescription = "Search",
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colorScheme.onSecondary
                     )
                 }
 
                 if (chosenPosition != null) {
-                    Button(onClick = onOpenReport) {
-                        Text("Vis rapport")
+                    Button(
+                        onClick = onOpenReport,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.secondary
+                        )
+                    ) {
+                        Text("Vis rapport", color = MaterialTheme.colorScheme.onSecondary)
                     }
                 }
             }
+
             if (chosenPosition != null) {
                 Text(
                     text = chosenPosition!!.name,
                     style = MaterialTheme.typography.labelLarge,
-                    fontSize = 30.sp,
+                    fontSize = 20.sp,
                     color = Color.Black,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.semantics { heading() }
