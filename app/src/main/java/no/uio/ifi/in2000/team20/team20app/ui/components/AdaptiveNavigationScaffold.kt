@@ -20,6 +20,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.NavigationDrawerItemColors
+import androidx.compose.material3.NavigationRailItemColors
+import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuite
@@ -29,9 +32,11 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffo
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import no.uio.ifi.in2000.team20.team20app.ui.theme.LocalTheme
 import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
+import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
 
 /*
 Main changes done (24.04.2026 adaptive-navigation-impl):
@@ -47,7 +52,7 @@ fun AdaptiveNavigationScaffold (
     onBackClick: () -> Unit = {},
     content: @Composable (Modifier) -> Unit
 ){
-    val theme = LocalTheme.current
+    val theme = MaterialTheme.colorScheme
     val compactScreenWidth = !LocalWindowSizeClass.current
         .isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
 
@@ -60,32 +65,43 @@ fun AdaptiveNavigationScaffold (
 
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = theme.background
+        color = theme.surface
     ){
         NavigationSuiteScaffoldLayout(
             navigationSuite = {
                 Surface(
                     modifier = Modifier
                         .windowInsetsPadding(WindowInsets.navigationBars)
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                        .padding((DEFAULT_PADDING_DP/2).dp),
                     shape = navShape,
-                    color = theme.background
+//                    color = theme.surface
                 ){
+                    val itemColors = NavigationSuiteDefaults.itemColors(
+                        navigationBarItemColors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = theme.onPrimary,
+                            indicatorColor = theme.primary
+                        ),
+                        navigationRailItemColors = NavigationRailItemDefaults.colors(
+                            selectedIconColor = theme.onPrimary,
+                            indicatorColor = theme.primary
+                        )
+                    )
                     NavigationSuite(
                         layoutType = layoutType,
                         colors = NavigationSuiteDefaults.colors(
-                            navigationBarContainerColor = theme.primary,
-                            navigationBarContentColor = theme.primary,
-                            navigationRailContainerColor = theme.primary,
-                            navigationRailContentColor = theme.primary
+                            navigationBarContainerColor = theme.surfaceContainerLow,
+                            navigationBarContentColor = theme.surfaceContainerLow,
+                            navigationRailContainerColor = theme.surfaceContainerLow,
+                            navigationRailContentColor = theme.surfaceContainerLow
                         )
                     ) {
                         Screen.entries.forEach { screen ->
                             item(
                                 selected = screen.route == highlightedDest,
                                 onClick = { onNavigate(screen) },
-                                icon = { Icon(screen.icon, contentDescription = screen.title) },
-                                label = { Text(screen.title) },
+                                icon = { Icon(screen.icon, contentDescription = screen.title, tint = theme.onSurfaceVariant) },
+                                label = { Text(screen.title, color = theme.onSurfaceVariant) },
+                                colors = itemColors
                             )
                         }
                     }

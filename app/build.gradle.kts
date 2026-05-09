@@ -33,6 +33,9 @@ android {
 
         val FROST_V0_CLIENT_SECRET = properties.getProperty("FROST_V0_CLIENT_SECRET") ?: ""
         buildConfigField("String", "FROST_V0_CLIENT_SECRET", "\"$FROST_V0_CLIENT_SECRET\"")
+
+        val CHATGPT_API_KEY = properties.getProperty("CHATGPT_API_KEY") ?: ""
+        buildConfigField("String", "CHATGPT_API_KEY", "\"$CHATGPT_API_KEY\"")
     }
 
     buildTypes {

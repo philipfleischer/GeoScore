@@ -80,24 +80,26 @@ fun GeoscoreScreen(
     }
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.primaryContainer,
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surface)
+                    .background(MaterialTheme.colorScheme.surfaceContainerLow)
                     .windowInsetsPadding(WindowInsets.statusBars)
             ) {
                 SecondaryTabRow(selectedTabIndex = 0, modifier = Modifier.fillMaxWidth().semantics{isTraversalGroup = true}) {
                     Tab(
                         modifier = Modifier
+                            .background(MaterialTheme.colorScheme.surfaceContainerLow)
                             .semantics{ onClick(label = "See geo-score rapport for ${location.name}", action = { true })},
                         selected = true,
                         onClick = { },
-                        text = { Text("Rapport") }
+                        text = { Text("Rapport", color = MaterialTheme.colorScheme.secondary) }
                     )
                     Tab(
                         modifier = Modifier
+                            .background(MaterialTheme.colorScheme.surfaceContainerLow)
                             .semantics{ onClick(
                                 label = "See historic climate data for ${location.name}",
                                 action = {
@@ -106,7 +108,7 @@ fun GeoscoreScreen(
                                 })},
                         selected = false,
                         onClick = onHistoricDataClick,
-                        text = { Text("Historisk klimadata") }
+                        text = { Text("Historisk klimadata", color = MaterialTheme.colorScheme.secondary) }
                     )
                 }
 
@@ -116,7 +118,8 @@ fun GeoscoreScreen(
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Tilbake"
+                        contentDescription = "Tilbake",
+                        tint = MaterialTheme.colorScheme.secondary
                     )
                 }
             }
@@ -132,13 +135,13 @@ fun GeoscoreScreen(
             return@Scaffold
         }
 
-
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
             contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+
         ) {
             item {
                 GeomarkingCard(
@@ -158,7 +161,8 @@ fun GeoscoreScreen(
             item {
                 Text(
                     text = "Detaljert analyse",
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
+
 
                 )
             }
@@ -252,7 +256,7 @@ private fun GeomarkingCard(
             .fillMaxWidth()
             .semantics(mergeDescendants = true){},
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
         )
     ) {
         Row(
@@ -274,12 +278,13 @@ private fun GeomarkingCard(
             ) {
                 Text(
                     text = location.name,
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
                     text = gradeToRiskLabel(geoState.grade),
                     style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.75f)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f)
                 )
             }
 
@@ -296,7 +301,8 @@ private fun GeomarkingCard(
             ) {
                 Icon(
                     imageVector = if (isCurrentSaved) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
-                    contentDescription = if (isCurrentSaved) "Address saved" else "Address not saved"
+                    contentDescription = if (isCurrentSaved) "Address saved" else "Address not saved",
+                    tint = MaterialTheme.colorScheme.secondary
                 )
             }
         }

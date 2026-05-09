@@ -63,13 +63,13 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     sharedViewModel: AppViewModel = hiltViewModel(),
     savedViewModel: SavedViewModel,
-    frostViewModel: FrostViewModel
+    frostViewModel: FrostViewModel,
+    theme: MaterialTheme = MaterialTheme,
 ) {
     val location by sharedViewModel.selectedLocation.collectAsStateWithLifecycle()
 
     // Calculates window width and returns true if the size width class is compact, and false for everything else.
     val compactScreenWidth = !LocalWindowSizeClass.current.isWidthAtLeastBreakpoint(MEDIUM_SCREEN_WIDTH)
-    val theme = LocalTheme.current
 
     LaunchedEffect(location) {
         if(location != null) {
@@ -111,7 +111,7 @@ fun HomeScreen(
                     text = "Vit hva du kjøper - før du kjøper det",
                     fontSize = 40.sp,
                     lineHeight = 48.sp,
-                    color = theme.tertiary,
+                    color = theme.colorScheme.secondary,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.semantics{ heading() }
                 )
@@ -120,7 +120,7 @@ fun HomeScreen(
                             "basert på geologisk og meterologisk data.",
                     style = MaterialTheme.typography.bodyMedium,
                     fontSize = 20.sp,
-                    color = theme.onBackground
+                    color = theme.colorScheme.onSurface
                 )
             }
         }
@@ -136,8 +136,9 @@ fun ExpandableInfoBox(
     modifier: Modifier = Modifier,
     rightContent: @Composable (() -> Unit)? = null,
     initiallyExpanded: Boolean = false,
-    cardColor: Color = MaterialTheme.colorScheme.surface,
-    content: @Composable () -> Unit
+    cardColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
+    theme: MaterialTheme = MaterialTheme,
+    content: @Composable () -> Unit,
 ) {
     var isExpanded by remember { mutableStateOf(initiallyExpanded) }
 
@@ -176,7 +177,7 @@ fun ExpandableInfoBox(
             AnimatedVisibility(visible = isExpanded) {
                 Column {
                     Spacer(modifier = Modifier.height(12.dp))
-                    Divider(color = MaterialTheme.colorScheme.outlineVariant)
+                    Divider(color = theme.colorScheme.outlineVariant)
                     Spacer(modifier = Modifier.height(12.dp))
                     content()
                 }
@@ -191,12 +192,13 @@ fun GeomarkingInfoBox(
     geomarking: String,
     riskLabel: String,
     expandedText: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    theme: MaterialTheme = MaterialTheme
 ) {
     ExpandableInfoBox(
         title = selectedLocation,
         modifier = modifier,
-        cardColor = MaterialTheme.colorScheme.secondaryContainer,
+        cardColor = theme.colorScheme.secondaryContainer,
         rightContent = {
             GeomarkingBadge(
                 grade = geomarking
@@ -205,15 +207,15 @@ fun GeomarkingInfoBox(
     ) {
         Text(
             text = "Samlet vurdering",
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.75f)
+            style = theme.typography.labelLarge,
+            color = theme.colorScheme.onSecondaryContainer.copy(alpha = 0.75f)
         )
 
         Spacer(modifier = Modifier.height(6.dp))
 
         Text(
             text = riskLabel,
-            style = MaterialTheme.typography.titleLarge,
+            style = theme.typography.titleLarge,
             fontWeight = FontWeight.Bold
         )
 
@@ -221,7 +223,7 @@ fun GeomarkingInfoBox(
 
         Text(
             text = expandedText,
-            style = MaterialTheme.typography.bodyMedium
+            style = theme.typography.bodyMedium
         )
     }
 }
@@ -229,7 +231,8 @@ fun GeomarkingInfoBox(
 @Composable
 fun GeomarkingBadge(
     grade: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    theme: MaterialTheme = MaterialTheme
 ) {
     val badgeColor = when (grade.uppercase()) {
         "A" -> Color(0xFFDFF5E1)
@@ -239,7 +242,7 @@ fun GeomarkingBadge(
         "E" -> Color(0xFFEFA066)
         "F" -> Color(0xFFE36C5C)
         "G" -> Color(0xFFB64545)
-        else -> MaterialTheme.colorScheme.surfaceVariant
+        else -> theme.colorScheme.surfaceVariant
     }
 
     Card(
@@ -253,7 +256,7 @@ fun GeomarkingBadge(
         ) {
             Text(
                 text = grade.uppercase(),
-                style = MaterialTheme.typography.titleMedium,
+                style = theme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
         }
