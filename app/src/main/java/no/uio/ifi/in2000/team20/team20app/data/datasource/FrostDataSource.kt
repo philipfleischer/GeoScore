@@ -39,11 +39,12 @@ data class SunshineRawResult(
  * Ranked observation methods use V1 (frost-rc.met.no).
  */
 interface FrostDataSourceService {
-    suspend fun getTemperatureNormals(lat: Double, lon: Double): FrostV0ObservationResponseDto
-    suspend fun getPrecipitationNormals(lat: Double, lon: Double): FrostV0ObservationResponseDto
-    suspend fun getPrecipitationHistory(lat: Double, lon: Double): FrostV0ObservationResponseDto
-    suspend fun getSnowDepthHistory(lat: Double, lon: Double): FrostV0ObservationResponseDto
-    suspend fun getWindHistory(lat: Double, lon: Double): FrostV0ObservationResponseDto
+    suspend fun getStationsNearby(lat: Double, lon: Double): String
+    suspend fun getTemperatureNormals(lat: Double, lon: Double, sources: String): FrostV0ObservationResponseDto
+    suspend fun getPrecipitationNormals(lat: Double, lon: Double, sources: String): FrostV0ObservationResponseDto
+    suspend fun getPrecipitationHistory(lat: Double, lon: Double, sources: String): FrostV0ObservationResponseDto
+    suspend fun getSnowDepthHistory(lat: Double, lon: Double, sources: String): FrostV0ObservationResponseDto
+    suspend fun getWindHistory(lat: Double, lon: Double, sources: String): FrostV0ObservationResponseDto
     suspend fun getSunshineNormals(lat: Double, lon: Double): SunshineRawResult
     suspend fun getRankedObservationsForPrecipitation(lat: Double, lon: Double, startYear: Int = 1980, endYear: Int = 2025, maxDist: Double = 10.0, maxCount: Int = 5): FrostV1ResponseDto
     suspend fun getRankedObservationsForWind(lat: Double, lon: Double, startYear: Int = 1980, endYear: Int = 2025, maxDist: Double = 10.0, maxCount: Int = 5): FrostV1ResponseDto
@@ -60,6 +61,11 @@ class FrostDataSource @Inject constructor(
     private suspend inline fun <reified T> io.ktor.client.statement.HttpResponse.frostBody(): T {
         if (!status.isSuccess()) throw Exception("Frost ${status.value}: ${bodyAsText()}")
         return body()
+    }
+
+    // Fetches the 30 nearest station IDs for a given location
+    override suspend fun getStationsNearby(lat: Double, lon: Double): String {
+        return findNearestV0Sources(lat, lon)
     }
 
     // V0 helpers
@@ -84,8 +90,7 @@ class FrostDataSource @Inject constructor(
     // Pre-computed normals (air_temperature_normal P1M 1991_2020) are defined in the Frost catalog
     // but are not available in any endpoints. So we fetch the raw monthly means instead
     // and aggregate them in the repository to produce the 1991-2020 normals
-    override suspend fun getTemperatureNormals(lat: Double, lon: Double): FrostV0ObservationResponseDto {
-        val sources = findNearestV0Sources(lat, lon)
+    override suspend fun getTemperatureNormals(lat: Double, lon: Double, sources: String): FrostV0ObservationResponseDto {
         return client.get(FrostRoutes.OBSERVATIONS_V0) {
             url.encodedParameters.append("sources", sources)
             url.encodedParameters.append(
@@ -105,8 +110,7 @@ class FrostDataSource @Inject constructor(
     }
 
     // Fetches raw monthly rainy days (>= 1mm). raw values 1991-2020 that must be aggregated client-side
-    override suspend fun getPrecipitationNormals(lat: Double, lon: Double): FrostV0ObservationResponseDto {
-        val sources = findNearestV0Sources(lat, lon)
+    override suspend fun getPrecipitationNormals(lat: Double, lon: Double, sources: String): FrostV0ObservationResponseDto {
         return client.get(FrostRoutes.OBSERVATIONS_V0) {
             url.encodedParameters.append("sources", sources)
             url.encodedParameters.append(
@@ -119,8 +123,7 @@ class FrostDataSource @Inject constructor(
     }
 
     // Fetches raw monthly max daily precipitation. no pre-computed normal exists, must be aggregated in the repository
-    override suspend fun getPrecipitationHistory(lat: Double, lon: Double): FrostV0ObservationResponseDto {
-        val sources = findNearestV0Sources(lat, lon)
+    override suspend fun getPrecipitationHistory(lat: Double, lon: Double, sources: String): FrostV0ObservationResponseDto {
         return client.get(FrostRoutes.OBSERVATIONS_V0) {
             url.encodedParameters.append("sources", sources)
             url.encodedParameters.append(
@@ -133,8 +136,7 @@ class FrostDataSource @Inject constructor(
     }
 
     // Fetches raw snow depth history — no pre-computed normal exists, must be aggregated in the repository
-    override suspend fun getSnowDepthHistory(lat: Double, lon: Double): FrostV0ObservationResponseDto {
-        val sources = findNearestV0Sources(lat, lon)
+    override suspend fun getSnowDepthHistory(lat: Double, lon: Double, sources: String): FrostV0ObservationResponseDto {
         return client.get(FrostRoutes.OBSERVATIONS_V0) {
             url.encodedParameters.append("sources", sources)
             url.encodedParameters.append(
@@ -150,8 +152,7 @@ class FrostDataSource @Inject constructor(
     }
 
     // Fetches raw wind history — no pre-computed normal exists, must be aggregated in the repository
-    override suspend fun getWindHistory(lat: Double, lon: Double): FrostV0ObservationResponseDto {
-        val sources = findNearestV0Sources(lat, lon)
+    override suspend fun getWindHistory(lat: Double, lon: Double, sources: String): FrostV0ObservationResponseDto {
         return client.get(FrostRoutes.OBSERVATIONS_V0) {
             url.encodedParameters.append("sources", sources)
             url.encodedParameters.append(

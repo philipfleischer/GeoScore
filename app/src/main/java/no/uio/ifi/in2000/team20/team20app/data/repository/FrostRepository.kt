@@ -65,6 +65,10 @@ class FrostRepository @Inject constructor(
     private val precipitationCacheDao: PrecipitationCacheDao
 ) : FrostRepositoryService {
 
+    // In-memory cache for station IDs keyed by location (rounded to 2 decimal places)
+    // Prevents redundant API calls when fetching multiple climate parameters for the same location
+    private val stationCache = mutableMapOf<String, String>()
+
     override suspend fun getTemperatureData(lat: Double, lon: Double): Result<Triple<List<Double>, List<Double>, List<Double>>> =
         runCatching {
             val locationKey = formatLocationKey(lat, lon)
@@ -80,8 +84,9 @@ class FrostRepository @Inject constructor(
                 )
             }
 
-            // Cache miss: fetch from API
-            val data = dataSource.getTemperatureNormals(lat, lon)
+            // Cache miss: fetch stations once, then data
+            val stations = getOrCacheStations(lat, lon)
+            val data = dataSource.getTemperatureNormals(lat, lon, stations)
 
             // Log which stations contributed data
             val stationIds = data.data.map { it.sourceId }.distinct()
@@ -124,7 +129,8 @@ class FrostRepository @Inject constructor(
                 )
             }
 
-            val data = dataSource.getWindHistory(lat, lon)
+            val stations = getOrCacheStations(lat, lon)
+            val data = dataSource.getWindHistory(lat, lon, stations)
 
             val windMeanMap = data.aggregateByMonthV0("mean(wind_speed P1M)")
             val windMaxMap  = data.aggregateByMonthV0("max(wind_speed P1M)")
@@ -200,7 +206,8 @@ class FrostRepository @Inject constructor(
                 )
             }
 
-            val raw = dataSource.getSnowDepthHistory(lat, lon)
+            val stations = getOrCacheStations(lat, lon)
+            val raw = dataSource.getSnowDepthHistory(lat, lon, stations)
 
             val meanMap = raw.aggregateByMonthV0("mean(surface_snow_thickness P1M)")
                 .mapValues { if (it.value < 0) 0.0 else it.value }
@@ -236,13 +243,14 @@ class FrostRepository @Inject constructor(
             }
 
             // Rainy days. raw aggregation since pre-computed normal is unavailable
-            val rainyDaysRaw = dataSource.getPrecipitationNormals(lat, lon)
+            val stations = getOrCacheStations(lat, lon)
+            val rainyDaysRaw = dataSource.getPrecipitationNormals(lat, lon, stations)
             val rainyDays = rainyDaysRaw.aggregateByMonthV0(
                 "number_of_days_gte(sum(precipitation_amount P1D) P1M 1.0)"
             )
 
             // Max daily precipitation. no normal exists, always raw
-            val maxDaily = dataSource.getPrecipitationHistory(lat, lon)
+            val maxDaily = dataSource.getPrecipitationHistory(lat, lon, stations)
                 .aggregateByMonthV0("max(sum(precipitation_amount P1D) P1M)")
 
             val rainyDaysList = (1..12).map { rainyDays[it] ?: 0.0 }
@@ -271,6 +279,18 @@ class FrostRepository @Inject constructor(
                 precipitationValues = precipitation.await().extractValuesWithDate(),
                 windValues = wind.await().extractValuesWithDate()
             )
+        }
+    }
+
+    // Fetches and caches the 30 nearest station IDs for a location
+    // Uses the same location key format as the data methods to ensure cache reuse
+    private suspend fun getOrCacheStations(lat: Double, lon: Double): String {
+        val key = formatLocationKey(lat, lon)
+        return stationCache[key] ?: run {
+            val stations = dataSource.getStationsNearby(lat, lon)
+            stationCache[key] = stations
+            Log.d("FrostRepository", "Stations fetched and cached for $key: $stations")
+            stations
         }
     }
 
