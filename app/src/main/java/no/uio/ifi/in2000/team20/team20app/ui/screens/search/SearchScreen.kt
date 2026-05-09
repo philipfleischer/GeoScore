@@ -90,7 +90,6 @@ fun SearchBarObject(
 fun SearchScreen(
     onBackClick: () -> Unit,
     onLocationSelected: (Location) -> Unit,
-    searchViewModel: SearchViewModel = viewModel(),
     theme: MaterialTheme = MaterialTheme,
     searchViewModel: SearchViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
