@@ -7,6 +7,13 @@ import no.uio.ifi.in2000.team20.team20app.util.Constants.HAZARDSCORE_WEIGHT
 import no.uio.ifi.in2000.team20.team20app.util.Constants.VULNERABILITYSCORE_WEIGHT
 import javax.inject.Inject
 
+/**
+ * Use case for calculating the GeoScore.
+ * @property getExposureScore Use case for calculating the exposure score
+ * @property getHazardScore Use case for calculating the hazard score
+ * @property getVulnerabilityScore Use case for calculating the vulnerability score
+ * @property scoreCacheRepository Repository for caching scores
+ */
 class GetGeoScore @Inject constructor(
     private val getExposureScore: GetExposureScore,
     private val getHazardScore: GetHazardScore,
@@ -14,9 +21,9 @@ class GetGeoScore @Inject constructor(
     private val scoreCacheRepository: ScoreCacheRepository
 ) {
     suspend fun calculateGeoScore(lat: Double, lon: Double): GeoScore {
-
-        val locationKey = "%.2f, %.2f".format(lat, lon)
+        val locationKey = "%.2f, %.2f".format(lat, lon) //TODO: Standardize lat/lng precision on an app level
         val cachedTotal = scoreCacheRepository.getGeoScoreCache(locationKey)
+        //TODO: COMPUTE THE SUB-SCORES IN PARALLEL!!! scope ( .launch .launch .await .await)
 
         // Always compute sub-scores — they hit their own caches if already stored
         val hazardResult = getHazardScore.calculateHazardScore(lat, lon)

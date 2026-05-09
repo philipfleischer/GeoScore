@@ -16,26 +16,51 @@ import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetAiReport
 import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetGeoScore
 import javax.inject.Inject
 
+/**
+ * UiState for GeoScoreScreen
+ * @property isScoreLoading Whether the score is currently being calculated
+ * @property geoScore The calculated score
+ * @property grade The letter grade of the score
+ * @property scoreError The error message if the score could not be calculated
+ * @property isReportLoading Whether the report is currently being generated
+ * @property aiReport The generated report for the score
+ * @property reportError The error message if the report could not be generated
+ */
 data class GeoScoreUiState(
     val isScoreLoading: Boolean = false,
     val geoScore: GeoScore? = null,
     val grade: String = "",
     val scoreError: String? = null,
-
     val isReportLoading: Boolean = false,
     val aiReport: Report? = null,
     val reportError: String? = null
 )
 
+/**
+ * ViewModel for GeoScoreScreen
+ * @property getGeoScore Use case for calculating the GeoScore
+ * @property getAiReport Use case for generating the report
+ * @property _uiState The current state of the UI. Private and mutable
+ * @property uiState The current state of _uiState collected as a StateFlow
+ */
 @HiltViewModel
 class GeoScoreViewModel @Inject constructor(
     private val getGeoScore: GetGeoScore,
     private val getAiReport: GetAiReport
 ) : ViewModel() {
 
+
     private val _uiState = MutableStateFlow(GeoScoreUiState())
     val uiState: StateFlow<GeoScoreUiState> = _uiState.asStateFlow()
 
+    /**
+     * Updates the UI state to reflect loading.
+     * Then gets the GeoScore via getGeoScore.
+     * This score is then used to get a report via loadReport.
+     * The UI state is updated with the results of these.
+     * Should score or report fail to load, the UI state reflects so.
+     * @param location The location to calculate the score for
+     */
     fun load(location: Location) {
         viewModelScope.launch {
             _uiState.update { it.copy(isScoreLoading = true, scoreError = null) }
@@ -61,6 +86,10 @@ class GeoScoreViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Loads the report on the GeoScore via getAiReport.
+     * @param score The score to generate a report for
+     */
     private suspend fun loadReport(score: GeoScore) {
         _uiState.update { it.copy(isReportLoading = true, reportError = null) }
         runCatching {

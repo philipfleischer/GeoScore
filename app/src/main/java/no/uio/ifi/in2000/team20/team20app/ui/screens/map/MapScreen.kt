@@ -73,6 +73,7 @@ fun MapScreen(
 ) {
     //TODO: Import custom colors
     val chosenPosition by sharedViewModel.selectedLocation.collectAsStateWithLifecycle()
+    // TODO: isCurrentSaved not used in Map! We can decouple selectedLocation and isCurrent saved!
     val isCurrentSaved by savedViewModel.isCurrentSaved.collectAsStateWithLifecycle()
     val layers by mapViewModel.layers.collectAsStateWithLifecycle()
 
