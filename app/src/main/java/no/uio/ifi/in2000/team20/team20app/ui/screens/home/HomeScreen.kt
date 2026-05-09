@@ -39,7 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.core.layout.WindowSizeClass
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchBarObject
@@ -60,8 +60,8 @@ import no.uio.ifi.in2000.team20.team20app.util.Constants.MEDIUM_SCREEN_WIDTH
 fun HomeScreen(
     modifier: Modifier = Modifier,
     onOpenSearch: () -> Unit,
-    viewModel: HomeViewModel = viewModel(),
-    sharedViewModel: AppViewModel = viewModel(),
+    viewModel: HomeViewModel = hiltViewModel(),
+    sharedViewModel: AppViewModel = hiltViewModel(),
     savedViewModel: SavedViewModel,
     frostViewModel: FrostViewModel,
     theme: MaterialTheme = MaterialTheme,

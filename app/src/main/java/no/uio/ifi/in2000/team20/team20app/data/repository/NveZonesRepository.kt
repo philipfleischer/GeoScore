@@ -1,15 +1,16 @@
 package no.uio.ifi.in2000.team20.team20app.data.repository
 
-import no.uio.ifi.in2000.team20.team20app.data.datasource.NveZonesRemoteDataSource
+import no.uio.ifi.in2000.team20.team20app.data.datasource.NveZonesRemoteDataSourceService
+import javax.inject.Inject
 
 interface NveZonesRepositoryService {
     suspend fun isInLandslideZone(lat: Double, lon: Double): Boolean
     suspend fun isInFloodZone(lat: Double, lon: Double): Boolean
 }
 
-class NveZonesRepository (
-    private val nveZonesDataSource: NveZonesRemoteDataSource
-): NveZonesRepositoryService {
+class NveZonesRepository @Inject constructor(
+    private val nveZonesDataSource: NveZonesRemoteDataSourceService
+) : NveZonesRepositoryService {
     override suspend fun isInLandslideZone(lat: Double, lon: Double): Boolean {
         val response = nveZonesDataSource.getLandslideZoneData(lon, lat)
         

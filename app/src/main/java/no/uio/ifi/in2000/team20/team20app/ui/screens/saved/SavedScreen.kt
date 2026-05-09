@@ -16,20 +16,23 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,13 +51,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
-import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetGeoScore
 import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetAiReport
+import no.uio.ifi.in2000.team20.team20app.domain.usecase.GetGeoScore
 import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GeoScoreViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
@@ -71,8 +72,6 @@ fun SavedScreen(
     modifier: Modifier = Modifier,
     sharedViewModel: AppViewModel,
     savedViewModel: SavedViewModel,
-    getGeoScore: GetGeoScore,
-    getAiReport: GetAiReport,
     onSavedClick: (Location) -> Unit
 ) {
     val saved by savedViewModel.saved.collectAsStateWithLifecycle()
@@ -119,12 +118,7 @@ fun SavedScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(saved) { area ->
-                    val geoScoreViewModel: GeoScoreViewModel = viewModel(
-                        key = area.address,
-                        factory = viewModelFactory {
-                            initializer { GeoScoreViewModel(getGeoScore, getAiReport) }
-                        }
-                    )
+                    val geoScoreViewModel: GeoScoreViewModel = hiltViewModel(key = area.address)
                     SavedLocationCard(
                         location = area,
                         geoScoreViewModel = geoScoreViewModel,
@@ -133,7 +127,6 @@ fun SavedScreen(
                             onSavedClick(area)
                         },
                         onSavedToggle = { isSaved ->
-                            //TODO make unsaving a location less sudden. give some visual feedback
                             if (isSaved) {
                                 savedViewModel.removeSaved(area)
                             } else {
@@ -155,6 +148,18 @@ private fun SavedLocationCard(
     onSavedToggle: (Boolean) -> Unit,
 ) {
     val geoState by geoScoreViewModel.uiState.collectAsStateWithLifecycle()
+
+    val showDeleteDialog = remember {mutableStateOf(false)}
+
+    if (showDeleteDialog.value) {
+        DeleteLocationDialog(
+            onDismiss = { showDeleteDialog.value = false },
+            onConfirm = {
+                onSavedToggle(true)
+                showDeleteDialog.value = false
+            }
+        )
+    }
 
     LaunchedEffect(location) {
         geoScoreViewModel.load(location)
@@ -225,17 +230,18 @@ private fun SavedLocationCard(
                     .padding(top = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(0.dp)
             ) {
-                IconButton(
-                    onClick = { },
-                    modifier = Modifier.size(32.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Share,
-                        contentDescription = "Del",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
+                // TODO: Add share functionality ;)
+//                IconButton(
+//                    onClick = { },
+//                    modifier = Modifier.size(32.dp)
+//                ) {
+//                    Icon(
+//                        imageVector = Icons.Default.Share,
+//                        contentDescription = "Del",
+//                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+//                        modifier = Modifier.size(20.dp)
+//                    )
+//                }
 
                 IconButton(
                     onClick = { },
@@ -250,15 +256,13 @@ private fun SavedLocationCard(
                 }
 
                 IconButton(
-                    onClick = { onSavedToggle(true) },
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clearAndSetSemantics{}
+                    onClick = { showDeleteDialog.value = true },
+                    modifier = Modifier.size(32.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Bookmark,
-                        contentDescription = "Delete address from saved",
-                        tint = MaterialTheme.colorScheme.secondary,
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Fjern fra lagret",
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -307,5 +311,27 @@ private fun GradeBadge(grade: String) {
         fontWeight = FontWeight.Bold,
         color = gradeColor,
         fontSize = 28.sp
+    )
+}
+
+@Composable
+private fun DeleteLocationDialog(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+){
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Fjern lokasjon") },
+        text = { Text("Er du sikker på at du vil fjerne denne lokasjonen?")},
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text("Fjern", color = Color.Red)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Avbryt")
+            }
+        }
     )
 }

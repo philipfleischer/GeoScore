@@ -14,6 +14,9 @@ import no.uio.ifi.in2000.team20.team20app.data.dto.FrostV0AvailableTimeSeriesRes
 import no.uio.ifi.in2000.team20.team20app.data.dto.FrostV0ObservationResponseDto
 import no.uio.ifi.in2000.team20.team20app.data.dto.FrostV0SourceResponseDto
 import no.uio.ifi.in2000.team20.team20app.data.dto.FrostV1ResponseDto
+import no.uio.ifi.in2000.team20.team20app.di.FrostClient
+import no.uio.ifi.in2000.team20.team20app.util.Constants
+import javax.inject.Inject
 
 /**
  * For sunshine data we must do a separate station lookup to find the nearest station
@@ -46,16 +49,12 @@ interface FrostDataSourceService {
     suspend fun getRankedObservationsForWind(lat: Double, lon: Double, startYear: Int = 1980, endYear: Int = 2025, maxDist: Double = 10.0, maxCount: Int = 5): FrostV1ResponseDto
 }
 
-class FrostDataSource(
-    private val client: HttpClient,
-    private val credentials: String // format: "clientId:clientSecret"
+class FrostDataSource @Inject constructor(
+    @FrostClient private val client: HttpClient
 ) : FrostDataSourceService {
 
     private val authHeader: String
-        get() {
-            val header = "Basic " + credentials.encodeBase64()
-            return header
-        }
+        get() = "Basic " + "${Constants.FROST_CLIENT_ID}:${Constants.FROST_CLIENT_SECRET}".encodeBase64()
 
     // Checks HTTP status and throws with Frost's error body on non-2xx responses
     private suspend inline fun <reified T> io.ktor.client.statement.HttpResponse.frostBody(): T {

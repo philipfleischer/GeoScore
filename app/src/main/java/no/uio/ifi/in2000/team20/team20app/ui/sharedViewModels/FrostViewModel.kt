@@ -1,7 +1,9 @@
 package no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,6 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepositoryService
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
+import javax.inject.Inject
 
 data class FrostUiState(
     val isLoading: Boolean = false,
@@ -52,9 +55,14 @@ data class FrostUiState(
  * the same state without duplicating fetch logic.
  * Accepts FrostRepositoryService so it can be tested with a fake repository.
  */
-class FrostViewModel(
+@HiltViewModel
+class FrostViewModel @Inject constructor(
     private val repo: FrostRepositoryService
 ) : ViewModel() {
+
+    init{
+        Log.d("ViewModel", "FrostViewModel created")
+    }
 
     private val _uiState = MutableStateFlow(FrostUiState())
     val uiState: StateFlow<FrostUiState> = _uiState.asStateFlow()
