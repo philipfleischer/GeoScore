@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team20.team20app.ui.screens.result
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,6 +33,10 @@ class GeoScoreViewModel @Inject constructor(
     private val getGeoScore: GetGeoScore,
     private val getAiReport: GetAiReport
 ) : ViewModel() {
+
+    init{
+        Log.d("ViewModel", "GeoScoreViewModel created")
+    }
 
     private val _uiState = MutableStateFlow(GeoScoreUiState())
     val uiState: StateFlow<GeoScoreUiState> = _uiState.asStateFlow()
