@@ -17,13 +17,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -42,7 +44,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.window.core.layout.WindowSizeClass
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchBarObject
 import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
@@ -51,10 +52,7 @@ import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.traversalIndex
-import no.uio.ifi.in2000.team20.team20app.ui.theme.LocalTheme
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
-import no.uio.ifi.in2000.team20.team20app.util.Constants.LARGE_PADDING_DP
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MEDIUM_SCREEN_WIDTH
 
 @Composable
@@ -102,7 +100,7 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier
                     .fillMaxWidth(if (compactScreenWidth) 1f else 0.5f)
-                    .semantics{
+                    .semantics {
                         isTraversalGroup = !compactScreenWidth
                     }
             ){
@@ -135,23 +133,25 @@ fun ExpandableInfoBox(
     modifier: Modifier = Modifier,
     rightContent: @Composable (() -> Unit)? = null,
     initiallyExpanded: Boolean = false,
-    cardColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
-    theme: MaterialTheme = MaterialTheme,
     content: @Composable () -> Unit,
 ) {
     var isExpanded by remember { mutableStateOf(initiallyExpanded) }
 
-    Card(
+    Box(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(onClickLabel = if(!isExpanded) "expand information box" else "close information box") { isExpanded = !isExpanded },
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = cardColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            .clickable(onClickLabel = if (!isExpanded) "expand information box" else "close information box") {
+                isExpanded = !isExpanded
+            }
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+        ,
+//        shape = RoundedCornerShape(24.dp),
+//        colors = CardDefaults.cardColors(containerColor = cardColor),
+//        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(modifier = Modifier.padding(18.dp)) {
+        Column(modifier = Modifier.padding((DEFAULT_PADDING_DP*0.5).dp), verticalArrangement = Arrangement.Center) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding((DEFAULT_PADDING_DP*0.5).dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
@@ -176,11 +176,13 @@ fun ExpandableInfoBox(
             AnimatedVisibility(visible = isExpanded) {
                 Column {
                     Spacer(modifier = Modifier.height(12.dp))
-                    Divider(color = theme.colorScheme.outlineVariant)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                     Spacer(modifier = Modifier.height(12.dp))
                     content()
                 }
             }
+            Spacer(modifier = Modifier.height(12.dp))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
         }
     }
 }
@@ -197,7 +199,6 @@ fun GeomarkingInfoBox(
     ExpandableInfoBox(
         title = selectedLocation,
         modifier = modifier,
-        cardColor = theme.colorScheme.secondaryContainer,
         rightContent = {
             GeomarkingBadge(
                 grade = geomarking
@@ -231,35 +232,48 @@ fun GeomarkingInfoBox(
 fun GeomarkingBadge(
     grade: String,
     modifier: Modifier = Modifier,
-    theme: MaterialTheme = MaterialTheme
-) {
+    theme: ColorScheme = MaterialTheme.colorScheme,
+    iconStyle: Boolean = true,
+
+    ) {
     val badgeColor = when (grade.uppercase()) {
-        "A" -> Color(0xFFDFF5E1)
-        "B" -> Color(0xFFBFE7A1)
-        "C" -> Color(0xFFF1E38A)
-        "D" -> Color(0xFFF3C56B)
+        "A" -> Color(0xFF4CAF50)
+        "B" -> Color(0xFF8BC34A)
+        "C" -> Color(0xFFFFC107)
+        "D" -> Color(0xFFFFC56B)
         "E" -> Color(0xFFEFA066)
         "F" -> Color(0xFFE36C5C)
-        "G" -> Color(0xFFB64545)
-        else -> theme.colorScheme.surfaceVariant
+        else -> Color(0xFFBDBDBD)
     }
 
-    Card(
-        modifier = modifier,
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = badgeColor)
-    ) {
-        Box(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-            contentAlignment = Alignment.Center
+    if(iconStyle) {
+        Card(
+            modifier = modifier,
+            shape = CircleShape,
+            colors = CardDefaults.cardColors(containerColor = badgeColor)
         ) {
-            Text(
-                text = grade.uppercase(),
-                style = theme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
+            Box(
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = grade.uppercase(),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
         }
+    } else {
+        Text(
+            text = grade.uppercase(),
+            style = MaterialTheme.typography.labelLarge,
+            fontWeight = FontWeight.Bold,
+            fontSize = 40.sp,
+            color = badgeColor
+        )
     }
+
 }
 
 @Preview(showBackground = true, showSystemUi = true)
