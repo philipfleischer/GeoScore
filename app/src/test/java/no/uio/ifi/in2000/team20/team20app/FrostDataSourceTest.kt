@@ -33,33 +33,6 @@ class FrostDataSourceTest {
 
     private val dataSource = FrostDataSource(client)
 
-    /*@Test
-    fun getStationWithCoordinatesReturnsNearestStation() = runBlocking {
-        // Arrange
-        val lat = 59.91
-        val lon = 10.74
-
-        // Act
-        val station = dataSource.getStation(lat = lat, lon = lon)
-
-        // Assert
-        assertNotNull(station)
-        assertTrue(station.id.startsWith("SN"))
-    }
-
-    @Test
-    fun getObservationsWithValidStationIdReturnsObservationList() = runBlocking {
-        // Arrange
-        val station = dataSource.getStation(lat = 59.91, lon = 10.74)
-
-        // Act
-        val response = dataSource.getObservations(stationId = station.id)
-
-        // Assert
-        assertNotNull(response)
-        assertTrue(response.data.isNotEmpty())
-    }*/
-
     @Test
     fun getRankedObservationsForPrecipitationReturnsResponse() = runBlocking {
         // Arrange
@@ -129,5 +102,48 @@ class FrostDataSourceTest {
         // Assert
         val stationIds = response.data.tseries.map { it.header.id.stationid }
         assertTrue(stationIds.all { it > 0 })
+    }
+
+    @Test
+    fun getStationsNearbyReturnsStationList() = runBlocking {
+        // Arrange
+        val lat = 59.91
+        val lon = 10.74
+
+        // Act
+        val stations = dataSource.getStationsNearby(lat = lat, lon = lon)
+
+        // Assert
+        assertTrue(stations.isNotEmpty())
+        val stationList = stations.split(",")
+        assertTrue(stationList.any { it.startsWith("SN") })
+    }
+
+    @Test
+    fun getTemperatureNormalsReturnsData() = runBlocking {
+        // Arrange
+        val lat = 59.91
+        val lon = 10.74
+        val stations = dataSource.getStationsNearby(lat = lat, lon = lon)
+
+        // Act
+        val response = dataSource.getTemperatureNormals(lat = lat, lon = lon, sources = stations)
+
+        // Assert
+        assertNotNull(response)
+        assertTrue(response.data.isNotEmpty())
+    }
+
+    @Test
+    fun getSunshineStationNearbyReturnsSunshineStation() = runBlocking {
+        // Arrange
+        val lat = 59.91
+        val lon = 10.74
+
+        // Act
+        val stationId = dataSource.getSunshineStationNearby(lat = lat, lon = lon)
+
+        // Assert
+        assertTrue(stationId.startsWith("SN"))
     }
 }
