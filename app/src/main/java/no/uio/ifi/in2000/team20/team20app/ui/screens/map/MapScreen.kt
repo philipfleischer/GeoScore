@@ -4,11 +4,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -43,6 +47,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.maps.android.compose.DefaultMapContentPadding
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.Marker
@@ -70,13 +75,15 @@ import java.math.RoundingMode
 @Composable
 fun MapScreen(
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     sharedViewModel: AppViewModel = hiltViewModel(),
     savedViewModel: SavedViewModel,
     mapViewModel: MapViewModel = hiltViewModel(),
     onOpenSearch: () -> Unit = {},
     onOpenReport: () -> Unit = {}
 ) {
-    //TODO: Import custom colors
+
+    val padding = DEFAULT_PADDING_DP
     val chosenPosition by sharedViewModel.selectedLocation.collectAsStateWithLifecycle()
     val isCurrentSaved by savedViewModel.isCurrentSaved.collectAsStateWithLifecycle()
     val layers by mapViewModel.layers.collectAsStateWithLifecycle()
@@ -117,7 +124,9 @@ fun MapScreen(
         GoogleMap(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surfaceVariant),
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+//                .windowInsetsPadding(WindowInsets.safeDrawing)
+            ,
             cameraPositionState = cameraPositionState,
             properties = MapProperties(
                 maxZoomPreference = MAX_ZOOM,
@@ -136,7 +145,10 @@ fun MapScreen(
                         lon = lon
                     )
                 )
-            }
+            },
+            contentPadding = PaddingValues(
+                horizontal = if(!compactScreenWidth) (padding*3).dp else 0.dp,
+                vertical = if (compactScreenWidth) (padding*9).dp else 0.dp)
         ) {
             layers.forEach { layer ->
                 WmsTileOverlay(
@@ -153,14 +165,14 @@ fun MapScreen(
             }
         }
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .align(Alignment.TopStart)
                 .fillMaxWidth()
                 .padding(
-                    top = (DEFAULT_PADDING_DP * 2).dp,
-                    start = DEFAULT_PADDING_DP.dp,
-                    end = if (compactScreenWidth) DEFAULT_PADDING_DP.dp else (DEFAULT_PADDING_DP * 4).dp,
-                    bottom = DEFAULT_PADDING_DP.dp
+                    top = (padding * 3).dp,
+                    start = if (compactScreenWidth) padding.dp else 0.dp,
+                    end = if (compactScreenWidth) padding.dp else (padding * 4).dp,
+                    bottom = padding.dp
                 ),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -172,7 +184,7 @@ fun MapScreen(
                 FloatingActionButton(
                     onClick = onOpenSearch,
                     containerColor = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier.clip(CircleShape)
+                    modifier = Modifier.clip(CircleShape).size(48.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Search,

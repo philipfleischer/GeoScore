@@ -1,6 +1,9 @@
 package no.uio.ifi.in2000.team20.team20app.ui.navigation
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -69,14 +72,14 @@ fun NavigationRoot() {
                 val homeViewModel: HomeViewModel = hiltViewModel()
 
                 AdaptiveNavigationScaffold(
-                    title = Screen.HOME.title,
+//                    title = Screen.HOME.title,
                     onNavigate = onNavigate,
-                    onOpenSettings = goToSettings,
+//                    onOpenSettings = goToSettings,
                     highlightedDest = Screen.HOME.route,
-                ) { modifier ->
+                ) { insets ->
                     HomeScreen(
                         onOpenSearch = goToSearch,
-                        modifier = modifier,
+                        modifier = Modifier.padding(insets),
                         viewModel = homeViewModel,
                         sharedViewModel = appViewModel,
                         savedViewModel = savedViewModel,
@@ -90,13 +93,15 @@ fun NavigationRoot() {
                 val mapViewModel: MapViewModel = hiltViewModel()
 
                 AdaptiveNavigationScaffold(
-                    title = Screen.MAP.title,
+//                    title = Screen.MAP.title,
                     onNavigate = onNavigate,
-                    onOpenSettings = goToSettings,
-                    highlightedDest = Screen.MAP.route
-                ) { modifier ->
+//                    onOpenSettings = goToSettings,
+                    highlightedDest = Screen.MAP.route,
+                    floatingNav = true
+                ) { insets ->
                     MapScreen(
-                        modifier = modifier,
+                        modifier = Modifier.padding(insets),
+                        contentPadding = insets,
                         sharedViewModel = appViewModel,
                         savedViewModel = savedViewModel,
                         mapViewModel = mapViewModel,
@@ -110,13 +115,13 @@ fun NavigationRoot() {
 
             entry<Route.SavedDestination> {
                 AdaptiveNavigationScaffold(
-                    title = Screen.SAVED.title,
+//                    title = Screen.SAVED.title,
                     onNavigate = onNavigate,
-                    onOpenSettings = goToSettings,
+//                    onOpenSettings = goToSettings,
                     highlightedDest = Screen.SAVED.route
-                ) { modifier ->
+                ) { insets ->
                     SavedScreen(
-                        modifier = modifier,
+                        modifier = Modifier.padding(insets),
                         sharedViewModel = appViewModel,
                         savedViewModel = savedViewModel,
                         onSavedClick = { location ->
@@ -132,10 +137,8 @@ fun NavigationRoot() {
                 val geoScoreViewModel: GeoScoreViewModel = hiltViewModel()
 
                 AdaptiveNavigationScaffold(
-                    title = destination.location.name,
                     highlightedDest = Screen.SAVED.route,
                     onNavigate = onNavigate,
-                    onBackClick = goBack,
                 ) {
                     GeoscoreScreen(
                         location = destination.location,
@@ -155,11 +158,9 @@ fun NavigationRoot() {
                 val searchViewModel: SearchViewModel = hiltViewModel()
 
                 AdaptiveNavigationScaffold(
-                    title = "Søk etter en adresse",
                     highlightedDest = Screen.HOME.route,
                     onNavigate = onNavigate,
-                    onBackClick = goBack,
-                ) { modifier ->
+                ) { insets ->
                     SearchScreen(
                         onBackClick = goBack,
                         onLocationSelected = { location ->
@@ -167,17 +168,15 @@ fun NavigationRoot() {
                             backStack.add(Route.MapDestination)
                         },
                         searchViewModel = searchViewModel,
-                        modifier = modifier
+                        modifier = Modifier.padding(insets)
                     )
                 }
             }
 
             entry<Route.ClimateStatsDestination> { destination ->
                 AdaptiveNavigationScaffold(
-                    title = destination.location.name,
                     highlightedDest = Screen.SAVED.route,
                     onNavigate = onNavigate,
-                    onBackClick = goBack
                 ) {
                     ClimateStatsScreen(
                         location = destination.location,
