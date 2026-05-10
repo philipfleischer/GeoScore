@@ -77,63 +77,71 @@ fun SavedScreen(
     val saved by savedViewModel.saved.collectAsStateWithLifecycle()
     val compactScreenWidth = !LocalWindowSizeClass.current.isWidthAtLeastBreakpoint(MEDIUM_SCREEN_WIDTH)
 
-    Column(
-        modifier = modifier
+    // Box to ensure the whole screen has color, and the column get unified padding
+    Box(
+        modifier = Modifier
             .fillMaxSize()
-            .padding(
-                top = if (compactScreenWidth) (DEFAULT_PADDING_DP*3).dp else (DEFAULT_PADDING_DP*2).dp,
-                start = if (compactScreenWidth) DEFAULT_PADDING_DP.dp else LARGE_PADDING_DP.dp,
-                end = if (compactScreenWidth) DEFAULT_PADDING_DP.dp else (DEFAULT_PADDING_DP*5).dp,
-                bottom = if(compactScreenWidth) (DEFAULT_PADDING_DP*2).dp else LARGE_PADDING_DP.dp
-            ),
-        verticalArrangement = if (!saved.isEmpty()) Arrangement.spacedBy(DEFAULT_PADDING_DP.dp) else Arrangement.Center
-    ) {
-        if (saved.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .padding(DEFAULT_PADDING_DP.dp)
-                    .clip(shape = RoundedCornerShape(100))
-                    .fillMaxHeight(0.1f)
-                    .background(MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.5f))
-                ,
-                contentAlignment = Alignment.Center
-            ){
-                Text( // Could be in the center of the screen
-                    modifier = Modifier.fillMaxWidth().padding(SMALL_PADDING_DP.dp),
-                    text = "Når du har lagret et sted, vil det vises her.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Center,
-                    fontSize = 16.sp
+            .background(MaterialTheme.colorScheme.surface)
+    ){
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(
+                    top = if (compactScreenWidth) (DEFAULT_PADDING_DP*3).dp else (DEFAULT_PADDING_DP*2).dp,
+                    start = if (compactScreenWidth) DEFAULT_PADDING_DP.dp else LARGE_PADDING_DP.dp,
+                    end = if (compactScreenWidth) DEFAULT_PADDING_DP.dp else (DEFAULT_PADDING_DP*5).dp,
+                    bottom = if(compactScreenWidth) (DEFAULT_PADDING_DP*2).dp else LARGE_PADDING_DP.dp
                 )
-            }
-        } else {
-            Text(
-                text = "Lagrede steder",
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.secondary
-            )
-
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(saved) { area ->
-                    val geoScoreViewModel: GeoScoreViewModel = hiltViewModel(key = area.address)
-                    SavedLocationCard(
-                        location = area,
-                        geoScoreViewModel = geoScoreViewModel,
-                        onOpenReport = {
-                            sharedViewModel.setSelectedArea(area)
-                            onSavedClick(area)
-                        },
-                        onSavedToggle = { isSaved ->
-                            if (isSaved) {
-                                savedViewModel.removeSaved(area)
-                            } else {
-                                savedViewModel.addSaved(area)
-                            }
-                        }
+            ,
+            verticalArrangement = if (!saved.isEmpty()) Arrangement.spacedBy(DEFAULT_PADDING_DP.dp) else Arrangement.Center
+        ) {
+            if (saved.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .padding(DEFAULT_PADDING_DP.dp)
+                        .clip(shape = RoundedCornerShape(100))
+                        .fillMaxHeight(0.1f)
+                        .background(MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.5f))
+                    ,
+                    contentAlignment = Alignment.Center
+                ){
+                    Text( // Could be in the center of the screen
+                        modifier = Modifier.fillMaxWidth().padding(SMALL_PADDING_DP.dp),
+                        text = "Når du har lagret et sted, vil det vises her.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center,
+                        fontSize = 16.sp
                     )
+                }
+            } else {
+                Text(
+                    text = "Lagrede steder",
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(saved) { area ->
+                        val geoScoreViewModel: GeoScoreViewModel = hiltViewModel(key = area.address)
+                        SavedLocationCard(
+                            location = area,
+                            geoScoreViewModel = geoScoreViewModel,
+                            onOpenReport = {
+                                sharedViewModel.setSelectedArea(area)
+                                onSavedClick(area)
+                            },
+                            onSavedToggle = { isSaved ->
+                                if (isSaved) {
+                                    savedViewModel.removeSaved(area)
+                                } else {
+                                    savedViewModel.addSaved(area)
+                                }
+                            }
+                        )
+                    }
                 }
             }
         }

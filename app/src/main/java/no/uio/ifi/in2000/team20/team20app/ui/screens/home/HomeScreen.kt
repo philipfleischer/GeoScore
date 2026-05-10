@@ -1,6 +1,7 @@
 package no.uio.ifi.in2000.team20.team20app.ui.screens.home
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -79,13 +80,11 @@ fun HomeScreen(
     }
 
     LazyVerticalGrid(
-        columns = GridCells.Fixed(if(compactScreenWidth) 1 else 2),
         modifier = modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface)
         ,
-        // Orginal:
-        // contentPadding = PaddingValues(horizontal = 32.dp, vertical = 32.dp),
-        // Attemt to get the text slightly lower in portrait:
+        columns = GridCells.Fixed(if(compactScreenWidth) 1 else 2),
         contentPadding = PaddingValues(
             start = (DEFAULT_PADDING_DP*2).dp,
             end = if (compactScreenWidth) (DEFAULT_PADDING_DP*2).dp else (DEFAULT_PADDING_DP*5).dp,
