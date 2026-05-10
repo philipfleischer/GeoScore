@@ -75,12 +75,13 @@ class FrostRepository @Inject constructor(
 
     override suspend fun getTemperatureData(lat: Double, lon: Double): Result<Triple<List<Double>, List<Double>, List<Double>>> =
         runCatching {
-            val locationKey = formatLocationKey(lat, lon)
+            // Fetch stations once, then data
+            val stations = getOrCacheStations(lat, lon)
+            val stationId = stations.split(",").first()  // Use nearest (first) station as cache key
 
             // Cache hit: return stored normals without a network call
-            val cached = temperatureCacheDao.getByKey(locationKey)
+            val cached = temperatureCacheDao.getByKey(stationId)
             if (cached != null) {
-                Log.d("FrostRepository", "Temperature cache hit for $locationKey")
                 return@runCatching Triple(
                     fromJson(cached.monthlyMean),
                     fromJson(cached.monthlyMax),
@@ -88,8 +89,7 @@ class FrostRepository @Inject constructor(
                 )
             }
 
-            // Cache miss: fetch stations once, then data
-            val stations = getOrCacheStations(lat, lon)
+            // Cache miss: fetch from API
             val data = dataSource.getTemperatureNormals(lat, lon, stations)
 
             // Log which stations contributed data
@@ -108,24 +108,24 @@ class FrostRepository @Inject constructor(
 
             temperatureCacheDao.insert(
                 TemperatureCacheEntity(
-                    locationKey = locationKey,
+                    stationId = stationId,
                     monthlyMean = toJson(meanList),
                     monthlyMax  = toJson(maxList),
                     monthlyMin  = toJson(minList)
                 )
             )
-            Log.d("FrostRepository", "Temperature data cached for $locationKey")
+            Log.d("FrostRepository", "Temperature data cached for stationId: $stationId")
 
             Triple(meanList, maxList, minList)
         }
 
     override suspend fun getWindData(lat: Double, lon: Double): Result<Triple<List<Double>, List<Double>, List<Double>>> =
         runCatching {
-            val locationKey = formatLocationKey(lat, lon)
+            val stations = getOrCacheStations(lat, lon)
+            val stationId = stations.split(",").first()  // Use nearest (first) station as cache key
 
-            val cached = windCacheDao.getByKey(locationKey)
+            val cached = windCacheDao.getByKey(stationId)
             if (cached != null) {
-                Log.d("FrostRepository", "Wind cache hit for $locationKey")
                 return@runCatching Triple(
                     fromJson(cached.monthlyMean),
                     fromJson(cached.monthlyMaxSpeed),
@@ -133,7 +133,6 @@ class FrostRepository @Inject constructor(
                 )
             }
 
-            val stations = getOrCacheStations(lat, lon)
             val data = dataSource.getWindHistory(lat, lon, stations)
 
             val windMeanMap = data.aggregateByMonthV0("mean(wind_speed P1M)")
@@ -146,24 +145,24 @@ class FrostRepository @Inject constructor(
 
             windCacheDao.insert(
                 WindCacheEntity(
-                    locationKey    = locationKey,
+                    stationId    = stationId,
                     monthlyMean    = toJson(meanList),
                     monthlyMaxSpeed = toJson(maxList),
                     monthlyMaxGust = toJson(gustList)
                 )
             )
-            Log.d("FrostRepository", "Wind data cached for $locationKey")
+            Log.d("FrostRepository", "Wind data cached for stationId: $stationId")
 
             Triple(meanList, maxList, gustList)
         }
 
     override suspend fun getSunshineData(lat: Double, lon: Double): Result<Triple<List<Double>, String?, Double?>> =
         runCatching {
-            val locationKey = formatLocationKey(lat, lon)
+            // Get sunshine station (uses in-memory cache)
+            val stationId = getOrCacheSunshineStation(lat, lon)
 
-            val cached = sunshineCacheDao.getByKey(locationKey)
+            val cached = sunshineCacheDao.getByKey(stationId)
             if (cached != null) {
-                Log.d("FrostRepository", "Sunshine cache hit for $locationKey")
                 return@runCatching Triple(
                     fromJson(cached.monthlyHoursPerDay),
                     cached.stationName,
@@ -171,8 +170,6 @@ class FrostRepository @Inject constructor(
                 )
             }
 
-            // Get sunshine station (uses in-memory cache)
-            val stationId = getOrCacheSunshineStation(lat, lon)
             val sunshineResult = dataSource.getSunshineNormals(lat, lon, stationId)
             
             // Aggregated in the repository to produce 1991-2020 monthly normals
@@ -189,31 +186,30 @@ class FrostRepository @Inject constructor(
 
             sunshineCacheDao.insert(
                 SunshineCacheEntity(
-                    locationKey        = locationKey,
+                    stationId        = stationId,
                     monthlyHoursPerDay = toJson(hoursPerDay),
                     stationName        = sunshineResult.stationName,
                     distanceKm         = sunshineResult.distanceKm
                 )
             )
-            Log.d("FrostRepository", "Sunshine data cached for $locationKey")
+            Log.d("FrostRepository", "Sunshine data cached for stationId: $stationId")
 
             Triple(hoursPerDay, sunshineResult.stationName, sunshineResult.distanceKm)
         }
 
     override suspend fun getSnowData(lat: Double, lon: Double): Result<Pair<List<Double>, List<Double>>> =
         runCatching {
-            val locationKey = formatLocationKey(lat, lon)
+            val stations = getOrCacheStations(lat, lon)
+            val stationId = stations.split(",").first()  // Use nearest (first) station as cache key
 
-            val cached = snowCacheDao.getByKey(locationKey)
+            val cached = snowCacheDao.getByKey(stationId)
             if (cached != null) {
-                Log.d("FrostRepository", "Snow cache hit for $locationKey")
                 return@runCatching Pair(
                     fromJson(cached.monthlyMean),
                     fromJson(cached.monthlyMax)
                 )
             }
 
-            val stations = getOrCacheStations(lat, lon)
             val raw = dataSource.getSnowDepthHistory(lat, lon, stations)
 
             val meanMap = raw.aggregateByMonthV0("mean(surface_snow_thickness P1M)")
@@ -226,23 +222,23 @@ class FrostRepository @Inject constructor(
 
             snowCacheDao.insert(
                 SnowCacheEntity(
-                    locationKey = locationKey,
+                    stationId = stationId,
                     monthlyMean = toJson(meanList),
                     monthlyMax  = toJson(maxList)
                 )
             )
-            Log.d("FrostRepository", "Snow data cached for $locationKey")
+            Log.d("FrostRepository", "Snow data cached for stationId: $stationId")
 
             Pair(meanList, maxList)
         }
 
     override suspend fun getPrecipitationData(lat: Double, lon: Double): Result<Pair<List<Double>, List<Double>>> =
         runCatching {
-            val locationKey = formatLocationKey(lat, lon)
+            val stations = getOrCacheStations(lat, lon)
+            val stationId = stations.split(",").first()  // Use nearest (first) station as cache key
 
-            val cached = precipitationCacheDao.getByKey(locationKey)
+            val cached = precipitationCacheDao.getByKey(stationId)
             if (cached != null) {
-                Log.d("FrostRepository", "Precipitation cache hit for $locationKey")
                 return@runCatching Pair(
                     fromJson(cached.monthlyRainyDays),
                     fromJson(cached.monthlyMaxDaily)
@@ -250,7 +246,6 @@ class FrostRepository @Inject constructor(
             }
 
             // Rainy days. raw aggregation since pre-computed normal is unavailable
-            val stations = getOrCacheStations(lat, lon)
             val rainyDaysRaw = dataSource.getPrecipitationNormals(lat, lon, stations)
             val rainyDays = rainyDaysRaw.aggregateByMonthV0(
                 "number_of_days_gte(sum(precipitation_amount P1D) P1M 1.0)"
@@ -265,12 +260,12 @@ class FrostRepository @Inject constructor(
 
             precipitationCacheDao.insert(
                 PrecipitationCacheEntity(
-                    locationKey      = locationKey,
+                    stationId      = stationId,
                     monthlyRainyDays = toJson(rainyDaysList),
                     monthlyMaxDaily  = toJson(maxDailyList)
                 )
             )
-            Log.d("FrostRepository", "Precipitation data cached for $locationKey")
+            Log.d("FrostRepository", "Precipitation data cached for stationId: $stationId")
 
             Pair(rainyDaysList, maxDailyList)
         }
@@ -296,7 +291,7 @@ class FrostRepository @Inject constructor(
         return stationCache[key] ?: run {
             val stations = dataSource.getStationsNearby(lat, lon)
             stationCache[key] = stations
-            Log.d("FrostRepository", "Stations fetched and cached for $key: $stations")
+            Log.d("FrostRepository", "Fetched stations for $key: $stations")
             stations
         }
     }
@@ -308,7 +303,7 @@ class FrostRepository @Inject constructor(
         return sunshineStationCache[key] ?: run {
             val sunshineStationId = dataSource.getSunshineStationNearby(lat, lon)
             sunshineStationCache[key] = sunshineStationId
-            Log.d("FrostRepository", "Sunshine station fetched and cached for $key: $sunshineStationId")
+            Log.d("FrostRepository", "Fetched sunshine station for $key: $sunshineStationId")
             sunshineStationId
         }
     }
