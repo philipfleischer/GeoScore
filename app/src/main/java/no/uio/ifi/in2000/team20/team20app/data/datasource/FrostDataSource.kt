@@ -40,12 +40,13 @@ data class SunshineRawResult(
  */
 interface FrostDataSourceService {
     suspend fun getStationsNearby(lat: Double, lon: Double): String
+    suspend fun getSunshineStationNearby(lat: Double, lon: Double): String
     suspend fun getTemperatureNormals(lat: Double, lon: Double, sources: String): FrostV0ObservationResponseDto
     suspend fun getPrecipitationNormals(lat: Double, lon: Double, sources: String): FrostV0ObservationResponseDto
     suspend fun getPrecipitationHistory(lat: Double, lon: Double, sources: String): FrostV0ObservationResponseDto
     suspend fun getSnowDepthHistory(lat: Double, lon: Double, sources: String): FrostV0ObservationResponseDto
     suspend fun getWindHistory(lat: Double, lon: Double, sources: String): FrostV0ObservationResponseDto
-    suspend fun getSunshineNormals(lat: Double, lon: Double): SunshineRawResult
+    suspend fun getSunshineNormals(lat: Double, lon: Double, stationId: String): SunshineRawResult
     suspend fun getRankedObservationsForPrecipitation(lat: Double, lon: Double, startYear: Int = 1980, endYear: Int = 2025, maxDist: Double = 10.0, maxCount: Int = 5): FrostV1ResponseDto
     suspend fun getRankedObservationsForWind(lat: Double, lon: Double, startYear: Int = 1980, endYear: Int = 2025, maxDist: Double = 10.0, maxCount: Int = 5): FrostV1ResponseDto
 }
@@ -66,6 +67,11 @@ class FrostDataSource @Inject constructor(
     // Fetches the 30 nearest station IDs for a given location
     override suspend fun getStationsNearby(lat: Double, lon: Double): String {
         return findNearestV0Sources(lat, lon)
+    }
+
+    // Fetches the nearest station that has sunshine data for the 1991-2020 period
+    override suspend fun getSunshineStationNearby(lat: Double, lon: Double): String {
+        return findNearestSunshineStationId(lat, lon)
     }
 
     // V0 helpers
@@ -175,55 +181,49 @@ class FrostDataSource @Inject constructor(
     }
 
     // Finds the nearest station that has sunshine data for the 1991-2020 period
-    // Returns stationId, stationName, and distance in km
-    private suspend fun findNearestSunshineStation(lat: Double, lon: Double): Triple<String, String?, Double?> {
-        try {
-            val availableResponse: FrostV0AvailableTimeSeriesResponseDto = client.get(FrostRoutes.AVAILABLE_TIMESERIES_V0) {
-                url.encodedParameters.append("elements", "sum(duration_of_sunshine%20P1M)")
-                url.encodedParameters.append("referencetime", "1991-01-01/2020-12-31")
-                url.encodedParameters.append("fields", "sourceId")
-                header("Authorization", authHeader)
-            }.let { response ->
-                if (!response.status.isSuccess()) {
-                    Log.e("FrostDataSource", "availableTimeSeries error ${response.status.value}: ${response.bodyAsText()}")
-                    throw Exception("Frost ${response.status.value}: ${response.bodyAsText()}")
-                }
-                response.body()
+    // Returns just the station ID string (station details handled by Repository)
+    private suspend fun findNearestSunshineStationId(lat: Double, lon: Double): String {
+        val availableResponse: FrostV0AvailableTimeSeriesResponseDto = client.get(FrostRoutes.AVAILABLE_TIMESERIES_V0) {
+            url.encodedParameters.append("elements", "sum(duration_of_sunshine%20P1M)")
+            url.encodedParameters.append("referencetime", "1991-01-01/2020-12-31")
+            url.encodedParameters.append("fields", "sourceId")
+            header("Authorization", authHeader)
+        }.let { response ->
+            if (!response.status.isSuccess()) {
+                Log.e("FrostDataSource", "availableTimeSeries error ${response.status.value}: ${response.bodyAsText()}")
+                throw Exception("Frost ${response.status.value}: ${response.bodyAsText()}")
             }
-
-            if (availableResponse.data.isEmpty()) {
-                throw Exception("No stations found with sunshine data for 1991-2020")
-            }
-
-            val allStationIds = availableResponse.data
-                .map { it.sourceId.removeSuffix(":0") }
-                .distinct()
-            val stationIds = allStationIds.take(50).joinToString(",")
-
-            val lonStr = String.format(java.util.Locale.US, "%.4f", lon)
-            val latStr = String.format(java.util.Locale.US, "%.4f", lat)
-            val sourcesResponse: FrostV0SourceResponseDto = client.get(FrostRoutes.SOURCES_V0) {
-                url.encodedParameters.append("geometry", "nearest(POINT($lonStr%20$latStr))")
-                url.encodedParameters.append("nearestmaxcount", "200")
-                url.encodedParameters.append("ids", stationIds)
-                header("Authorization", authHeader)
-            }.frostBody()
-
-            if (sourcesResponse.data.isEmpty()) {
-                throw Exception("No nearby stations with sunshine data found")
-            }
-
-            val nearestStation = sourcesResponse.data.first()
-            return Triple(nearestStation.id, nearestStation.name, nearestStation.distance)
-        } catch (e: Exception) {
-            throw e
+            response.body()
         }
+
+        if (availableResponse.data.isEmpty()) {
+            throw Exception("No stations found with sunshine data for 1991-2020")
+        }
+
+        val allSunshineIds = availableResponse.data
+            .map { it.sourceId.removeSuffix(":0") }
+            .distinct()
+            .joinToString(",")
+
+        val lonStr = String.format(java.util.Locale.US, "%.4f", lon)
+        val latStr = String.format(java.util.Locale.US, "%.4f", lat)
+        val sourcesResponse: FrostV0SourceResponseDto = client.get(FrostRoutes.SOURCES_V0) {
+            url.encodedParameters.append("geometry", "nearest(POINT($lonStr%20$latStr))")
+            url.encodedParameters.append("ids", allSunshineIds)
+            url.encodedParameters.append("nearestmaxcount", "1")
+            header("Authorization", authHeader)
+        }.frostBody()
+
+        if (sourcesResponse.data.isEmpty()) {
+            throw Exception("No nearby stations with sunshine data found")
+        }
+
+        return sourcesResponse.data.first().id
     }
 
     // Fetches raw monthly sunshine hours for 1991-2020 from V0
-    // Finds the nearest station with actual sunshine data to avoid HTTP 412 failures
-    override suspend fun getSunshineNormals(lat: Double, lon: Double): SunshineRawResult {
-        val (stationId, stationName, distance) = findNearestSunshineStation(lat, lon)
+    // Uses the provided stationId (fetched and cached by Repository)
+    override suspend fun getSunshineNormals(lat: Double, lon: Double, stationId: String): SunshineRawResult {
         val observations: FrostV0ObservationResponseDto = client.get(FrostRoutes.OBSERVATIONS_V0) {
             url.encodedParameters.append("sources", stationId)
             url.encodedParameters.append(
@@ -236,8 +236,8 @@ class FrostDataSource @Inject constructor(
 
         return SunshineRawResult(
             stationId = stationId,
-            stationName = stationName,
-            distanceKm = distance,
+            stationName = null,
+            distanceKm = null,
             observations = observations
         )
     }

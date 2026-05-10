@@ -69,6 +69,10 @@ class FrostRepository @Inject constructor(
     // Prevents redundant API calls when fetching multiple climate parameters for the same location
     private val stationCache = mutableMapOf<String, String>()
 
+    // In-memory cache for sunshine station IDs keyed by location (rounded to 2 decimal places)
+    // Prevents redundant API calls when searching for nearest sunshine station
+    private val sunshineStationCache = mutableMapOf<String, String>()
+
     override suspend fun getTemperatureData(lat: Double, lon: Double): Result<Triple<List<Double>, List<Double>, List<Double>>> =
         runCatching {
             val locationKey = formatLocationKey(lat, lon)
@@ -167,7 +171,10 @@ class FrostRepository @Inject constructor(
                 )
             }
 
-            val sunshineResult = dataSource.getSunshineNormals(lat, lon)
+            // Get sunshine station (uses in-memory cache)
+            val stationId = getOrCacheSunshineStation(lat, lon)
+            val sunshineResult = dataSource.getSunshineNormals(lat, lon, stationId)
+            
             // Aggregated in the repository to produce 1991-2020 monthly normals
             val map = sunshineResult.observations.aggregateByMonthV0("sum(duration_of_sunshine P1M)")
             val daysInMonth = mapOf(
@@ -291,6 +298,18 @@ class FrostRepository @Inject constructor(
             stationCache[key] = stations
             Log.d("FrostRepository", "Stations fetched and cached for $key: $stations")
             stations
+        }
+    }
+
+    // Fetches and caches the nearest sunshine station ID for a location
+    // Uses the same location key format to ensure cache reuse across requests
+    private suspend fun getOrCacheSunshineStation(lat: Double, lon: Double): String {
+        val key = formatLocationKey(lat, lon)
+        return sunshineStationCache[key] ?: run {
+            val sunshineStationId = dataSource.getSunshineStationNearby(lat, lon)
+            sunshineStationCache[key] = sunshineStationId
+            Log.d("FrostRepository", "Sunshine station fetched and cached for $key: $sunshineStationId")
+            sunshineStationId
         }
     }
 
