@@ -96,6 +96,7 @@ val LightColorScheme = lightColorScheme(
     onPrimary = Charcoal,
     secondary = DarkBlue,
     onSecondary = White,
+    outline = DarkBlue,
     error = Salmon,
 )
 
@@ -106,9 +107,10 @@ val DarkColorScheme = darkColorScheme(
     surfaceContainerLow = DarkGray, // Bars/rails
     onSurfaceVariant = White, //
     primary = MayaBlue,
-    onPrimary = White,
+    onPrimary = Black,
     secondary = MayaBlue,
     onSecondary = White,
+    outline = Color.Transparent,
     error = Salmon
 )
 

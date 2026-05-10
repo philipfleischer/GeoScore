@@ -8,20 +8,27 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -106,123 +113,140 @@ fun SearchScreen(
         keyboardController?.show()
     }
 
-//    Scaffold(
-//        topBar = {
+    Scaffold(
+        topBar = {
 //            SharedTopAppBar(
 //                title = "Søk etter adresse",
 //                onBackClick = onBackClick
 //            )
-//        }
-//    ) { innerPadding ->
-//
-//    }
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding((DEFAULT_PADDING_DP*2).dp)
-            .background(theme.colorScheme.surface)
-        ,
-        verticalArrangement = Arrangement.Top
-    ) {
-        TextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .clip(RoundedCornerShape(28.dp))
-                .background(theme.colorScheme.surfaceContainerLow)
-                .padding(horizontal = 16.dp)
-                .focusRequester(focusRequester),
-            value = uiState.query,
-            onValueChange = { searchViewModel.updateInput(it) },
-            label = { Text("Sted", color = theme.colorScheme.secondary) },
-            placeholder = { Text("Skriv inn adresse...") },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Search"
+            Row(
+                modifier = Modifier
+                    .windowInsetsPadding(WindowInsets.displayCutout)
+                    .background(MaterialTheme.colorScheme.surface)
+                ,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ){
+                IconButton(onClick = onBackClick) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Gå tilbake"
+                    )
+                }
+                TextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .clip(RoundedCornerShape(28.dp))
+                        .background(theme.colorScheme.surfaceContainerLow)
+                        .padding(horizontal = 16.dp)
+                        .focusRequester(focusRequester),
+                    value = uiState.query,
+                    onValueChange = { searchViewModel.updateInput(it) },
+                    label = { Text("Sted", color = theme.colorScheme.secondary) },
+                    placeholder = { Text("Skriv inn adresse...") },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search"
+                        )
+                    },
+                    isError = uiState.inputError != null,
+                    singleLine = true,
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = theme.colorScheme.surfaceContainerLow,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        focusedTextColor = theme.colorScheme.secondary,
+                        unfocusedTextColor = theme.colorScheme.onSurfaceVariant,
+                        cursorColor = theme.colorScheme.secondary,
+                    )
                 )
-            },
-            isError = uiState.inputError != null,
-            singleLine = true,
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = theme.colorScheme.surfaceContainerLow,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                focusedTextColor = theme.colorScheme.secondary,
-                unfocusedTextColor = theme.colorScheme.onSurfaceVariant,
-                cursorColor = theme.colorScheme.secondary,
-            )
-        )
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.surface
+    ) { innerPadding ->
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .background(theme.colorScheme.surface)
+            ,
+            verticalArrangement = Arrangement.Top
+        ) {
 
-        // her viser vi egen feilmelding hvis brukeren skriver ugyldig input.
-        if (uiState.inputError != null) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = uiState.inputError!!,
-                color = theme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
 
-        when {
-            uiState.query.isBlank() -> {
+            // her viser vi egen feilmelding hvis brukeren skriver ugyldig input.
+            if (uiState.inputError != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = uiState.inputError!!,
+                    color = theme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
 
-                if(uiState.recentlySearched.isEmpty()){
-                    Box(modifier = Modifier.fillMaxWidth()) {
-                        Text("Begynn å skrive for å se forslag")
+            Spacer(modifier = Modifier.height(16.dp))
+
+            when {
+                uiState.query.isBlank() -> {
+
+                    if(uiState.recentlySearched.isEmpty()){
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            Text("Begynn å skrive for å se forslag")
+                        }
+                    } else {
+                        Text(text = "Siste søk")
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f, fill = false)
+                        ) {
+                            items(uiState.recentlySearched) { location ->
+                                SearchResultItem(
+                                    location = location,
+                                    onSelect = {
+                                        onLocationSelected(location)
+                                    }
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                            }
+                        }
                     }
-                } else {
-                    Text(text = "Siste søk")
+
+                }
+                uiState.isLoading -> LoadingState(modifier = Modifier.fillMaxWidth())
+                uiState.error != null -> ErrorState(message = uiState.error!!, modifier = Modifier.fillMaxWidth())
+                uiState.results.isEmpty() -> {
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        Text("Ingen resultater for \"${uiState.query}\"", color = theme.colorScheme.error)
+                    }
+                }
+                // Search results
+                else -> {
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(1f, fill = false)
+                            .weight(1f, fill = false),
+                        verticalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        items(uiState.recentlySearched) { location ->
+                        items(uiState.results) { location ->
                             SearchResultItem(
                                 location = location,
                                 onSelect = {
+                                    searchViewModel.addRecentlySearched(location)
                                     onLocationSelected(location)
                                 }
                             )
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height((DEFAULT_PADDING_DP/2).dp))
                         }
-                    }
-                }
-
-            }
-            uiState.isLoading -> LoadingState(modifier = Modifier.fillMaxWidth())
-            uiState.error != null -> ErrorState(message = uiState.error!!, modifier = Modifier.fillMaxWidth())
-            uiState.results.isEmpty() -> {
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    Text("Ingen resultater for \"${uiState.query}\"", color = theme.colorScheme.error)
-                }
-            }
-            // Search results
-            else -> {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f, fill = false),
-                    verticalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    items(uiState.results) { location ->
-                        SearchResultItem(
-                            location = location,
-                            onSelect = {
-                                searchViewModel.addRecentlySearched(location)
-                                onLocationSelected(location)
-                            }
-                        )
-                        Spacer(modifier = Modifier.height((DEFAULT_PADDING_DP/2).dp))
                     }
                 }
             }
         }
     }
+
 
 }
 

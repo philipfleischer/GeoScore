@@ -3,6 +3,7 @@ package no.uio.ifi.in2000.team20.team20app.util
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -19,7 +20,7 @@ enum class Screen(
     val icon: ImageVector,
 //    val contentDescription: String
 ) {
-    HOME(Route.HomeDestination, "Søk", Icons.Default.Search),
+    HOME(Route.HomeDestination, "Søk", Icons.Default.LocationOn),
     MAP(Route.MapDestination, "Kart", Icons.Default.Map),
     SAVED(Route.SavedDestination, "Lagret", Icons.Default.Bookmark)
 }
