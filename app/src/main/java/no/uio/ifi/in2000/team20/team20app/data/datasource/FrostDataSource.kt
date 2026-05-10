@@ -50,7 +50,7 @@ interface FrostDataSourceService {
     suspend fun getWindHistory(lat: Double, lon: Double): FrostV0ObservationResponseDto
     suspend fun getSunshineNormals(lat: Double, lon: Double): SunshineRawResult
     suspend fun getRankedObservationsForPrecipitation(lat: Double, lon: Double, startYear: Int = 1990, endYear: Int = 2020, maxDist: Double = 10.0, maxCount: Int = 5): FrostV1ResponseDto
-    suspend fun getRankedObservationsForWind(lat: Double, lon: Double, startYear: Int = 19990, endYear: Int = 2020, maxDist: Double = 10.0, maxCount: Int = 5): FrostV1ResponseDto
+    suspend fun getRankedObservationsForWind(lat: Double, lon: Double, startYear: Int = 1990, endYear: Int = 2020, maxDist: Double = 10.0, maxCount: Int = 5): FrostV1ResponseDto
 }
 
 class FrostDataSource @Inject constructor(
