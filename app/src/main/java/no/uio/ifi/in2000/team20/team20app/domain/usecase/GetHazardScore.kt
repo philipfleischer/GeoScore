@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team20.team20app.domain.usecase
 
+import android.util.Log
 import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepositoryService
 import no.uio.ifi.in2000.team20.team20app.data.repository.ScoreCacheRepository
 import no.uio.ifi.in2000.team20.team20app.domain.model.HazardScoreResult
@@ -28,6 +29,9 @@ class GetHazardScore @Inject constructor(
         val windAndPrecipitationObservationsResult = frostRepository.getWindAndPrecipitationObservations(lat, lon)
         val precipitationResults = windAndPrecipitationObservationsResult.precipitationValues
         val windResults = windAndPrecipitationObservationsResult.windValues
+        Log.d("GetHazardScore", "precipitationResults: $precipitationResults")
+        Log.d("GetHazardScore", "windResults: $windResults")
+
 
         val extremePrecipDays = precipitationResults.values.filter { it > EXTREME_PRECIPITATION_THRESHOLD }
 

@@ -271,11 +271,22 @@ class FrostDataSource @Inject constructor(
         maxDist: Double,
         maxCount: Int
     ): FrostV1ResponseDto = coroutineScope {
-        listOf(10.0, 20.0, 30.0)
-            .map { dist -> async { fetchV1(lat, lon, dist, maxCount, startYear, endYear, "sum(precipitation_amount P1D)") } }
-            .awaitAll()
-            .firstOrNull { it.data.tseries.isNotEmpty() }
-    } ?: FrostV1ResponseDto()
+        val d10 = async { fetchV1(lat, lon, 10.0, maxCount, startYear, endYear, "sum(precipitation_amount P1D)") }
+        val d20 = async { fetchV1(lat, lon, 20.0, maxCount, startYear, endYear, "sum(precipitation_amount P1D)") }
+        val d30 = async { fetchV1(lat, lon, 30.0, maxCount, startYear, endYear, "sum(precipitation_amount P1D)") }
+
+        val (r10, r20, r30) = awaitAll(d10, d20, d30)
+        Log.d("FrostDataSource", "Precip 10km: ${r10.data.tseries.size} stns – ${r10.data.tseries.isNotEmpty()}")
+        Log.d("FrostDataSource", "Precip 20km: ${r20.data.tseries.size} stns – ${r20.data.tseries.isNotEmpty()}")
+        Log.d("FrostDataSource", "Precip 30km: ${r30.data.tseries.size} stns – ${r30.data.tseries.isNotEmpty()}")
+
+        when {
+            r10.data.tseries.isNotEmpty() -> r10
+            r20.data.tseries.isNotEmpty() -> r20
+            r30.data.tseries.isNotEmpty() -> r30
+            else -> FrostV1ResponseDto()
+        }
+    }
 
     override suspend fun getRankedObservationsForWind(
         lat: Double,
@@ -287,20 +298,44 @@ class FrostDataSource @Inject constructor(
     ): FrostV1ResponseDto {
         // Round 1: wind gust at all radiuses in parallel
         val gustResult = coroutineScope {
-            listOf(10.0, 20.0, 30.0)
-                .map { dist -> async { fetchV1(lat, lon, dist, maxCount, startYear, endYear, "max(wind_speed_of_gust P1D)") } }
-                .awaitAll()
-                .firstOrNull { it.data.tseries.isNotEmpty() }
+            val d10 = async { fetchV1(lat, lon, 10.0, maxCount, startYear, endYear, "max(wind_speed_of_gust P1D)") }
+            val d20 = async { fetchV1(lat, lon, 20.0, maxCount, startYear, endYear, "max(wind_speed_of_gust P1D)") }
+            val d30 = async { fetchV1(lat, lon, 30.0, maxCount, startYear, endYear, "max(wind_speed_of_gust P1D)") }
+
+            val (r10, r20, r30) = awaitAll(d10, d20, d30)
+            Log.d("FrostDataSource", "WindGust 10km: ${r10.data.tseries.size} stns – ${r10.data.tseries.isNotEmpty()}")
+            Log.d("FrostDataSource", "WindGust 20km: ${r20.data.tseries.size} stns – ${r20.data.tseries.isNotEmpty()}")
+            Log.d("FrostDataSource", "WindGust 30km: ${r30.data.tseries.size} stns – ${r30.data.tseries.isNotEmpty()}")
+
+            //Choose data for the closest one that is not empty
+            when {
+                r10.data.tseries.isNotEmpty() -> r10
+                r20.data.tseries.isNotEmpty() -> r20
+                r30.data.tseries.isNotEmpty() -> r30
+                else -> null
+            }
         }
         if (gustResult != null) return gustResult
 
         // Round 2: fallback to mean wind speed at all radiuses in parallel
         return coroutineScope {
-            listOf(10.0, 20.0, 30.0)
-                .map { dist -> async { fetchV1(lat, lon, dist, maxCount, startYear, endYear, "mean(wind_speed P1D)") } }
-                .awaitAll()
-                .firstOrNull { it.data.tseries.isNotEmpty() }
-        } ?: FrostV1ResponseDto()
+            val d10 = async { fetchV1(lat, lon, 10.0, maxCount, startYear, endYear, "mean(wind_speed P1D)") }
+            val d20 = async { fetchV1(lat, lon, 20.0, maxCount, startYear, endYear, "mean(wind_speed P1D)") }
+            val d30 = async { fetchV1(lat, lon, 30.0, maxCount, startYear, endYear, "mean(wind_speed P1D)") }
+
+            val (r10, r20, r30) = awaitAll(d10, d20, d30)
+            Log.d("FrostDataSource", "WindMean 10km: ${r10.data.tseries.size} stns – ${r10.data.tseries.isNotEmpty()}")
+            Log.d("FrostDataSource", "WindMean 20km: ${r20.data.tseries.size} stns – ${r20.data.tseries.isNotEmpty()}")
+            Log.d("FrostDataSource", "WindMean 30km: ${r30.data.tseries.size} stns – ${r30.data.tseries.isNotEmpty()}")
+
+            //Choose data for the closest one that is not empty
+            when {
+                r10.data.tseries.isNotEmpty() -> r10
+                r20.data.tseries.isNotEmpty() -> r20
+                r30.data.tseries.isNotEmpty() -> r30
+                else -> FrostV1ResponseDto()
+            }
+        }
     }
 
     private suspend fun fetchV1(
@@ -311,13 +346,21 @@ class FrostDataSource @Inject constructor(
         startYear: Int,
         endYear: Int,
         elementId: String
-    ): FrostV1ResponseDto = client.get(FrostRoutes.OBSERVATIONS_V1) {
-        parameter("nearest", buildNearest(lat, lon, dist, maxCount))
-        parameter("referencetime", buildTime(startYear, endYear))
-        parameter("elementids", elementId)
-        parameter("incobs", true)
-        header("Authorization", authHeader)
-    }.body()
+    ): FrostV1ResponseDto {
+        val response = client.get(FrostRoutes.OBSERVATIONS_V1) {
+            parameter("nearest", buildNearest(lat, lon, dist, maxCount))
+            parameter("time", buildTime(startYear, endYear))
+            parameter("elementids", elementId)
+            parameter("incobs", true)
+            header("Authorization", authHeader)
+        }
+        Log.d("FrostDataSource", "fetchV1 [${elementId}] dist=${dist}km → HTTP ${response.status.value}")
+        if (!response.status.isSuccess()) {
+            Log.e("FrostDataSource", "fetchV1 error body: ${response.bodyAsText()}")
+            return FrostV1ResponseDto()
+        }
+        return response.body()
+    }
 
     private fun buildNearest(lat: Double, lon: Double, maxDist: Double = 10.0, maxCount: Int = 2): String {
         return """{"maxdist":$maxDist,"maxcount":$maxCount,"points":[{"lon":$lon,"lat":$lat}]}"""
