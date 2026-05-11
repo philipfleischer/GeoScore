@@ -6,25 +6,27 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
 data class CustomTheme (
-    val background: Color,
-//    val backgroundGradient: Color,
-    val tertiary: Color, // For headers and navigation bar
-    val secondary: Color, // middleground
-    val primary: Color, // foreground
-    val detail: Color,
+    val background: Color,  // Background
+    val tertiary: Color,    // Headers
+    val secondary: Color,   // Topbar, navbar/rail
+    val primary: Color,     // Cards, boxes and columns
+    val detail: Color,      // Borders, decoration
     val button: Color,
-    val buttonDetail: Color,
-    val disabledButton: Color,
-    val disabledButtonDetail: Color,
+    val selected: Color,    // Selected elements such as navigation icons
+//    val buttonDetail: Color,
+//    val disabledButton: Color,
+//    val disabledButtonDetail: Color,
     val error: Color,
     val warning: Color,
     val trafficGreen: Color,
     val trafficYellow: Color,
     val trafficRed: Color,
 
-//    val onBackground: Color,
-//    val onMiddleground: Color,
-//    val onForeground: Color,
+    val onBackground: Color,    // Text and contrast on background
+    val onPrimary: Color,       // Text on cards, boxes and columns
+    val onSecondary: Color,     // Text and icons on topbar and navigation bar/rail
+//    val onTertiary: Color,
+    val onSelected: Color,      // Icon colors when selected
 //    val onButton: Color,
 //    val onDisabledButton: Color,
 //    val onError: Color,
@@ -35,16 +37,21 @@ data class CustomTheme (
 
 //TODO: Change light theme colors
 val lightThemeColors = CustomTheme(
-    background = Platinum,
+    background = LightBlue,
+    onBackground = DarkGray,
     tertiary = DarkBlue,
-//    backgroundGradient = PaleSky,
-    secondary = BrightWhite, // Should be 50% opaque
-    primary = BrightWhite,
+//    onTertiary = Platinum,
+    secondary = MayaBlue,
+    onSecondary = Black,
+    primary = OffWhite, // Cards, boxes, columns
+    onPrimary = Black, // Main text color on card, boxes, columns
     detail = CloudySky,
     button = MayaBlue,
-    buttonDetail = DustyBlue,
-    disabledButton = AliceBlue,
-    disabledButtonDetail = CloudySky,
+    selected = MayaBlue,
+    onSelected = DarkBlue,
+//    buttonDetail = DustyBlue,
+//    disabledButton = AliceBlue,
+//    disabledButtonDetail = CloudySky,
     error = Salmon,
     warning = RoyalGold,
     trafficGreen = TrafficGreen,
@@ -55,59 +62,56 @@ val lightThemeColors = CustomTheme(
 
 //TODO: Change dark theme colors
 val darkThemeColors = CustomTheme(
-    background = Midnight,
-//    backgroundGradient = Color.Black,
-    tertiary = Midnight,
+    background = Black,
+    onBackground = OffWhite,
+    tertiary = LightBlue,
+//    onTertiary = ,
     secondary = Charcoal,
-    primary = DarkLake,
-    detail = Midnight,
+    primary = DarkGray,
+    detail = Black,
     button = MayaBlue,
-    buttonDetail = DustyBlue,
-    disabledButton = AliceBlue,
-    disabledButtonDetail = Charcoal,
+//    buttonDetail = DustyBlue,
+//    disabledButton = AliceBlue,
+//    disabledButtonDetail = Charcoal,
+    selected = DarkGray,
+    onPrimary = OffWhite,
+    onSecondary = OffWhite,
+    onSelected = OffWhite,
     error = Salmon,
     warning = RoyalGold,
     trafficGreen = TrafficGreen,
     trafficYellow = TrafficYellow,
     trafficRed = TrafficRed,
-    isLight = false
+    isLight = false,
 )
 
 // Material3 Color Schemes
 val LightColorScheme = lightColorScheme(
-    primary = DarkBlue,
-    onPrimary = BrightWhite,
-    primaryContainer = PaleSky,
-    onPrimaryContainer = DarkBlue,
-    secondary = MayaBlue,
-    onSecondary = BrightWhite,
-    secondaryContainer = AliceBlue,
-    onSecondaryContainer = DarkBlue,
-    background = Platinum,
-    onBackground = DarkBlue,
-    surface = BrightWhite,
-    onSurface = DarkBlue,
-    surfaceVariant = PaleSky,
-    onSurfaceVariant = SlateGray,
+    surface = LightBlue, // Essentially background
+    onSurface = Charcoal, // Text on background
+    surfaceContainerHigh = White, // Cards
+    surfaceContainerLow = OffWhite, // Bars/rails
+    onSurfaceVariant = Charcoal, // Text/ icons on bars/rails and cards
+    primary = MayaBlue, // Buttons/selected
+    onPrimary = Charcoal,
+    secondary = DarkBlue,
+    onSecondary = White,
+    outline = DarkBlue,
     error = Salmon,
-    onError = BrightWhite,
 )
 
 val DarkColorScheme = darkColorScheme(
+    surface = Black, // Essentially background
+    onSurface = White, // Text on background
+    surfaceContainerHigh = DarkGray, // Cards
+    surfaceContainerLow = DarkGray, // Bars/rails
+    onSurfaceVariant = White, //
     primary = MayaBlue,
-    onPrimary = Midnight,
-    primaryContainer = DarkLake,
-    onPrimaryContainer = MayaBlue,
+    onPrimary = Black,
     secondary = MayaBlue,
-    onSecondary = Midnight,
-    background = Midnight,
-    onBackground = BrightWhite,
-    surface = Charcoal,
-    onSurface = BrightWhite,
-    surfaceVariant = DarkLake,
-    onSurfaceVariant = SteelGray,
-    error = Salmon,
-    onError = Midnight,
+    onSecondary = White,
+    outline = Color.Transparent,
+    error = Salmon
 )
 
 val LocalTheme = staticCompositionLocalOf<CustomTheme> {

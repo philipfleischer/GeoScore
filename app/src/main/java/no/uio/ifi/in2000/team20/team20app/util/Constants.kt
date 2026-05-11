@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team20.team20app.util
 
+import androidx.window.core.layout.WindowSizeClass
 import no.uio.ifi.in2000.team20.team20app.BuildConfig
 
 /**
@@ -32,8 +33,22 @@ object Constants {
     const val FROST_BASE_URL = "https://frost.met.no/"
     const val NVE_BASE_URL = "https://api.nve.no/"
     const val TIMEOUT_SECONDS = 30L
+
+    val ADDRESS_URL_FORMATTER = {encodedQuery:String -> "https://ws.geonorge.no/adresser/v1/sok?sok=$encodedQuery&fuzzy=false&utkoordsys=4258&treffPerSide=10&side=0&asciiKompatibel=true"}
+
     const val FROST_CLIENT_ID = BuildConfig.FROST_V0_CLIENT_ID
     const val FROST_CLIENT_SECRET = BuildConfig.FROST_V0_CLIENT_SECRET
+    const val CHATGPT_API_KEY = BuildConfig.CHATGPT_API_KEY
+
+    // SAVED STATE HANDLE KEYS
+    const val KEY_SELECTED_LOCATION = "selectedLocation"
+
+    // SEARCH RESULT STATUS CODES
+    const val HTTP_OK = 200
+    const val HTTP_CLIENT_ERROR = 400
+    const val HTTP_SERVER_ERROR = 500
+    const val NO_INTERNET = -100
+    const val CANCELLED_SEARCH = -200
 
     // MAP DEFAULT SETTINGS
     const val DEFAULT_ZOOM = 8f
@@ -76,6 +91,8 @@ object Constants {
 
     const val CARD_CORNER_RADIUS_DP = 16
     const val MAP_LEGEND_HEIGHT_DP = 120
+
+    const val MEDIUM_SCREEN_WIDTH = WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND
 
     // DATA REFRESH SETTINGS
     const val AUTO_REFRESH_INTERVAL_MINUTES = 2

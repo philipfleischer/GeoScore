@@ -1,10 +1,12 @@
 package no.uio.ifi.in2000.team20.team20app.ui.screens.map
 
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
 
 /**
  * ViewModel for MapScreen.
@@ -17,7 +19,8 @@ import kotlinx.coroutines.flow.update
  * Keeps map logic outside UI.
  */
 
-class MapViewModel(): ViewModel() {
+@HiltViewModel
+class MapViewModel @Inject constructor() : ViewModel() {
     private val _layers: MutableStateFlow<List<MapLayer>> = MutableStateFlow(MapLayers.layers)
     val layers: StateFlow<List<MapLayer>> = _layers.asStateFlow()
 

@@ -4,19 +4,26 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.LayersClear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.twotone.Layers
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -29,20 +36,25 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.window.core.layout.WindowSizeClass
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.maps.android.compose.DefaultMapContentPadding
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.Marker
@@ -53,6 +65,9 @@ import no.uio.ifi.in2000.team20.team20app.R
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
+import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
+import no.uio.ifi.in2000.team20.team20app.util.Constants.SMALL_PADDING_DP
+import no.uio.ifi.in2000.team20.team20app.util.Constants.LARGE_PADDING_DP
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_ZOOM
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MAX_ZOOM
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MIN_ZOOM
@@ -66,19 +81,21 @@ import java.math.RoundingMode
 @Composable
 fun MapScreen(
     modifier: Modifier = Modifier,
-    sharedViewModel: AppViewModel = viewModel(),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    sharedViewModel: AppViewModel = hiltViewModel(),
     savedViewModel: SavedViewModel,
-    mapViewModel: MapViewModel = viewModel(),
+    mapViewModel: MapViewModel = hiltViewModel(),
     onOpenSearch: () -> Unit = {},
     onOpenReport: () -> Unit = {}
 ) {
-    //TODO: Import custom colors
+
+    val padding = DEFAULT_PADDING_DP
     val chosenPosition by sharedViewModel.selectedLocation.collectAsStateWithLifecycle()
     val isCurrentSaved by savedViewModel.isCurrentSaved.collectAsStateWithLifecycle()
     val layers by mapViewModel.layers.collectAsStateWithLifecycle()
     val layersExpanded by mapViewModel.layersExpanded.collectAsStateWithLifecycle()
 
-    val compactScreenWidth = !LocalWindowSizeClass.current.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
+    val compactScreenWidth = !LocalWindowSizeClass.current.isWidthAtLeastBreakpoint(MEDIUM_SCREEN_WIDTH)
 
     val cameraPosition =
         if(chosenPosition != null) {
@@ -108,16 +125,15 @@ fun MapScreen(
         }
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
         val context = LocalContext.current
         val mapStyleOptions = MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style)
         GoogleMap(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surfaceVariant),
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+//                .windowInsetsPadding(WindowInsets.safeDrawing)
+            ,
             cameraPositionState = cameraPositionState,
             properties = MapProperties(
                 maxZoomPreference = MAX_ZOOM,
@@ -136,7 +152,10 @@ fun MapScreen(
                         lon = lon
                     )
                 )
-            }
+            },
+            contentPadding = PaddingValues(
+                horizontal = if(!compactScreenWidth) (padding*3).dp else 0.dp,
+                vertical = if (compactScreenWidth) (padding*9).dp else 0.dp)
         ) {
             layers.forEach { layer ->
                 WmsTileOverlay(
@@ -153,95 +172,56 @@ fun MapScreen(
             }
         }
         Column(
-            Modifier.align(Alignment.TopStart)
-                .fillMaxHeight()
-        ){
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        top = if (compactScreenWidth) 48.dp else 16.dp,
-                        start = 16.dp,
-                        end = 16.dp,
-                        bottom = 16.dp
-                    ),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = modifier
+                .align(Alignment.TopStart)
+                .fillMaxWidth()
+                .padding(
+                    top = (padding * 3).dp,
+                    start = if (compactScreenWidth) padding.dp else 0.dp,
+                    end = if (compactScreenWidth) padding.dp else (padding * 4).dp,
+                    bottom = padding.dp
+                ),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                FloatingActionButton(
+                    onClick = onOpenSearch,
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.clip(CircleShape).size(48.dp)
                 ) {
-                    FloatingActionButton(
-                        onClick = onOpenSearch,
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(48.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Søk etter adresse",
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-
-                    if (chosenPosition != null) {
-                        Button(onClick = onOpenReport) {
-                            Text("Vis rapport")
-                        }
-                    }
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search",
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colorScheme.onSecondary
+                    )
                 }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (chosenPosition != null) {
-                        Text(
-                            text = chosenPosition!!.name,
-                            style = MaterialTheme.typography.labelLarge,
-                            fontSize = 30.sp,
-                            color = Color.Black,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.semantics { heading() }
-                        )
-                    }
-                    Spacer(modifier = Modifier.weight(1f))
-                    IconButton(
-                        onClick = mapViewModel::toggleLayersExpanded,
-                        colors = IconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary,
-                            disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                            disabledContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+
+                if (chosenPosition != null) {
+                    Button(
+                        onClick = onOpenReport,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.secondary
                         )
                     ) {
-                        Icon(
-                            imageVector = if(!layersExpanded) Icons.Filled.Layers else Icons.Filled.LayersClear,
-                            contentDescription = "Vis lag"
-                        )
+                        Text("Vis rapport", color = MaterialTheme.colorScheme.onSecondary)
                     }
                 }
             }
-            Spacer(modifier = Modifier.weight(1f))
-            Column(){
-                Row(
-                    modifier = Modifier.fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.primary)
-                ) {
-                    Column(
-                    ) {
-                        if (layersExpanded) {
-                            layers.forEach { layer ->
-                                Button(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    onClick = { mapViewModel.toggleLayer(layer.layerId) },
-                                ){
-                                    Text(text = layer.name)
-                                }
-                            }
-                        }
-                    }
-                }
+
+            if (chosenPosition != null) {
+                Text(
+                    text = chosenPosition!!.name,
+                    style = MaterialTheme.typography.labelLarge,
+                    fontSize = 20.sp,
+                    color = Color.Black,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.semantics { heading() }
+                )
             }
         }
     }

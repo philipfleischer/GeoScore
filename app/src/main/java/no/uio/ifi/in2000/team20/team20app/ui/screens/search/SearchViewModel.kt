@@ -2,7 +2,7 @@ package no.uio.ifi.in2000.team20.team20app.ui.screens.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.CancellationException
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,8 +12,15 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team20.team20app.data.repository.GeoSearchRepositoryService
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
+import no.uio.ifi.in2000.team20.team20app.util.Constants.CANCELLED_SEARCH
+import no.uio.ifi.in2000.team20.team20app.util.Constants.HTTP_CLIENT_ERROR
+import no.uio.ifi.in2000.team20.team20app.util.Constants.HTTP_OK
+import no.uio.ifi.in2000.team20.team20app.util.Constants.HTTP_SERVER_ERROR
+import no.uio.ifi.in2000.team20.team20app.util.Constants.NO_INTERNET
+import javax.inject.Inject
 
-class SearchViewModel(
+@HiltViewModel
+class SearchViewModel @Inject constructor(
     private val repository: GeoSearchRepositoryService
 ) : ViewModel() {
 
@@ -36,8 +43,9 @@ class SearchViewModel(
         _uiState.update {
             it.copy(
                 query = text,
+                isLoading = it.results.isEmpty(), // This way the UI doesn't say "No results" for the split second of debounce
                 inputError = null,
-                error = null
+                error = null,
             )
         }
 
@@ -62,13 +70,28 @@ class SearchViewModel(
 
         setLoadingState()
 
-        try {
-            val result = repository.getSearchResults(query)
-            setSuccessState(result.locations)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            setErrorState("Søk feilet. Prøv igjen.")
+        val result = repository.getSearchResults(query)
+
+        when (result.status) {
+            HTTP_OK -> {
+                if (result.locations.isEmpty()) {
+                    setErrorState("Ingen resultater funnet.")
+                }else {
+                    setSuccessState(result.locations)
+                }
+            }
+            HTTP_CLIENT_ERROR -> {
+                setErrorState("Klient feilet. Prøv igjen.")
+            }
+            HTTP_SERVER_ERROR -> {
+                setErrorState("Server feilet. Prøv igjen.")
+            }
+            CANCELLED_SEARCH -> {
+                // We don't want to restart the loading animation
+            }
+            NO_INTERNET -> {
+                setErrorState("Ingen internet. Koble til å prøv igjen.")
+            }
         }
     }
 
@@ -128,7 +151,8 @@ class SearchViewModel(
             it.copy(
                 isLoading = false,
                 error = message,
-                inputError = null
+                inputError = null,
+                results = emptyList() // This way the UI doesn't show stale results for a split second when adding a character
             )
         }
     }

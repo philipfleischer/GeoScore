@@ -2,6 +2,7 @@ package no.uio.ifi.in2000.team20.team20app.ui.screens.map
 
 import no.uio.ifi.in2000.team20.team20app.util.WmsFormatterLambdas
 
+
 data class MapLayer(
     val name: String,
     val layerId: Int,

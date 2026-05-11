@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team20.team20app.ui.screens.search
 
+import android.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -7,19 +8,29 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -34,26 +45,32 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.components.ErrorState
 import no.uio.ifi.in2000.team20.team20app.ui.components.LoadingState
+import no.uio.ifi.in2000.team20.team20app.ui.components.SharedTopAppBar
+import no.uio.ifi.in2000.team20.team20app.ui.theme.LocalTheme
+import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
 
 @Composable
 fun SearchBarObject(
     onOpenSearch: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    theme: MaterialTheme = MaterialTheme
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
             .height(56.dp)
             .clip(RoundedCornerShape(28.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .clickable { onOpenSearch() }
-            .padding(horizontal = 16.dp),
+            .background(theme.colorScheme.surfaceContainerLow)
+            .clickable (onClickLabel = "Search address") { onOpenSearch() }
+            .padding(horizontal = DEFAULT_PADDING_DP.dp),
         contentAlignment = Alignment.CenterStart
     ) {
         Row(
@@ -80,7 +97,8 @@ fun SearchBarObject(
 fun SearchScreen(
     onBackClick: () -> Unit,
     onLocationSelected: (Location) -> Unit,
-    searchViewModel: SearchViewModel = viewModel(),
+    theme: MaterialTheme = MaterialTheme,
+    searchViewModel: SearchViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
 ) {
     val uiState by searchViewModel.uiState.collectAsStateWithLifecycle()
@@ -95,119 +113,141 @@ fun SearchScreen(
         keyboardController?.show()
     }
 
-//    Scaffold(
-//        topBar = {
+    Scaffold(
+        topBar = {
 //            SharedTopAppBar(
 //                title = "Søk etter adresse",
 //                onBackClick = onBackClick
 //            )
-//        }
-//    ) { innerPadding ->
-//
-//    }
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-//            .padding(innerPadding)
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Top
-    ) {
-        TextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .clip(RoundedCornerShape(28.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-                .padding(horizontal = 16.dp)
-                .focusRequester(focusRequester),
-            value = uiState.query,
-            onValueChange = { searchViewModel.updateInput(it) },
-            label = { Text("Sted") },
-            placeholder = { Text("Skriv inn adresse...") },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Søk"
+            Row(
+                modifier = Modifier
+                    .windowInsetsPadding(WindowInsets.displayCutout)
+                    .background(MaterialTheme.colorScheme.surface)
+                ,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ){
+                IconButton(onClick = onBackClick) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Gå tilbake"
+                    )
+                }
+                TextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .clip(RoundedCornerShape(28.dp))
+                        .background(theme.colorScheme.surfaceContainerLow)
+                        .padding(horizontal = 16.dp)
+                        .focusRequester(focusRequester),
+                    value = uiState.query,
+                    onValueChange = { searchViewModel.updateInput(it) },
+                    label = { Text("Sted", color = theme.colorScheme.secondary) },
+                    placeholder = { Text("Skriv inn adresse...") },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search"
+                        )
+                    },
+                    isError = uiState.inputError != null,
+                    singleLine = true,
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = theme.colorScheme.surfaceContainerLow,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        focusedTextColor = theme.colorScheme.secondary,
+                        unfocusedTextColor = theme.colorScheme.onSurfaceVariant,
+                        cursorColor = theme.colorScheme.secondary,
+                    )
                 )
-            },
-            isError = uiState.inputError != null,
-            singleLine = true,
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-                cursorColor = MaterialTheme.colorScheme.primary,
-            )
-        )
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.surface
+    ) { innerPadding ->
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .background(theme.colorScheme.surface)
+            ,
+            verticalArrangement = Arrangement.Top
+        ) {
 
-        // her viser vi egen feilmelding hvis brukeren skriver ugyldig input.
-        if (uiState.inputError != null) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = uiState.inputError!!,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
 
-        when {
-            uiState.query.isBlank() -> {
+            // her viser vi egen feilmelding hvis brukeren skriver ugyldig input.
+            if (uiState.inputError != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = uiState.inputError!!,
+                    color = theme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
 
-                if(uiState.recentlySearched.isEmpty()){
-                    Box(modifier = Modifier.fillMaxWidth()) {
-                        Text("Begynn å skrive for å se forslag")
+            Spacer(modifier = Modifier.height(16.dp))
+
+            when {
+                uiState.query.isBlank() -> {
+
+                    if(uiState.recentlySearched.isEmpty()){
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            Text("Begynn å skrive for å se forslag")
+                        }
+                    } else {
+                        Text(text = "Siste søk")
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f, fill = false)
+                        ) {
+                            items(uiState.recentlySearched) { location ->
+                                SearchResultItem(
+                                    location = location,
+                                    onSelect = {
+                                        onLocationSelected(location)
+                                    }
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                            }
+                        }
                     }
-                } else {
-                    Text(text = "Siste søk")
+
+                }
+                uiState.isLoading -> LoadingState(modifier = Modifier.fillMaxWidth())
+                uiState.error != null -> ErrorState(message = uiState.error!!, modifier = Modifier.fillMaxWidth())
+                uiState.results.isEmpty() -> {
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        Text("Ingen resultater for \"${uiState.query}\"", color = theme.colorScheme.error)
+                    }
+                }
+                // Search results
+                else -> {
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(1f, fill = false)
+                            .weight(1f, fill = false),
+                        verticalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        items(uiState.recentlySearched) { location ->
+                        items(uiState.results) { location ->
                             SearchResultItem(
                                 location = location,
                                 onSelect = {
+                                    searchViewModel.addRecentlySearched(location)
                                     onLocationSelected(location)
                                 }
                             )
+                            Spacer(modifier = Modifier.height((DEFAULT_PADDING_DP/2).dp))
                         }
-                    }
-                }
-
-            }
-            uiState.isLoading -> LoadingState(modifier = Modifier.fillMaxWidth())
-            uiState.error != null -> ErrorState(message = uiState.error!!, modifier = Modifier.fillMaxWidth())
-            uiState.results.isEmpty() -> {
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    Text("Ingen resultater for \"${uiState.query}\"")
-                }
-            }
-            else -> {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f, fill = false)
-                ) {
-                    items(uiState.results) { location ->
-                        SearchResultItem(
-                            location = location,
-                            onSelect = {
-                                searchViewModel.addRecentlySearched(location)
-                                onLocationSelected(location)
-                            }
-                        )
-                        HorizontalDivider()
                     }
                 }
             }
         }
     }
+
+
 }
 
 @Composable
@@ -215,24 +255,34 @@ private fun SearchResultItem(
     location: Location,
     onSelect: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onSelect() }
-            .padding(vertical = 12.dp, horizontal = 4.dp),
-        verticalArrangement = Arrangement.spacedBy(2.dp)
-    ) {
-        Text(
-            text = location.name ?: "",
-            style = MaterialTheme.typography.bodyLarge
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
         )
-        val subtitle = listOfNotNull(location.municipality, location.county).joinToString(", ")
-        if (subtitle.isNotEmpty()) {
+    ){
+        Column(
+            modifier = Modifier
+                .semantics(mergeDescendants = true){}
+                .fillMaxWidth()
+                .clickable(onClickLabel = "Select this address") { onSelect() }
+                .padding(vertical = 12.dp, horizontal = 4.dp)
+
+            ,
+            verticalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
             Text(
-                text = subtitle,
-                style = MaterialTheme.typography.bodySmall,
+                text = location.name ?: "",
+                style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+            val subtitle = listOfNotNull(location.municipality, location.county).joinToString(", ")
+            if (subtitle.isNotEmpty()) {
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
         }
     }
 }

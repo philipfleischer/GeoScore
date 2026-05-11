@@ -3,6 +3,8 @@ package no.uio.ifi.in2000.team20.team20app
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import dagger.hilt.android.AndroidEntryPoint
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
@@ -15,13 +17,16 @@ import no.uio.ifi.in2000.team20.team20app.ui.theme.LightColorScheme
 import no.uio.ifi.in2000.team20.team20app.ui.theme.LocalTheme
 import no.uio.ifi.in2000.team20.team20app.ui.theme.darkThemeColors
 import no.uio.ifi.in2000.team20.team20app.ui.theme.lightThemeColors
+import no.uio.ifi.in2000.team20.team20app.ui.navigation.NavigationRoot
 import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
 
         installSplashScreen()
+        enableEdgeToEdge()
 
         super.onCreate(savedInstanceState)
         setContent {
@@ -33,7 +38,7 @@ class MainActivity : ComponentActivity() {
                 LocalWindowSizeClass provides windowSizeClass,
             ) {
                 MaterialTheme(colorScheme = colorScheme) {
-                    NaturhendelserApp()
+                    NavigationRoot()
                 }
             }
         }

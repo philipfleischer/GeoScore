@@ -1,55 +1,37 @@
 package no.uio.ifi.in2000.team20.team20app
 
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.request.header
+import io.ktor.http.ContentType
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.runBlocking
-import no.uio.ifi.in2000.team20.team20app.BuildConfig.FROST_V0_CLIENT_ID
-import no.uio.ifi.in2000.team20.team20app.BuildConfig.FROST_V0_CLIENT_SECRET
-import no.uio.ifi.in2000.team20.team20app.data.api.FrostClientProvider
+import kotlinx.serialization.json.Json
 import no.uio.ifi.in2000.team20.team20app.data.datasource.FrostDataSource
+import no.uio.ifi.in2000.team20.team20app.util.Constants
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
  * Integration test for FrostDataSource.
+ * Credentials are read from Constants (backed by BuildConfig / local.properties).
  */
 
 class FrostDataSourceTest {
 
-    // Arrange (shared setup)
-    // Access credentials from constants generated from local.properties
-    private val credentials = "${FROST_V0_CLIENT_ID}:$FROST_V0_CLIENT_SECRET}"
-    
-    private val dataSource = FrostDataSource(
-        client = FrostClientProvider.client,
-        credentials = credentials
-    )
-
-    /*@Test
-    fun getStationWithCoordinatesReturnsNearestStation() = runBlocking {
-        // Arrange
-        val lat = 59.91
-        val lon = 10.74
-
-        // Act
-        val station = dataSource.getStation(lat = lat, lon = lon)
-
-        // Assert
-        assertNotNull(station)
-        assertTrue(station.id.startsWith("SN"))
+    private val client = HttpClient(CIO) {
+        install(ContentNegotiation) {
+            json(Json { ignoreUnknownKeys = true })
+            json(Json { ignoreUnknownKeys = true }, contentType = ContentType.Text.Plain)
+        }
+        expectSuccess = false
+        defaultRequest { header("User-Agent", "IN2000-Team20 jeryosa@uio.no") }
     }
 
-    @Test
-    fun getObservationsWithValidStationIdReturnsObservationList() = runBlocking {
-        // Arrange
-        val station = dataSource.getStation(lat = 59.91, lon = 10.74)
-
-        // Act
-        val response = dataSource.getObservations(stationId = station.id)
-
-        // Assert
-        assertNotNull(response)
-        assertTrue(response.data.isNotEmpty())
-    }*/
+    private val dataSource = FrostDataSource(client)
 
     @Test
     fun getRankedObservationsForPrecipitationReturnsResponse() = runBlocking {
@@ -120,5 +102,48 @@ class FrostDataSourceTest {
         // Assert
         val stationIds = response.data.tseries.map { it.header.id.stationid }
         assertTrue(stationIds.all { it > 0 })
+    }
+
+    @Test
+    fun getStationsNearbyReturnsStationList() = runBlocking {
+        // Arrange
+        val lat = 59.91
+        val lon = 10.74
+
+        // Act
+        val stations = dataSource.getStationsNearby(lat = lat, lon = lon)
+
+        // Assert
+        assertTrue(stations.isNotEmpty())
+        val stationList = stations.split(",")
+        assertTrue(stationList.any { it.startsWith("SN") })
+    }
+
+    @Test
+    fun getTemperatureNormalsReturnsData() = runBlocking {
+        // Arrange
+        val lat = 59.91
+        val lon = 10.74
+        val stations = dataSource.getStationsNearby(lat = lat, lon = lon)
+
+        // Act
+        val response = dataSource.getTemperatureNormals(lat = lat, lon = lon, sources = stations)
+
+        // Assert
+        assertNotNull(response)
+        assertTrue(response.data.isNotEmpty())
+    }
+
+    @Test
+    fun getSunshineStationNearbyReturnsSunshineStation() = runBlocking {
+        // Arrange
+        val lat = 59.91
+        val lon = 10.74
+
+        // Act
+        val stationId = dataSource.getSunshineStationNearby(lat = lat, lon = lon)
+
+        // Assert
+        assertTrue(stationId.startsWith("SN"))
     }
 }

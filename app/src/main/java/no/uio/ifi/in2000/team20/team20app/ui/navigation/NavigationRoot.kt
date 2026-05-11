@@ -1,45 +1,38 @@
 package no.uio.ifi.in2000.team20.team20app.ui.navigation
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.viewModelFactory
-import androidx.lifecycle.viewmodel.initializer
+import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.ui.NavDisplay
-import no.uio.ifi.in2000.team20.team20app.data.repository.SavedRepository
 import no.uio.ifi.in2000.team20.team20app.ui.components.AdaptiveNavigationScaffold
-import no.uio.ifi.in2000.team20.team20app.ui.screens.details.AreaDetailsScreen
-import no.uio.ifi.in2000.team20.team20app.ui.screens.details.ClimateStatsScreen
-import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.GeoscoreScreen
+import no.uio.ifi.in2000.team20.team20app.ui.screens.result.ClimateStatsScreen
+import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GeoscoreScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GeoScoreViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchViewModel
-import no.uio.ifi.in2000.team20.team20app.ui.screens.settings.SettingsScreen
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Screen
 
-/*
-Main changes (24.04.2026 adaptive-navigation-impl):
-- Replaced goToHome, goToMap and goToSaved with a general onNavigate to reduce repetition (I commented out old code).
-- Replaced ScreenScaffold with AdaptiveNavigationScaffold
-*/
 @Composable
-fun NavigationRoot(
-    appViewModel: AppViewModel,
-    searchViewModel: SearchViewModel,
-    homeViewModel: HomeViewModel,
-    mapViewModel: MapViewModel,
-    frostViewModel: FrostViewModel,
-    savedRepository: SavedRepository
-){
+fun NavigationRoot() {
+    // Shared ViewModels, activity-scoped, single instance across all nav entries
+    val appViewModel: AppViewModel = hiltViewModel()
+    val frostViewModel: FrostViewModel = hiltViewModel()
+    // SavedViewModel is shared so that isCurrentSaved stays consistent across all screens
+    val savedViewModel: SavedViewModel = hiltViewModel()
+
     //BackStack
     val backStack = rememberNavBackStack(Screen.HOME.route)
 
@@ -74,22 +67,19 @@ fun NavigationRoot(
         backStack = backStack,
         onBack = goBack,
         entryProvider = entryProvider {
-            entry<Route.HomeDestination> { // Type parameter. Can't use Screen.XXX.route
-                val savedViewModel: SavedViewModel = viewModel(
-                    factory = viewModelFactory {
-                        initializer { SavedViewModel(savedRepository) }
-                    }
-                )
+            entry<Route.HomeDestination> {
+                // Screen-specific ViewModel scoped to this nav entry
+                val homeViewModel: HomeViewModel = hiltViewModel()
 
                 AdaptiveNavigationScaffold(
-                    title = Screen.HOME.title,
+//                    title = Screen.HOME.title,
                     onNavigate = onNavigate,
-                    onOpenSettings = goToSettings,
+//                    onOpenSettings = goToSettings,
                     highlightedDest = Screen.HOME.route,
-                ) { modifier ->
+                ) { insets ->
                     HomeScreen(
                         onOpenSearch = goToSearch,
-                        modifier = modifier,
+                        modifier = Modifier.padding(insets),
                         viewModel = homeViewModel,
                         sharedViewModel = appViewModel,
                         savedViewModel = savedViewModel,
@@ -99,20 +89,19 @@ fun NavigationRoot(
             }
 
             entry<Route.MapDestination> {
-                val savedViewModel: SavedViewModel = viewModel(
-                    factory = viewModelFactory {
-                        initializer { SavedViewModel(savedRepository) }
-                    }
-                )
+                // Screen-specific ViewModel scoped to this nav entry
+                val mapViewModel: MapViewModel = hiltViewModel()
 
                 AdaptiveNavigationScaffold(
-                    title = Screen.MAP.title,
+//                    title = Screen.MAP.title,
                     onNavigate = onNavigate,
-                    onOpenSettings = goToSettings,
-                    highlightedDest = Screen.MAP.route
-                ) { modifier ->
+//                    onOpenSettings = goToSettings,
+                    highlightedDest = Screen.MAP.route,
+                    floatingNav = true
+                ) { insets ->
                     MapScreen(
-                        modifier = modifier,
+                        modifier = Modifier.padding(insets),
+                        contentPadding = insets,
                         sharedViewModel = appViewModel,
                         savedViewModel = savedViewModel,
                         mapViewModel = mapViewModel,
@@ -125,20 +114,14 @@ fun NavigationRoot(
             }
 
             entry<Route.SavedDestination> {
-                val savedViewModel: SavedViewModel = viewModel(
-                    factory = viewModelFactory {
-                        initializer { SavedViewModel(savedRepository) }
-                    }
-                )
-
                 AdaptiveNavigationScaffold(
-                    title = Screen.SAVED.title,
+//                    title = Screen.SAVED.title,
                     onNavigate = onNavigate,
-                    onOpenSettings = goToSettings,
+//                    onOpenSettings = goToSettings,
                     highlightedDest = Screen.SAVED.route
-                ) { modifier ->
+                ) { insets ->
                     SavedScreen(
-                        modifier = modifier,
+                        modifier = Modifier.padding(insets),
                         sharedViewModel = appViewModel,
                         savedViewModel = savedViewModel,
                         onSavedClick = { location ->
@@ -150,17 +133,12 @@ fun NavigationRoot(
             }
 
             entry<Route.GeoscoreDestination> { destination ->
-                val savedViewModel: SavedViewModel = viewModel(
-                    factory = viewModelFactory {
-                        initializer { SavedViewModel(savedRepository) }
-                    }
-                )
+                // Screen-specific ViewModel scoped to this nav entry
+                val geoScoreViewModel: GeoScoreViewModel = hiltViewModel()
 
                 AdaptiveNavigationScaffold(
-                    title = destination.location.name,
                     highlightedDest = Screen.SAVED.route,
                     onNavigate = onNavigate,
-                    onBackClick = goBack,
                 ) {
                     GeoscoreScreen(
                         location = destination.location,
@@ -169,25 +147,20 @@ fun NavigationRoot(
                             backStack.add(Route.ClimateStatsDestination(destination.location))
                         },
                         frostViewModel = frostViewModel,
-                        savedViewModel = savedViewModel
+                        savedViewModel = savedViewModel,
+                        geoScoreViewModel = geoScoreViewModel
                     )
                 }
             }
 
-            entry<Route.SettingsDestination> {
-                SettingsScreen(
-                    onBackClick = goBack
-                )
-            }
-
             entry<Route.SearchDestination> {
+                // Screen-specific ViewModel scoped to this nav entry
+                val searchViewModel: SearchViewModel = hiltViewModel()
+
                 AdaptiveNavigationScaffold(
-                    title = "Søk etter en adresse",
                     highlightedDest = Screen.HOME.route,
                     onNavigate = onNavigate,
-                    onBackClick = goBack,
-                    hasTopBar = true
-                ) { modifier ->
+                ) { insets ->
                     SearchScreen(
                         onBackClick = goBack,
                         onLocationSelected = { location ->
@@ -195,31 +168,15 @@ fun NavigationRoot(
                             backStack.add(Route.MapDestination)
                         },
                         searchViewModel = searchViewModel,
-                        modifier = modifier
+                        modifier = Modifier.padding(insets)
                     )
                 }
             }
 
-            entry<Route.AreaDetailsDestination> { destination ->
-                AreaDetailsScreen(
-                    location = destination.location,
-                    onBackClick = goBack,
-                    onOpenClimateStats = {
-                        backStack.add(
-                            Route.ClimateStatsDestination(
-                                destination.location
-                            )
-                        )
-                    }
-                )
-            }
-
             entry<Route.ClimateStatsDestination> { destination ->
                 AdaptiveNavigationScaffold(
-                    title = destination.location.name,
                     highlightedDest = Screen.SAVED.route,
                     onNavigate = onNavigate,
-                    onBackClick = goBack
                 ) {
                     ClimateStatsScreen(
                         location = destination.location,
