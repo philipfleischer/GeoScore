@@ -61,28 +61,28 @@ class GeoScoreTest {
         // Fake in-memory DAOs for FrostRepository — no Room dependency needed in tests
         private val fakeTemperatureDao = object : TemperatureCacheDao {
             private val cache = mutableMapOf<String, TemperatureCacheEntity>()
-            override suspend fun getByKey(locationKey: String) = cache[locationKey]
-            override suspend fun insert(entity: TemperatureCacheEntity) { cache[entity.locationKey] = entity }
+            override suspend fun getByKey(stationId: String) = cache[stationId]
+            override suspend fun insert(entity: TemperatureCacheEntity) { cache[entity.stationId] = entity }
         }
         private val fakeWindDao = object : WindCacheDao {
             private val cache = mutableMapOf<String, WindCacheEntity>()
-            override suspend fun getByKey(locationKey: String) = cache[locationKey]
-            override suspend fun insert(entity: WindCacheEntity) { cache[entity.locationKey] = entity }
+            override suspend fun getByKey(stationId: String) = cache[stationId]
+            override suspend fun insert(entity: WindCacheEntity) { cache[entity.stationId] = entity }
         }
         private val fakeSunshineDao = object : SunshineCacheDao {
             private val cache = mutableMapOf<String, SunshineCacheEntity>()
-            override suspend fun getByKey(locationKey: String) = cache[locationKey]
-            override suspend fun insert(entity: SunshineCacheEntity) { cache[entity.locationKey] = entity }
+            override suspend fun getByKey(stationId: String) = cache[stationId]
+            override suspend fun insert(entity: SunshineCacheEntity) { cache[entity.stationId] = entity }
         }
         private val fakeSnowDao = object : SnowCacheDao {
             private val cache = mutableMapOf<String, SnowCacheEntity>()
-            override suspend fun getByKey(locationKey: String) = cache[locationKey]
-            override suspend fun insert(entity: SnowCacheEntity) { cache[entity.locationKey] = entity }
+            override suspend fun getByKey(stationId: String) = cache[stationId]
+            override suspend fun insert(entity: SnowCacheEntity) { cache[entity.stationId] = entity }
         }
         private val fakePrecipitationDao = object : PrecipitationCacheDao {
             private val cache = mutableMapOf<String, PrecipitationCacheEntity>()
-            override suspend fun getByKey(locationKey: String) = cache[locationKey]
-            override suspend fun insert(entity: PrecipitationCacheEntity) { cache[entity.locationKey] = entity }
+            override suspend fun getByKey(stationId: String) = cache[stationId]
+            override suspend fun insert(entity: PrecipitationCacheEntity) { cache[entity.stationId] = entity }
         }
 
         // Single fake ScoreCacheRepository — replaces the 4 individual score DAO fakes

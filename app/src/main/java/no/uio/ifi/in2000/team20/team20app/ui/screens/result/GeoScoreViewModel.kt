@@ -1,8 +1,10 @@
 package no.uio.ifi.in2000.team20.team20app.ui.screens.result
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -49,6 +51,9 @@ class GeoScoreViewModel @Inject constructor(
     private val getAiReport: GetAiReport
 ) : ViewModel() {
 
+    init{
+        Log.d("ViewModel", "GeoScoreViewModel created")
+    }
 
     private val _uiState = MutableStateFlow(GeoScoreUiState())
     val uiState: StateFlow<GeoScoreUiState> = _uiState.asStateFlow()
@@ -62,7 +67,7 @@ class GeoScoreViewModel @Inject constructor(
      * @param location The location to calculate the score for
      */
     fun load(location: Location) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) { // Moved of main thread, all functions called by this one will inherit this scope. {
             _uiState.update { it.copy(isScoreLoading = true, scoreError = null) }
             runCatching { getGeoScore.calculateGeoScore(location.lat, location.lon) }
                 .fold(

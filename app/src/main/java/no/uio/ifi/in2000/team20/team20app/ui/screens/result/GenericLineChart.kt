@@ -24,7 +24,7 @@ import ir.ehsannarmani.compose_charts.models.Line
 import ir.ehsannarmani.compose_charts.models.PopupProperties
 import ir.ehsannarmani.compose_charts.models.StrokeStyle
 import ir.ehsannarmani.compose_charts.models.ZeroLineProperties
-import no.uio.ifi.in2000.team20.team20app.ui.theme.BrightWhite
+import no.uio.ifi.in2000.team20.team20app.ui.theme.White
 import no.uio.ifi.in2000.team20.team20app.ui.theme.Charcoal
 import no.uio.ifi.in2000.team20.team20app.ui.theme.SlateGray
 import androidx.compose.animation.core.tween
@@ -86,7 +86,7 @@ fun GenericLineChart(
                 animationSpec = tween(300),
                 duration = 3000L,
                 textStyle = TextStyle(
-                    color = BrightWhite,
+                    color = White,
                     fontSize = 11.sp
                 ),
                 containerColor = Charcoal,

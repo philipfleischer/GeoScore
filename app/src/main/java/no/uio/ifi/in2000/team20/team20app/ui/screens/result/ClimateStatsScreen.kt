@@ -48,18 +48,8 @@ import ir.ehsannarmani.compose_charts.models.Line
 import ir.ehsannarmani.compose_charts.models.DotProperties
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.unit.sp
-import ir.ehsannarmani.compose_charts.models.ZeroLineProperties
-import ir.ehsannarmani.compose_charts.models.PopupProperties
-import androidx.compose.animation.core.tween
-import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.text.TextStyle
-import androidx.window.core.layout.WindowSizeClass
-import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
 import ir.ehsannarmani.compose_charts.models.IndicatorCount
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,18 +61,18 @@ fun ClimateStatsScreen(
     frostViewModel: FrostViewModel
 ) {
     val frostUiState by frostViewModel.uiState.collectAsStateWithLifecycle()
-    val theme = LocalTheme.current
 
     LaunchedEffect(location) {
         frostViewModel.loadFrostStats(location)
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surface)
+                    .background(MaterialTheme.colorScheme.surfaceContainerLow)
                     .windowInsetsPadding(WindowInsets.statusBars)
                     .semantics{
                         onClick(
@@ -94,13 +84,21 @@ fun ClimateStatsScreen(
                         )
                     }
             ) {
-                SecondaryTabRow(selectedTabIndex = 1, modifier = Modifier.fillMaxWidth()) {
+                SecondaryTabRow(
+                    selectedTabIndex = 1,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.surfaceContainerLow)
+                ) {
                     Tab(
+                        modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainerLow),
                         selected = false,
                         onClick = onRapportClick,
-                        text = { Text("Rapport") }
+                        text = { Text("Rapport") },
+
                     )
                     Tab(
+                        modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainerLow),
                         selected = true,
                         onClick = { },
                         text = { Text("Historisk klimadata") }
@@ -119,11 +117,7 @@ fun ClimateStatsScreen(
             }
         }
     ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(theme.background)
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {  // Why box?
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -139,7 +133,7 @@ fun ClimateStatsScreen(
                     Icon(
                         imageVector = Icons.Outlined.Home,
                         contentDescription = null,
-                        tint = theme.tertiary,
+                        tint = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier
                             .size(36.dp)
                             .padding(end = 8.dp)
@@ -148,7 +142,7 @@ fun ClimateStatsScreen(
                         text = location.name,
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
-                        color = theme.tertiary
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 }
             }
@@ -180,7 +174,7 @@ fun ClimateStatsScreen(
                                             curvedEdges = false,
                                             dotProperties = DotProperties(
                                                 enabled = true,
-                                                color = SolidColor(BrightWhite),
+                                                color = SolidColor(White),
                                                 radius = 4.dp,
                                                 strokeWidth = 2.dp,
                                                 strokeColor = SolidColor(MayaBlue)
@@ -195,7 +189,7 @@ fun ClimateStatsScreen(
                                             curvedEdges = false,
                                             dotProperties = DotProperties(
                                                 enabled = true,
-                                                color = SolidColor(BrightWhite),
+                                                color = SolidColor(White),
                                                 radius = 4.dp,
                                                 strokeWidth = 2.dp,
                                                 strokeColor = SolidColor(DustyBlue)
@@ -210,7 +204,7 @@ fun ClimateStatsScreen(
                                             curvedEdges = false,
                                             dotProperties = DotProperties(
                                                 enabled = true,
-                                                color = SolidColor(BrightWhite),
+                                                color = SolidColor(White),
                                                 radius = 4.dp,
                                                 strokeWidth = 2.dp,
                                                 strokeColor = SolidColor(Salmon)
@@ -260,7 +254,7 @@ fun ClimateStatsScreen(
                                             curvedEdges = false,
                                             dotProperties = DotProperties(
                                                 enabled = true,
-                                                color = SolidColor(BrightWhite),
+                                                color = SolidColor(White),
                                                 strokeColor = SolidColor(TrafficGreen)
                                             )
                                         ),
@@ -273,7 +267,7 @@ fun ClimateStatsScreen(
                                             curvedEdges = false,
                                             dotProperties = DotProperties(
                                                 enabled = true,
-                                                color = SolidColor(BrightWhite),
+                                                color = SolidColor(White),
                                                 strokeColor = SolidColor(RoyalGold)
                                             )
                                         ),
@@ -286,7 +280,7 @@ fun ClimateStatsScreen(
                                             curvedEdges = false,
                                             dotProperties = DotProperties(
                                                 enabled = true,
-                                                color = SolidColor(BrightWhite),
+                                                color = SolidColor(White),
                                                 strokeColor = SolidColor(TrafficRed)
                                             )
                                         )
@@ -331,7 +325,7 @@ fun ClimateStatsScreen(
                                             curvedEdges = false,
                                             dotProperties = DotProperties(
                                                 enabled = true,
-                                                color = SolidColor(BrightWhite),
+                                                color = SolidColor(White),
                                                 strokeColor = SolidColor(RoyalGold)
                                             )
                                         )
@@ -385,7 +379,7 @@ fun ClimateStatsScreen(
                                                 curvedEdges = false,
                                                 dotProperties = DotProperties(
                                                     enabled = true,
-                                                    color = SolidColor(BrightWhite),
+                                                    color = SolidColor(White),
                                                     radius = 4.dp,
                                                     strokeWidth = 2.dp,
                                                     strokeColor = SolidColor(MayaBlue)
@@ -413,7 +407,7 @@ fun ClimateStatsScreen(
                                                 curvedEdges = false,
                                                 dotProperties = DotProperties(
                                                     enabled = true,
-                                                    color = SolidColor(BrightWhite),
+                                                    color = SolidColor(White),
                                                     radius = 4.dp,
                                                     strokeWidth = 2.dp,
                                                     strokeColor = SolidColor(TrafficGreen)
@@ -459,7 +453,7 @@ fun ClimateStatsScreen(
                                             curvedEdges = false,
                                             dotProperties = DotProperties(
                                                 enabled = true,
-                                                color = SolidColor(BrightWhite),
+                                                color = SolidColor(White),
                                                 radius = 4.dp,
                                                 strokeWidth = 2.dp,
                                                 strokeColor = SolidColor(MayaBlue)
@@ -474,7 +468,7 @@ fun ClimateStatsScreen(
                                             curvedEdges = false,
                                             dotProperties = DotProperties(
                                                 enabled = true,
-                                                color = SolidColor(BrightWhite),
+                                                color = SolidColor(White),
                                                 radius = 4.dp,
                                                 strokeWidth = 2.dp,
                                                 strokeColor = SolidColor(DarkBlue)
@@ -512,11 +506,12 @@ private fun ChartSection(
 ) {
     SectionCard(
         title = title,
-        cardColor = LocalTheme.current.secondary
+        cardColor = MaterialTheme.colorScheme.surfaceContainerHigh
     ) {
         Text(
             text = description,
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f)
         )
         Spacer(modifier = Modifier.height(12.dp))
 
@@ -540,7 +535,7 @@ private fun ChartLoadingPlaceholder(height: Dp) {
             .fillMaxWidth()
             .height(height)
             .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant),
+            .background(MaterialTheme.colorScheme.secondaryContainer),
         contentAlignment = Alignment.Center
     ) {
         Text(

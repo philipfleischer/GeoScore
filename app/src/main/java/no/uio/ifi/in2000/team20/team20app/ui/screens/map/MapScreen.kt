@@ -4,14 +4,21 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -22,6 +29,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.CustomAccessibilityAction
@@ -39,6 +47,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.maps.android.compose.DefaultMapContentPadding
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.Marker
@@ -50,6 +59,7 @@ import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
+import no.uio.ifi.in2000.team20.team20app.util.Constants.SMALL_PADDING_DP
 import no.uio.ifi.in2000.team20.team20app.util.Constants.LARGE_PADDING_DP
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_ZOOM
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MAX_ZOOM
@@ -65,13 +75,15 @@ import java.math.RoundingMode
 @Composable
 fun MapScreen(
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     sharedViewModel: AppViewModel = hiltViewModel(),
     savedViewModel: SavedViewModel,
     mapViewModel: MapViewModel = hiltViewModel(),
     onOpenSearch: () -> Unit = {},
     onOpenReport: () -> Unit = {}
 ) {
-    //TODO: Import custom colors
+
+    val padding = DEFAULT_PADDING_DP
     val chosenPosition by sharedViewModel.selectedLocation.collectAsStateWithLifecycle()
     // TODO: isCurrentSaved not used in Map! We can decouple selectedLocation and isCurrent saved!
     val isCurrentSaved by savedViewModel.isCurrentSaved.collectAsStateWithLifecycle()
@@ -113,7 +125,9 @@ fun MapScreen(
         GoogleMap(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surfaceVariant),
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+//                .windowInsetsPadding(WindowInsets.safeDrawing)
+            ,
             cameraPositionState = cameraPositionState,
             properties = MapProperties(
                 maxZoomPreference = MAX_ZOOM,
@@ -132,7 +146,10 @@ fun MapScreen(
                         lon = lon
                     )
                 )
-            }
+            },
+            contentPadding = PaddingValues(
+                horizontal = if(!compactScreenWidth) (padding*3).dp else 0.dp,
+                vertical = if (compactScreenWidth) (padding*9).dp else 0.dp)
         ) {
             layers.forEach { layer ->
                 WmsTileOverlay(
@@ -149,14 +166,14 @@ fun MapScreen(
             }
         }
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .align(Alignment.TopStart)
                 .fillMaxWidth()
                 .padding(
-                    top = (DEFAULT_PADDING_DP * 2).dp,
-                    start = DEFAULT_PADDING_DP.dp,
-                    end = if (compactScreenWidth) DEFAULT_PADDING_DP.dp else (DEFAULT_PADDING_DP * 4).dp,
-                    bottom = DEFAULT_PADDING_DP.dp
+                    top = (padding * 3).dp,
+                    start = if (compactScreenWidth) padding.dp else 0.dp,
+                    end = if (compactScreenWidth) padding.dp else (padding * 4).dp,
+                    bottom = padding.dp
                 ),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -167,27 +184,34 @@ fun MapScreen(
             ) {
                 FloatingActionButton(
                     onClick = onOpenSearch,
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(48.dp)
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.clip(CircleShape).size(48.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Search,
                         contentDescription = "Search",
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colorScheme.onSecondary
                     )
                 }
 
                 if (chosenPosition != null) {
-                    Button(onClick = onOpenReport) {
-                        Text("Vis rapport")
+                    Button(
+                        onClick = onOpenReport,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.secondary
+                        )
+                    ) {
+                        Text("Vis rapport", color = MaterialTheme.colorScheme.onSecondary)
                     }
                 }
             }
+
             if (chosenPosition != null) {
                 Text(
                     text = chosenPosition!!.name,
                     style = MaterialTheme.typography.labelLarge,
-                    fontSize = 30.sp,
+                    fontSize = 20.sp,
                     color = Color.Black,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.semantics { heading() }

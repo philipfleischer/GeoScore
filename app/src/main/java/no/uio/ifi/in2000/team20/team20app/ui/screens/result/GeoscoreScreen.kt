@@ -1,6 +1,8 @@
 package no.uio.ifi.in2000.team20.team20app.ui.screens.result
 
+import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,7 +11,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -36,16 +37,17 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.CustomAccessibilityAction
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.toggleableState
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.unit.dp
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
@@ -69,31 +71,37 @@ fun GeoscoreScreen(
     val isCurrentSaved by savedViewModel.isCurrentSaved.collectAsStateWithLifecycle()
     val geoState by geoScoreViewModel.uiState.collectAsStateWithLifecycle()
 
+
     LaunchedEffect(location) {
+
+        Log.d("GeoScoreScreen", "LaunchedEffect called with $location")
+
         frostViewModel.loadFrostStats(location)
         savedViewModel.checkIfSaved(location)
         geoScoreViewModel.load(location)
     }
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.primaryContainer,
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surface)
+                    .background(MaterialTheme.colorScheme.surfaceContainerLow)
                     .windowInsetsPadding(WindowInsets.statusBars)
             ) {
                 SecondaryTabRow(selectedTabIndex = 0, modifier = Modifier.fillMaxWidth().semantics{isTraversalGroup = true}) {
                     Tab(
                         modifier = Modifier
+                            .background(MaterialTheme.colorScheme.surfaceContainerLow)
                             .semantics{ onClick(label = "See geo-score rapport for ${location.name}", action = { true })},
                         selected = true,
                         onClick = { },
-                        text = { Text("Rapport") }
+                        text = { Text("Rapport", color = MaterialTheme.colorScheme.secondary) }
                     )
                     Tab(
                         modifier = Modifier
+                            .background(MaterialTheme.colorScheme.surfaceContainerLow)
                             .semantics{ onClick(
                                 label = "See historic climate data for ${location.name}",
                                 action = {
@@ -102,7 +110,7 @@ fun GeoscoreScreen(
                                 })},
                         selected = false,
                         onClick = onHistoricDataClick,
-                        text = { Text("Historisk klimadata") }
+                        text = { Text("Historisk klimadata", color = MaterialTheme.colorScheme.secondary) }
                     )
                 }
 
@@ -112,7 +120,8 @@ fun GeoscoreScreen(
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Tilbake"
+                        contentDescription = "Tilbake",
+                        tint = MaterialTheme.colorScheme.secondary
                     )
                 }
             }
@@ -128,13 +137,13 @@ fun GeoscoreScreen(
             return@Scaffold
         }
 
-
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
             contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+
         ) {
             item {
                 GeomarkingCard(
@@ -150,88 +159,6 @@ fun GeoscoreScreen(
                     }
                 )
             }
-
-            item {
-                Text(
-                    text = "Detaljert analyse",
-                    style = MaterialTheme.typography.titleLarge
-
-                )
-            }
-
-            item {
-                ExpandableInfoBox(
-                    title = "☁\uFE0F Storm",
-
-                    rightContent = {
-                        GeomarkingBadge(
-                            grade = geoState.geoScore?.let { scoreToGrade(it.windScore) } ?: "?"
-                        )
-                    }
-                ) {
-                    Text(
-                        text = if (geoState.isReportLoading) "Laster rapport..."
-                               else geoState.aiReport?.extremeWindText ?: "Chat kallet funket ikke",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-            }
-
-            item {
-                ExpandableInfoBox(
-                    title = "⛰\uFE0F Skredfare",
-                    rightContent = {
-                        GeomarkingBadge(
-                            grade = geoState.geoScore?.let { scoreToGrade(it.landslideScore) } ?: "?"
-                        )
-                    }
-                ) {
-                    Text(
-                        text = if (geoState.isReportLoading) "Laster rapport..."
-                               else geoState.aiReport?.landslideText ?: "Chat kallet funket ikke",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-            }
-
-            item {
-                ExpandableInfoBox(
-                    title = "\uD83C\uDF0A Flomrisiko",
-                    rightContent = {
-                        GeomarkingBadge(
-                            grade = geoState.geoScore?.let { scoreToGrade(it.floodScore) } ?: "?"
-                        )
-                    }
-                ) {
-                    Text(
-                        text = if (geoState.isReportLoading) "Laster rapport..."
-                               else geoState.aiReport?.floodText ?: "Chat kallet funket ikke",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-            }
-
-            item {
-                ExpandableInfoBox(
-                    title = "\uD83C\uDF27\uFE0F Nedbør",
-                    rightContent = {
-                        GeomarkingBadge(
-                            grade = geoState.geoScore?.let { scoreToGrade(it.precipitationScore) } ?: "?"
-                        )
-                    }
-                ) {
-                    Text(
-                        text = if (geoState.isReportLoading) "Laster rapport..."
-                               else geoState.aiReport?.extremePrecipitationText ?: "",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-            }
-
-
-            item {
-                Spacer(modifier = Modifier.height(8.dp))
-            }
         }
     }
 }
@@ -243,59 +170,183 @@ private fun GeomarkingCard(
     isCurrentSaved: Boolean,
     onSavedToggle: (Boolean) -> Unit
 ) {
+
+    val NVEtiltakLink = "https://kommunikasjon.ntb.no/pressemelding/18558016/nve-sikrer-norge-mot-naturfarer-se-kart-bilder-og-tiltak-fra-hele-landet?publisherId=89280&lang=no"
+    val uriHandler = LocalUriHandler.current
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .semantics(mergeDescendants = true){},
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .height(IntrinsicSize.Min),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            GeomarkingBadge(
-                grade = geoState.grade.ifEmpty { "?" },
-            )
-
-            Column(
+        Column(){
+            Row(
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 12.dp)
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .height(IntrinsicSize.Min),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = location.name,
-                    style = MaterialTheme.typography.titleLarge
-                )
-                Text(
-                    text = gradeToRiskLabel(geoState.grade),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.75f)
-                )
+                GeomarkingBadge( grade = geoState.grade.ifEmpty { "?" }, iconStyle = false)
+
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 12.dp)
+                ) {
+                    Text(
+                        text = location.name,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = gradeToRiskLabel(geoState.grade),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f)
+                    )
+                }
+
+                IconButton(
+                    modifier = Modifier.semantics {
+                        onClick(
+                            label = if (isCurrentSaved) "Remove address from saved" else "Save address",
+                            action = {
+                                onSavedToggle(isCurrentSaved)
+                                true
+                            })
+                    },
+                    onClick = { onSavedToggle(isCurrentSaved) }
+                ) {
+                    Icon(
+                        imageVector = if (isCurrentSaved) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+                        contentDescription = if (isCurrentSaved) "Address saved" else "Address not saved",
+                        tint = MaterialTheme.colorScheme.secondary
+                    )
+                }
             }
 
-            IconButton(
-                modifier = Modifier.semantics {
-                    onClick(
-                        label = if (isCurrentSaved) "Remove address from saved" else "Save address",
-                        action = {
-                            onSavedToggle(isCurrentSaved)
-                            true
-                        })
-                },
-                onClick = { onSavedToggle(isCurrentSaved) }
+            Spacer(modifier = Modifier.height(8.dp))
+
+            ExpandableInfoBox(
+                title = "☁\uFE0F Storm",
+
+                rightContent = {
+                    GeomarkingBadge(
+                        grade = geoState.geoScore?.let { scoreToGrade(it.windScore) } ?: "?"
+                    )
+                }
             ) {
-                Icon(
-                    imageVector = if (isCurrentSaved) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
-                    contentDescription = if (isCurrentSaved) "Address saved" else "Address not saved"
+                Text(
+                    text = if (geoState.isReportLoading) "Laster rapport..."
+                    else geoState.aiReport?.extremeWindText ?: "Chat kallet funket ikke",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                if (!geoState.isReportLoading && geoState.aiReport != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(SpanStyle(
+                            color = MaterialTheme.colorScheme.primary,
+                            textDecoration = TextDecoration.Underline
+                        )) { append("Les mer på NVE.no") }
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.clickable { uriHandler.openUri(NVEtiltakLink) }
                 )
             }
+            }
+
+            ExpandableInfoBox(
+                title = "⛰\uFE0F Skredfare",
+                rightContent = {
+                    GeomarkingBadge(
+                        grade = geoState.geoScore?.let { scoreToGrade(it.landslideScore) } ?: "?"
+                    )
+                }
+            ) {
+                Text(
+                    text = if (geoState.isReportLoading) "Laster rapport..."
+                    else geoState.aiReport?.landslideText ?: "Chat kallet funket ikke",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                if (!geoState.isReportLoading && geoState.aiReport != null) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(SpanStyle(
+                                color = MaterialTheme.colorScheme.primary,
+                                textDecoration = TextDecoration.Underline
+                            )) { append("Les mer på NVE.no") }
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.clickable { uriHandler.openUri(NVEtiltakLink) }
+                    )
+                }
+            }
+
+            ExpandableInfoBox(
+                title = "\uD83C\uDF0A Flomrisiko",
+                rightContent = {
+                    GeomarkingBadge(
+                        grade = geoState.geoScore?.let { scoreToGrade(it.floodScore) } ?: "?"
+                    )
+                }
+            ) {
+                Text(
+                    text = if (geoState.isReportLoading) "Laster rapport..."
+                    else geoState.aiReport?.floodText ?: "Chat kallet funket ikke",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                if (!geoState.isReportLoading && geoState.aiReport != null) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(SpanStyle(
+                                color = MaterialTheme.colorScheme.primary,
+                                textDecoration = TextDecoration.Underline
+                            )) { append("Les mer på NVE.no") }
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.clickable { uriHandler.openUri(NVEtiltakLink) }
+                    )
+                }
+            }
+
+            ExpandableInfoBox(
+                title = "\uD83C\uDF27\uFE0F Nedbør",
+                rightContent = {
+                    GeomarkingBadge(
+                        grade = geoState.geoScore?.let { scoreToGrade(it.precipitationScore) } ?: "?"
+                    )
+                }
+            ) {
+                Text(
+                    text = if (geoState.isReportLoading) "Laster rapport..."
+                    else geoState.aiReport?.extremePrecipitationText ?: "",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                if (!geoState.isReportLoading && geoState.aiReport != null) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(SpanStyle(
+                                color = MaterialTheme.colorScheme.primary,
+                                textDecoration = TextDecoration.Underline
+                            )) { append("Les mer på NVE.no") }
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.clickable { uriHandler.openUri(NVEtiltakLink) }
+                    )
+                }
+            }
+
         }
+
     }
 }
 

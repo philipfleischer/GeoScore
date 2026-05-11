@@ -40,6 +40,9 @@ object Constants {
     const val FROST_CLIENT_SECRET = BuildConfig.FROST_V0_CLIENT_SECRET
     const val CHATGPT_API_KEY = BuildConfig.CHATGPT_API_KEY
 
+    // SAVED STATE HANDLE KEYS
+    const val KEY_SELECTED_LOCATION = "selectedLocation"
+
     // SEARCH RESULT STATUS CODES
     const val HTTP_OK = 200
     const val HTTP_CLIENT_ERROR = 400

@@ -15,7 +15,7 @@ import androidx.compose.runtime.Composable
 fun SharedTopAppBar(
     title: String,
     onBackClick: (() -> Unit)? = null,
-    onOpenSettings: (() -> Unit)? = null
+    onOpenSettings: (() -> Unit)? = null,
 ) {
     CenterAlignedTopAppBar(
         title = { Text(title) },

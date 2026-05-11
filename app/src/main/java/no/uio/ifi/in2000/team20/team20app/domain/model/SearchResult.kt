@@ -1,6 +1,8 @@
 package no.uio.ifi.in2000.team20.team20app.domain.model
 
+import android.os.Parcelable
 import kotlinx.serialization.Serializable
+import kotlinx.parcelize.Parcelize
 import no.uio.ifi.in2000.team20.team20app.data.dto.Address
 import no.uio.ifi.in2000.team20.team20app.data.dto.AddressMetadata
 import no.uio.ifi.in2000.team20.team20app.util.Constants.HTTP_OK
@@ -18,6 +20,7 @@ data class AddressResponseWrapper(
 )
 
 @Serializable
+@Parcelize
 data class Location(
     val address: String,
     val name: String = address,
@@ -26,4 +29,4 @@ data class Location(
     val lat: Double,
     val lon: Double,
     val savedAt: Long = 0L
-)
+):Parcelable
