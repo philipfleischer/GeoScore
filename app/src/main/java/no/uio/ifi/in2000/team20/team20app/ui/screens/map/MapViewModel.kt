@@ -24,6 +24,8 @@ class MapViewModel @Inject constructor() : ViewModel() {
     private val _layers: MutableStateFlow<List<MapLayer>> = MutableStateFlow(MapLayers.layers)
     val layers: StateFlow<List<MapLayer>> = _layers.asStateFlow()
 
+    private val _selectedLayer: MutableStateFlow<MapLayer> = MutableStateFlow(MapLayers.layers[0])
+    val selectedLayer: StateFlow<MapLayer> = _selectedLayer.asStateFlow()
     private val _layersExpanded: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val layersExpanded: StateFlow<Boolean> = _layersExpanded.asStateFlow()
 
@@ -31,16 +33,19 @@ class MapViewModel @Inject constructor() : ViewModel() {
         _layersExpanded.value = !_layersExpanded.value
     }
 
-    fun toggleLayer(layerId: Int){
-        _layers.update { layers ->
-            layers.map { layer ->
-                if (layer.layerId == layerId) {
-                    layer.copy(toggled = !layer.toggled)
-                } else {
-                    layer.copy(toggled = false)
-                }
-            }
-        }
+    fun setActiveLayer(layer: MapLayer) {
+        _selectedLayer.value = layer
     }
+//    fun toggleLayer(layerId: Int){
+//        _layers.update { layers ->
+//            layers.map { layer ->
+//                if (layer.layerId == layerId) {
+//                    layer.copy(toggled = !layer.toggled)
+//                } else {
+//                    layer.copy(toggled = false)
+//                }
+//            }
+//        }
+//    }
 
 }

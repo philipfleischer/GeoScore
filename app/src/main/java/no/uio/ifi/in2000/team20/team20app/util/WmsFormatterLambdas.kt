@@ -5,6 +5,23 @@ import androidx.core.net.toUri
 //TODO: Move base-urls to constants file
 //TODO: Figure out if lambdas should have a static resolution based on what suits their dataset or if this should be a parameter
 object WmsFormatterLambdas {
+    val RockfallUrlFormatter = { xMin: Double, yMin: Double, xMax: Double, yMax: Double, zoom: Int ->
+        "https://kart.nve.no/enterprise/services/SkredSteinAktR/MapServer/WMSServer".toUri()
+            .buildUpon()
+            .appendQueryParameter("service", "WMS")
+            .appendQueryParameter("version", "1.3.0")
+            .appendQueryParameter("request", "GetMap")
+            .appendQueryParameter("layers", "Utlopsomrade") // Layer name from XML
+            .appendQueryParameter("styles", "")
+            .appendQueryParameter("crs", "EPSG:3857")
+            .appendQueryParameter("bbox", "$xMin,$yMin,$xMax,$yMax")
+            .appendQueryParameter("width", "1024")
+            .appendQueryParameter("height", "1024")
+            .appendQueryParameter("format", "image/png")
+            .appendQueryParameter("transparent", "true")
+            .build()
+            .toString()
+    }
     val RadonUrlFormatter = { xMin: Double, yMin: Double, xMax: Double, yMax: Double, zoom: Int ->
         "https://geo.ngu.no/mapserver/RadonWMS2".toUri()
             .buildUpon()
@@ -71,7 +88,7 @@ object WmsFormatterLambdas {
                 .appendQueryParameter("SERVICE", "WMS")
                 .appendQueryParameter("VERSION", "1.3.0")
                 .appendQueryParameter("REQUEST", "GetMap")
-                .appendQueryParameter("LAYERS", "Flomsone_1000arsflom_klima")
+                .appendQueryParameter("LAYERS", "Flomsone_20arsflom_klima") //Finnes jo ikke!
                 .appendQueryParameter("STYLES", "")
                 .appendQueryParameter("CRS", "EPSG:3857")
                 .appendQueryParameter("WIDTH", "256")

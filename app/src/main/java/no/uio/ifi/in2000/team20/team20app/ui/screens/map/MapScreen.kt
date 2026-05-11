@@ -1,23 +1,36 @@
 package no.uio.ifi.in2000.team20.team20app.ui.screens.map
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Layers
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,10 +44,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -143,7 +158,7 @@ fun MapScreen(
             layers.forEach { layer ->
                 WmsTileOverlay(
                     urlFormatter = layer.formatter,
-                    visible = layer.toggled
+                    visible = layer.layerId == mapViewModel.selectedLayer.value.layerId
                 )
             }
             if(chosenPosition != null) {
@@ -206,8 +221,133 @@ fun MapScreen(
                     modifier = Modifier.semantics { heading() }
                 )
             }
+
+            Row{
+                Spacer(Modifier.weight(1f))
+                FloatingActionButton(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.clip(CircleShape).size(48.dp),
+                    onClick = mapViewModel::toggleLayersExpanded
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Layers,
+                        contentDescription = "Search",
+                        tint = MaterialTheme.colorScheme.onSecondary
+                    )
+                }
+            }
+        }
+        Column(
+            modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter)
+        ){
+            Row(
+                modifier = Modifier.fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.primary)
+            ) {
+                if (layersExpanded) {
+                    Column(
+                        modifier = Modifier.padding(bottom = contentPadding.calculateBottomPadding())
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ){
+                            Text(
+                                modifier = Modifier.padding(start = 15.dp),
+                                text = "Kartlag"
+                            )
+                            Spacer(Modifier.weight(1f))
+                            IconButton(
+                                onClick = mapViewModel::toggleLayersExpanded
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Search",
+                                    tint = MaterialTheme.colorScheme.onPrimary
+                                )
+                            }
+                        }
+                        LazyRow() {
+                            item {
+                                layers.forEach { layer ->
+                                    MapLayerSelectable(
+                                        modifier = Modifier.size(100.dp),
+                                        layer = layer,
+                                        onClick = { mapViewModel.setActiveLayer(layer) }
+                                    )
+                                }
+                            }
+                        }
+                        DisplayLegend(
+                            modifier = Modifier.size(20.dp),
+                            layer = mapViewModel.selectedLayer.collectAsStateWithLifecycle().value
+                        )
+                    }
+                }
+            }
         }
     }
 }
 
+@Composable
+fun MapLayerSelectable(
+    modifier: Modifier = Modifier,
+    layer: MapLayer,
+    onClick: () -> Unit
+){
+    Column(
+        modifier = modifier,
+
+    ) {
+        Button(
+            onClick = onClick
+        ) {
+            AsyncImage(
+                model = layer.imageURI,
+                contentDescription = layer.name
+            )
+        }
+        Text(
+            modifier = Modifier.fillMaxWidth(1f),
+            text = layer.name,
+            textAlign = TextAlign.Center,
+        )
+    }
+}
+
+@Composable
+fun DisplayLegend(
+    modifier: Modifier = Modifier,
+    layer: MapLayer
+) {
+    Row {
+        if(layer.legendURI.isEmpty()){
+            Row(Modifier.height(24.dp)){}
+        }
+        layer.legendURI.forEach {
+            Box(
+                modifier = Modifier.wrapContentSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Row(
+                    modifier = Modifier.padding(start = 15.dp).height(24.dp)
+                ) {
+                    Box( //We need contrast for the legend
+                        modifier = Modifier.fillMaxHeight(1f).aspectRatio(1f).background(color = Color.White),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        AsyncImage(
+                            modifier = modifier,
+                            model = it.second,
+                            contentDescription = it.first
+                        )
+                    }
+                    Text(
+                        text = it.first,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            }
+        }
+    }
+}
 
