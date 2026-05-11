@@ -121,6 +121,8 @@ fun SearchScreen(
     }
 
     Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        contentWindowInsets = WindowInsets(0),
         topBar = {
             Row(
                 modifier = Modifier
@@ -205,8 +207,8 @@ fun SearchScreen(
                 uiState.query.isBlank() -> {
 
                     if(uiState.recentlySearched.isEmpty()){
-                        Box(modifier = Modifier.fillMaxWidth()) {
-                            Text("Begynn å skrive for å se forslag")
+                        Box(modifier = Modifier.fillMaxWidth().padding(horizontal = padding.dp)) {
+                            Text("Begynn å skrive for å se forslag", color = MaterialTheme.colorScheme.onSurface)
                         }
                     } else {
                         Text(text = "Siste søk")

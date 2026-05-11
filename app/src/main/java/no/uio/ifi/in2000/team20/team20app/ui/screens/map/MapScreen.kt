@@ -75,7 +75,6 @@ import java.math.RoundingMode
 @Composable
 fun MapScreen(
     modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp),
     sharedViewModel: AppViewModel = hiltViewModel(),
     savedViewModel: SavedViewModel,
     mapViewModel: MapViewModel = hiltViewModel(),
