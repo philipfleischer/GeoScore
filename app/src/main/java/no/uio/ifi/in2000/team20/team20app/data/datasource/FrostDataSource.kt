@@ -64,7 +64,7 @@ class FrostDataSource @Inject constructor(
         return body()
     }
 
-    // Fetches the 30 nearest station IDs for a given location
+    // Fetches the 10 nearest station IDs for a given location
     override suspend fun getStationsNearby(lat: Double, lon: Double): String {
         return findNearestV0Sources(lat, lon)
     }
@@ -77,10 +77,11 @@ class FrostDataSource @Inject constructor(
     // V0 helpers
 
     // Finds nearest station IDs via V0 sources endpoint (geography-based)
-    // Uses a generous count. small automatic stations may not have monthly aggregates,
-    // but with 30 candidates at least one main meteorological station should be included.
+    // Requests 10 nearest stations to aggregate climate normals client-side (1991-2020).
+    // All 10 stations contribute to monthly averages for temperature, wind, snow, and precipitation,
+    // providing robust normals less sensitive to data gaps at individual stations.
     // TODO: create fallback if no stations are found? look into this
-    private suspend fun findNearestV0Sources(lat: Double, lon: Double, maxCount: Int = 30): String {
+    private suspend fun findNearestV0Sources(lat: Double, lon: Double, maxCount: Int = 10): String {
         val lonStr = String.format(java.util.Locale.US, "%.4f", lon)
         val latStr = String.format(java.util.Locale.US, "%.4f", lat)
         val response: FrostV0SourceResponseDto = client.get(FrostRoutes.SOURCES_V0) {
@@ -221,26 +222,39 @@ class FrostDataSource @Inject constructor(
         return sourcesResponse.data.first().id
     }
 
-    // Fetches raw monthly sunshine hours for 1991-2020 from V0
-    // Uses the provided stationId (fetched and cached by Repository)
-    override suspend fun getSunshineNormals(lat: Double, lon: Double, stationId: String): SunshineRawResult {
-        val observations: FrostV0ObservationResponseDto = client.get(FrostRoutes.OBSERVATIONS_V0) {
-            url.encodedParameters.append("sources", stationId)
-            url.encodedParameters.append(
-                "elements",
-                listOf("sum(duration_of_sunshine P1M)").joinToString(",").replace(" ", "%20")
-            )
-            url.encodedParameters.append("referencetime", "1991-01-01/2020-12-31")
-            header("Authorization", authHeader)
-        }.frostBody()
+     // Fetches raw monthly sunshine hours for 1991-2020 from V0
+     // Uses the provided stationId (fetched and cached by Repository)
+     // Also fetches station metadata (name, distance) to display where the data came from
+     override suspend fun getSunshineNormals(lat: Double, lon: Double, stationId: String): SunshineRawResult {
+         // Fetch station metadata to get name and distance. Frost expects lat and lon wiith 4 decimal places
+         val lonStr = String.format(java.util.Locale.US, "%.4f", lon)
+         val latStr = String.format(java.util.Locale.US, "%.4f", lat)
+         
+         val stationMetadata: FrostV0SourceResponseDto = client.get(FrostRoutes.SOURCES_V0) {
+             url.encodedParameters.append("geometry", "nearest(POINT($lonStr%20$latStr))")
+             url.encodedParameters.append("ids", stationId)
+             header("Authorization", authHeader)
+         }.frostBody()
 
-        return SunshineRawResult(
-            stationId = stationId,
-            stationName = null,
-            distanceKm = null,
-            observations = observations
-        )
-    }
+         val station = stationMetadata.data.firstOrNull()
+         
+         val observations: FrostV0ObservationResponseDto = client.get(FrostRoutes.OBSERVATIONS_V0) {
+             url.encodedParameters.append("sources", stationId)
+             url.encodedParameters.append(
+                 "elements",
+                 listOf("sum(duration_of_sunshine P1M)").joinToString(",").replace(" ", "%20")
+             )
+             url.encodedParameters.append("referencetime", "1991-01-01/2020-12-31")
+             header("Authorization", authHeader)
+         }.frostBody()
+
+         return SunshineRawResult(
+             stationId = stationId,
+             stationName = station?.name,
+             distanceKm = station?.distance,
+             observations = observations
+         )
+     }
 
     // V1 ranked observation methods (used by GeoScore algorithm)
     // Includes fallback to wider search radius if no stations found nearby

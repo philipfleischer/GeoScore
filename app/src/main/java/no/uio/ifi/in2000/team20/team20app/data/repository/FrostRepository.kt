@@ -156,46 +156,46 @@ class FrostRepository @Inject constructor(
             Triple(meanList, maxList, gustList)
         }
 
-    override suspend fun getSunshineData(lat: Double, lon: Double): Result<Triple<List<Double>, String?, Double?>> =
-        runCatching {
-            // Get sunshine station (uses in-memory cache)
-            val stationId = getOrCacheSunshineStation(lat, lon)
+     override suspend fun getSunshineData(lat: Double, lon: Double): Result<Triple<List<Double>, String?, Double?>> =
+         runCatching {
+             // Get sunshine station (uses in-memory cache)
+             val stationId = getOrCacheSunshineStation(lat, lon)
 
-            val cached = sunshineCacheDao.getByKey(stationId)
-            if (cached != null) {
-                return@runCatching Triple(
-                    fromJson(cached.monthlyHoursPerDay),
-                    cached.stationName,
-                    cached.distanceKm
-                )
-            }
+             val cached = sunshineCacheDao.getByKey(stationId)
+             if (cached != null) {
+                 return@runCatching Triple(
+                     fromJson(cached.monthlyHoursPerDay),
+                     cached.stationName,
+                     cached.distanceKm
+                 )
+             }
 
-            val sunshineResult = dataSource.getSunshineNormals(lat, lon, stationId)
-            
-            // Aggregated in the repository to produce 1991-2020 monthly normals
-            val map = sunshineResult.observations.aggregateByMonthV0("sum(duration_of_sunshine P1M)")
-            val daysInMonth = mapOf(
-                1 to 31, 2 to 28, 3 to 31, 4 to 30,
-                5 to 31, 6 to 30, 7 to 31, 8 to 31,
-                9 to 30, 10 to 31, 11 to 30, 12 to 31
-            )
-            val hoursPerDay = (1..12).map { month ->
-                val hours = map[month] ?: 0.0
-                maxOf(0.0, hours / (daysInMonth[month] ?: 30))
-            }
+             val sunshineResult = dataSource.getSunshineNormals(lat, lon, stationId)
+             
+             // Aggregated in the repository to produce 1991-2020 monthly normals
+             val map = sunshineResult.observations.aggregateByMonthV0("sum(duration_of_sunshine P1M)")
+             val daysInMonth = mapOf(
+                 1 to 31, 2 to 28, 3 to 31, 4 to 30,
+                 5 to 31, 6 to 30, 7 to 31, 8 to 31,
+                 9 to 30, 10 to 31, 11 to 30, 12 to 31
+             )
+             val hoursPerDay = (1..12).map { month ->
+                 val hours = map[month] ?: 0.0
+                 maxOf(0.0, hours / (daysInMonth[month] ?: 30))
+             }
 
-            sunshineCacheDao.insert(
-                SunshineCacheEntity(
-                    stationId        = stationId,
-                    monthlyHoursPerDay = toJson(hoursPerDay),
-                    stationName        = sunshineResult.stationName,
-                    distanceKm         = sunshineResult.distanceKm
-                )
-            )
-            Log.d("FrostRepository", "Sunshine data cached for stationId: $stationId")
+             sunshineCacheDao.insert(
+                 SunshineCacheEntity(
+                     stationId        = stationId,
+                     monthlyHoursPerDay = toJson(hoursPerDay),
+                     stationName        = sunshineResult.stationName,
+                     distanceKm         = sunshineResult.distanceKm
+                 )
+             )
+             Log.d("FrostRepository", "Sunshine data cached for stationId: $stationId")
 
-            Triple(hoursPerDay, sunshineResult.stationName, sunshineResult.distanceKm)
-        }
+             Triple(hoursPerDay, sunshineResult.stationName, sunshineResult.distanceKm)
+         }
 
     override suspend fun getSnowData(lat: Double, lon: Double): Result<Pair<List<Double>, List<Double>>> =
         runCatching {
