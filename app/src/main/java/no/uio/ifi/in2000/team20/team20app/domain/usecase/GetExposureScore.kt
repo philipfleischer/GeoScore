@@ -1,8 +1,8 @@
 package no.uio.ifi.in2000.team20.team20app.domain.usecase
 
-import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepositoryService
 import no.uio.ifi.in2000.team20.team20app.data.repository.ScoreCacheRepository
 import no.uio.ifi.in2000.team20.team20app.domain.model.ExposureScoreResult
+import no.uio.ifi.in2000.team20.team20app.domain.model.WindAndPrecipitationObservationsResult
 import no.uio.ifi.in2000.team20.team20app.util.Constants.EXTREME_PRECIPITATION_THRESHOLD
 import no.uio.ifi.in2000.team20.team20app.util.Constants.EXTREME_WIND_GUST_THRESHOLD
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MAX_EXTREME_WEATHER_COUNT
@@ -12,10 +12,9 @@ import kotlin.math.max
 import kotlin.math.min
 
 class GetExposureScore @Inject constructor(
-    private val frostRepository: FrostRepositoryService,
     private val scoreCacheRepository: ScoreCacheRepository
 ) {
-    suspend fun calculateExposureScore(lat: Double, lon: Double): ExposureScoreResult {
+    suspend fun calculateExposureScore(lat: Double, lon: Double, observations: WindAndPrecipitationObservationsResult): ExposureScoreResult {
 
         val locationKey = "%.2f, %.2f".format(lat, lon)
         val cachedResult = scoreCacheRepository.getExposureCache(locationKey)
@@ -23,9 +22,8 @@ class GetExposureScore @Inject constructor(
             return cachedResult
         }
 
-        val result = frostRepository.getWindAndPrecipitationObservations(lat, lon)
-        val precipitationResults = result.precipitationValues
-        val windResults = result.windValues
+        val precipitationResults = observations.precipitationValues
+        val windResults = observations.windValues
 
         val extremePrecipDates = precipitationResults.filter { it.value >= EXTREME_PRECIPITATION_THRESHOLD }.keys
         val extremeWindDates = windResults.filter { it.value >= EXTREME_WIND_GUST_THRESHOLD }.keys

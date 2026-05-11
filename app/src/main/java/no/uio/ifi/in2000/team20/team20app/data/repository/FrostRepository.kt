@@ -275,8 +275,10 @@ class FrostRepository @Inject constructor(
         lon: Double
     ): WindAndPrecipitationObservationsResult {
         return coroutineScope {
+            Log.d("FrostRepository", "Wind data getting fetched")
             val precipitation = async { dataSource.getRankedObservationsForPrecipitation(lat, lon) }
-            val wind = async { dataSource.getRankedObservationsForWind(lat, lon) }
+            val wind = async { dataSource.getRankedObservationsForWind(lat, lon)
+            }
             WindAndPrecipitationObservationsResult(
                 precipitationValues = precipitation.await().extractValuesWithDate(),
                 windValues = wind.await().extractValuesWithDate()

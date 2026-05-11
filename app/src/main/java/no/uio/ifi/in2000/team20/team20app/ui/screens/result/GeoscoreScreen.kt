@@ -132,7 +132,7 @@ fun GeoscoreScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues),
-                message = "Beregner geoscore..."
+                message = listOf("Henter data fra koordinatene.","Henter data fra koordinatene..","Henter data fra koordinatene...", "Veier fordeler mot ulemper.", "Veier fordeler mot ulemper..","Veier fordeler mot ulemper...", "Nesten ferdig.", "Nesten ferdig..","Nesten ferdig...", "Er der straks.", "Er der straks..", "Er der straks...", "Formaterer resultatet.", "Formaterer resultatet..", "Formaterer resultatet...", "Alt er starks på plass.", "Alt er starks på plass..", "Alt er starks på plass...", "Siste ferdigstillinger.","Siste ferdigstillinger..", "Siste ferdigstillinger...")
             )
             return@Scaffold
         }

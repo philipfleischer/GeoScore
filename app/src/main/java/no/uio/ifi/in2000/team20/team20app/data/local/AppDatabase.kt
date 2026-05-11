@@ -40,7 +40,7 @@ import no.uio.ifi.in2000.team20.team20app.data.local.Entity.WindCacheEntity
         ReportCacheEntity::class
 
                ],
-    version = 7,
+    version = 8,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
