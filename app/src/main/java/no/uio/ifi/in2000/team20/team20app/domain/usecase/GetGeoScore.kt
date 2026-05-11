@@ -24,6 +24,7 @@ class GetGeoScore @Inject constructor(
 
         val locationKey = "%.2f, %.2f".format(lat, lon)
         val cachedTotal = scoreCacheRepository.getGeoScoreCache(locationKey)
+        if (cachedTotal != null) return cachedTotal
 
         val hazardResult: HazardScoreResult
         val vulnerabilityResult: VulnerabilityScoreResult
@@ -41,21 +42,6 @@ class GetGeoScore @Inject constructor(
             hazardResult = getHazardScore.calculateHazardScore(lat, lon, observations)
             exposureResult = getExposureScore.calculateExposureScore(lat, lon, observations)
         }
-        if (cachedTotal != null) {
-            return GeoScore(
-                locationKey             = locationKey,
-                precipitationScore      = hazardResult.precipitationScore,
-                windScore               = hazardResult.windScore,
-                floodScore              = vulnerabilityResult.floodScore,
-                landslideScore          = vulnerabilityResult.landslideScore,
-                hazardScore             = cachedTotal.hazardScore,
-                exposureScore           = cachedTotal.exposureScore,
-                vulnerabilityScore      = cachedTotal.vulnerabilityScore,
-                extremeWeatherDaysCount = exposureResult.eventCount,
-                geoScore                = cachedTotal.geoScore
-            )
-        }
-
         val geoScore = GeoScore(
             locationKey             = locationKey,
             precipitationScore      = hazardResult.precipitationScore,
