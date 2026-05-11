@@ -192,7 +192,7 @@ private fun GeomarkingCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                GeomarkingBadge( grade = geoState.grade.ifEmpty { "?" }, iconStyle = false)
+                GeomarkingBadge( grade = geoState.grade.ifEmpty { "?" }, iconStyle = false, showTooltip = true)
 
                 Column(
                     modifier = Modifier
