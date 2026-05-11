@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -105,7 +106,9 @@ fun AdaptiveNavigationScaffold (
                 }
             },
             layoutType = layoutType,
-        ) { content(PaddingValues(0.dp))}
+        ) {
+            content(PaddingValues(0.dp))
+        }
     }
 }
 
@@ -121,7 +124,7 @@ private fun NavSuiteContent(
     val theme = MaterialTheme.colorScheme
     Surface(
         modifier = modifier
-            .windowInsetsPadding(WindowInsets.safeDrawing)
+            .windowInsetsPadding(WindowInsets.systemBars)
             .padding((DEFAULT_PADDING_DP*2).dp)
         ,
         shape = RoundedCornerShape(100),
