@@ -1,7 +1,12 @@
 package no.uio.ifi.in2000.team20.team20app.domain.usecase
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import no.uio.ifi.in2000.team20.team20app.data.repository.ScoreCacheRepository
+import no.uio.ifi.in2000.team20.team20app.domain.model.ExposureScoreResult
 import no.uio.ifi.in2000.team20.team20app.domain.model.GeoScore
+import no.uio.ifi.in2000.team20.team20app.domain.model.HazardScoreResult
+import no.uio.ifi.in2000.team20.team20app.domain.model.VulnerabilityScoreResult
 import no.uio.ifi.in2000.team20.team20app.util.Constants.EXPOSURESCORE_WEIGHT
 import no.uio.ifi.in2000.team20.team20app.util.Constants.HAZARDSCORE_WEIGHT
 import no.uio.ifi.in2000.team20.team20app.util.Constants.VULNERABILITYSCORE_WEIGHT
@@ -18,11 +23,19 @@ class GetGeoScore @Inject constructor(
         val locationKey = "%.2f, %.2f".format(lat, lon)
         val cachedTotal = scoreCacheRepository.getGeoScoreCache(locationKey)
 
-        // Always compute sub-scores — they hit their own caches if already stored
-        val hazardResult = getHazardScore.calculateHazardScore(lat, lon)
-        val vulnerabilityResult = getVulnerabilityScore.calculateVulnerabilityScore(lat, lon)
-        val exposureResult = getExposureScore.calculateExposureScore(lat, lon)
+        val hazardResult: HazardScoreResult
+        val vulnerabilityResult: VulnerabilityScoreResult
+        val exposureResult: ExposureScoreResult
 
+        coroutineScope {
+            val hazardDeferred = async { getHazardScore.calculateHazardScore(lat, lon) }
+            val vulnerabilityDeferred = async { getVulnerabilityScore.calculateVulnerabilityScore(lat, lon) }
+            val exposureDeferred = async { getExposureScore.calculateExposureScore(lat, lon) }
+
+            hazardResult = hazardDeferred.await()
+            vulnerabilityResult = vulnerabilityDeferred.await()
+            exposureResult = exposureDeferred.await()
+        }
         if (cachedTotal != null) {
             return GeoScore(
                 locationKey             = locationKey,
