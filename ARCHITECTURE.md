@@ -170,17 +170,29 @@ Appen bruker **Room** for lokal caching av brukerdata og beregnede resultater. D
 | `vulnerability_cache` | Cachet sårbarhetsscore per lokasjon | `ScoreCacheRepository` |
 | `total_score_cache` | Cachet samlet GeoScore per lokasjon | `ScoreCacheRepository` |
 | `report_cache` | Cachet AI-generert rapport per lokasjon | `ChatGPTRepository` |
-| `temperature_cache` | Cachet temperaturdata (Frost) | `FrostRepository` |
-| `wind_cache` | Cachet vinddata (Frost) | `FrostRepository` |
-| `sunshine_cache` | Cachet solskinndata (Frost) | `FrostRepository` |
-| `snow_cache` | Cachet snødybdedata (Frost) | `FrostRepository` |
-| `precipitation_cache` | Cachet nedbørsdata (Frost) | `FrostRepository` |
+| `temperature_cache` | Cachet temperaturdata (Frost), indeksert ved stationId | `FrostRepository` |
+| `wind_cache` | Cachet vinddata (Frost), indeksert ved stationId | `FrostRepository` |
+| `sunshine_cache` | Cachet solskinndata (Frost), indeksert ved stationId | `FrostRepository` |
+| `snow_cache` | Cachet snødybdedata (Frost), indeksert ved stationId | `FrostRepository` |
+| `precipitation_cache` | Cachet nedbørsdata (Frost), indeksert ved stationId | `FrostRepository` |
 
 **Caching-strategi:**
 - Score-caching eies og håndteres av `ScoreCacheRepositoryImpl` (entity-konstruksjon skjer der)
 - Frost-caching eies av `FrostRepository`
 - AI-rapport-caching eies av `ChatGPTRepositoryImpl`
 - Entity-klasser er ikke importert i domenelaget (use cases)
+
+### Frost API-caching strategi
+
+`FrostRepository` bruker en to-lags caching-strategi for å minimere API-kall når brukeren søker etter flere lokasjoner:
+
+**Lag 1: Stasjonsliste (in-memory).** Når en bruker søker på en lokasjon rundes koordinatene til 2 desimaler (~1km presisjon) og brukes som nøkkel for å slå opp 10 nærmeste værstasjoner. Denne listen caches i minnet slik at påfølgende API-kall for samme område (f.eks. klimadata-typer) gjenbruker samme stasjonsliste uten nye API-kall. Med 10 stasjoner får man robuste normals som aggregeres fra flere kilder, noe som reduserer følsomheten for datagap ved enkelte stasjoner.
+
+**Lag 2: Klimadata (Room, indeksert ved stationId).** Den nærmeste stasjonen (første i listen) ekstraheres og brukes som primærnøkkel i Room-cachene. Dette gjør at når en bruker søker på en *annen* lokasjon som har samme nærmeste stasjon, returneres klimadataene direkte fra databasen uten API-kall. For eksempel: lokasjon 1 (59.33, 11.29) og lokasjon 2 (59.34, 11.30) kan begge ha SN1380 som nærmeste stasjon — data cachet fra lokasjon 1 gjenbrukes for lokasjon 2.
+
+**Solskinn (spesialtilfelle).** Bare 36 stasjoner i Norge har solskinndata. Nærmeste solskinnstasjon slås opp separat, caches i minnet per lokasjon, og klimadataene caches i Room ved stationId som vanlig.
+
+**Resultat:** ~60% færre API-kall ved søk på flere lokasjoner i samme område, ettersom stationsdata og klimadata deles mellom lokasjoner med samme nærmeste stasjon.
 
 ---
 
@@ -237,6 +249,18 @@ Her dokumenterer vi steder der arkitekturen avviker fra Androids offisielle anbe
 - `SavedViewModel` deles fordi `isCurrentSaved`-flagget må være konsistent på tvers av alle skjermer. Hvis hver skjerm hadde sin egen instans, ville flagget være inkonsistent.
 
 Dette er en pragmatisk løsning, men kan potensielt føre til state-kollisjonsproblemer dersom `loadFrostStats()` kalles samtidig fra flere skjermer med ulike lokasjoner. I praksis er dette usannsynlig fordi navigasjonen er lineær (brukeren er bare på én skjerm av gangen).
+
+### 5. Frost-aggregering fra flere stasjoner uten fallback
+
+**Gjeldende praksis:** `FrostRepository` aggregerer 1991-2020 klimanormaler fra de 10 nærmeste værstasjoner. Alle 10 stasjoner bidrar til månedlige gjennomsnitt for temperatur, vind, snø og nedbør. Imidlertid brukes kun den nærmeste stasjonen (første i listen) som cache-nøkkel i Room.
+
+**To relaterte utgaver:**
+
+1. **Mismatched caching:** Klimadataene er et gjennomsnitt av 10 stasjoner, men cached med den nærmeste stasjonens ID som primærnøkkel. Den cachede dataen representerer derfor ikke streng målingene fra den single stasjonen, selv om cache-nøkkelen antyder det. Dette kan føre til misforståelser ved debugging.
+
+2. **Ufullstendige data for 1991-2020-perioden:** Det finnes ingen reaktiv fallback-logikk. Hvis de 10 nærmeste stasjonene mangler data for en spesifikk klimaparameter over hele 1991-2020-perioden (f.eks. snødata), vil data-typen vise tomme verdier i stedet for å forsøke alternative kilder.
+
+**Begrunnelse:** Begge utgaver er aksepterte tilnærminger gitt tidsrammer. 10-stasjon-aggregering gir robuste normaler mindre følsomme for datagap ved enkelte stasjoner. Cache-nøkkel på første stasjon muliggjør cross-location-gjenbruk (flere lokasjoner med samme nærmeste stasjon deler cached data). En fullstendig reaktiv fallback-strategi krever betydelig ytterligere implementasjon og utsettes til videre utvikling.
 
 ---
 

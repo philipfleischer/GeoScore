@@ -9,8 +9,8 @@ import no.uio.ifi.in2000.team20.team20app.data.local.Entity.TemperatureCacheEnti
 @Dao
 interface TemperatureCacheDao {
 
-    @Query("SELECT * FROM temperature_cache WHERE locationKey = :locationKey")
-    suspend fun getByKey(locationKey: String): TemperatureCacheEntity?
+    @Query("SELECT * FROM temperature_cache WHERE stationId = :stationId")
+    suspend fun getByKey(stationId: String): TemperatureCacheEntity?
 
     @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
     suspend fun insert(entity: TemperatureCacheEntity)
