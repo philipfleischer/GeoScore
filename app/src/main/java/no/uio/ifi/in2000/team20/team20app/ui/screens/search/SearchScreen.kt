@@ -50,12 +50,14 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.window.core.layout.WindowSizeClass
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.components.ErrorState
 import no.uio.ifi.in2000.team20.team20app.ui.components.LoadingState
 import no.uio.ifi.in2000.team20.team20app.ui.components.SharedTopAppBar
 import no.uio.ifi.in2000.team20.team20app.ui.theme.LocalTheme
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
+import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
 
 @Composable
 fun SearchBarObject(
@@ -106,6 +108,11 @@ fun SearchScreen(
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
 
+    val compactScreenWidth = !LocalWindowSizeClass.current
+        .isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
+
+    val padding = DEFAULT_PADDING_DP
+
     // Slik at man er inni textfielden med engang man går inn i skjermen, og søkefeltet er tomt
     LaunchedEffect(Unit) {
         searchViewModel.resetQuery()
@@ -115,14 +122,14 @@ fun SearchScreen(
 
     Scaffold(
         topBar = {
-//            SharedTopAppBar(
-//                title = "Søk etter adresse",
-//                onBackClick = onBackClick
-//            )
             Row(
                 modifier = Modifier
                     .windowInsetsPadding(WindowInsets.displayCutout)
                     .background(MaterialTheme.colorScheme.surface)
+                    .padding(
+                        top = padding.dp,
+                        start = (padding/2).dp,
+                        end = if (compactScreenWidth) padding.dp else (padding*3).dp)
                 ,
                 horizontalArrangement = Arrangement.SpaceBetween,
             ){
@@ -144,12 +151,12 @@ fun SearchScreen(
                     onValueChange = { searchViewModel.updateInput(it) },
                     label = { Text("Sted", color = theme.colorScheme.secondary) },
                     placeholder = { Text("Skriv inn adresse...") },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search"
-                        )
-                    },
+//                    leadingIcon = {
+//                        Icon(
+//                            imageVector = Icons.Default.Search,
+//                            contentDescription = "Search"
+//                        )
+//                    },
                     isError = uiState.inputError != null,
                     singleLine = true,
                     colors = TextFieldDefaults.colors(
@@ -170,6 +177,11 @@ fun SearchScreen(
             modifier = modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .padding(
+                    top = padding.dp,
+                    start = padding.dp,
+                    end = if (compactScreenWidth) padding.dp else (padding*2).dp,
+                )
                 .background(theme.colorScheme.surface)
             ,
             verticalArrangement = Arrangement.Top
