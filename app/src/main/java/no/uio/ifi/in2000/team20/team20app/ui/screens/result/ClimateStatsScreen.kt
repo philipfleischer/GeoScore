@@ -535,7 +535,7 @@ private fun ChartLoadingPlaceholder(height: Dp) {
             .fillMaxWidth()
             .height(height)
             .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant),
+            .background(MaterialTheme.colorScheme.secondaryContainer),
         contentAlignment = Alignment.Center
     ) {
         Text(

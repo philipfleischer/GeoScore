@@ -2,6 +2,7 @@ package no.uio.ifi.in2000.team20.team20app.ui.screens.result
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,6 +40,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.toggleableState
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.unit.dp
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
@@ -61,6 +70,7 @@ fun GeoscoreScreen(
 ) {
     val isCurrentSaved by savedViewModel.isCurrentSaved.collectAsStateWithLifecycle()
     val geoState by geoScoreViewModel.uiState.collectAsStateWithLifecycle()
+
 
     LaunchedEffect(location) {
 
@@ -160,6 +170,10 @@ private fun GeomarkingCard(
     isCurrentSaved: Boolean,
     onSavedToggle: (Boolean) -> Unit
 ) {
+
+    val NVEtiltakLink = "https://kommunikasjon.ntb.no/pressemelding/18558016/nve-sikrer-norge-mot-naturfarer-se-kart-bilder-og-tiltak-fra-hele-landet?publisherId=89280&lang=no"
+    val uriHandler = LocalUriHandler.current
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -232,6 +246,19 @@ private fun GeomarkingCard(
                     else geoState.aiReport?.extremeWindText ?: "Chat kallet funket ikke",
                     style = MaterialTheme.typography.bodyMedium
                 )
+                if (!geoState.isReportLoading && geoState.aiReport != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(SpanStyle(
+                            color = MaterialTheme.colorScheme.primary,
+                            textDecoration = TextDecoration.Underline
+                        )) { append("Les mer på NVE.no") }
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.clickable { uriHandler.openUri(NVEtiltakLink) }
+                )
+            }
             }
 
             ExpandableInfoBox(
@@ -247,6 +274,19 @@ private fun GeomarkingCard(
                     else geoState.aiReport?.landslideText ?: "Chat kallet funket ikke",
                     style = MaterialTheme.typography.bodyMedium
                 )
+                if (!geoState.isReportLoading && geoState.aiReport != null) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(SpanStyle(
+                                color = MaterialTheme.colorScheme.primary,
+                                textDecoration = TextDecoration.Underline
+                            )) { append("Les mer på NVE.no") }
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.clickable { uriHandler.openUri(NVEtiltakLink) }
+                    )
+                }
             }
 
             ExpandableInfoBox(
@@ -262,6 +302,19 @@ private fun GeomarkingCard(
                     else geoState.aiReport?.floodText ?: "Chat kallet funket ikke",
                     style = MaterialTheme.typography.bodyMedium
                 )
+                if (!geoState.isReportLoading && geoState.aiReport != null) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(SpanStyle(
+                                color = MaterialTheme.colorScheme.primary,
+                                textDecoration = TextDecoration.Underline
+                            )) { append("Les mer på NVE.no") }
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.clickable { uriHandler.openUri(NVEtiltakLink) }
+                    )
+                }
             }
 
             ExpandableInfoBox(
@@ -277,6 +330,19 @@ private fun GeomarkingCard(
                     else geoState.aiReport?.extremePrecipitationText ?: "",
                     style = MaterialTheme.typography.bodyMedium
                 )
+                if (!geoState.isReportLoading && geoState.aiReport != null) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(SpanStyle(
+                                color = MaterialTheme.colorScheme.primary,
+                                textDecoration = TextDecoration.Underline
+                            )) { append("Les mer på NVE.no") }
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.clickable { uriHandler.openUri(NVEtiltakLink) }
+                    )
+                }
             }
 
         }
