@@ -225,7 +225,7 @@ fun GeomarkingBadge(
             RichTooltip(
                 title = { Text("Karakter ${grade.uppercase()}") }
             ) {
-                Text("Karakter skalaen går fra A til F. Denne karakteren er en samling av flere faktorer ....")
+                Text("Merkingen er gitt utifra fra en skala fra A-F, der A betyr minst samlet risiko")
             }
         },
         state = tooltipState,
