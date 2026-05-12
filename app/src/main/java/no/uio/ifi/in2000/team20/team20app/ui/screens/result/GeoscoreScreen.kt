@@ -151,6 +151,72 @@ fun GeoscoreScreen(
                     }
                 )
             }
+
+            item {
+                ExpandableInfoBox(
+                    title = "☁\uFE0F Storm",
+
+                    rightContent = {
+                        GeomarkingBadge(
+                            grade = geoState.geoScore?.let { scoreToGrade(it.windScore) } ?: "?"
+                        )
+                    }
+                ) {
+                    Text(
+                        text = if (geoState.isReportLoading) "Laster rapport..."
+                        else geoState.aiReport?.extremeWindText ?: "Chat kallet funket ikke",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+            item {
+                ExpandableInfoBox(
+                    title = "⛰\uFE0F Skredfare",
+                    rightContent = {
+                        GeomarkingBadge(
+                            grade = geoState.geoScore?.let { scoreToGrade(it.landslideScore) } ?: "?"
+                        )
+                    }
+                ) {
+                    Text(
+                        text = if (geoState.isReportLoading) "Laster rapport..."
+                        else geoState.aiReport?.landslideText ?: "Chat kallet funket ikke",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+            item {
+                ExpandableInfoBox(
+                    title = "\uD83C\uDF0A Flomrisiko",
+                    rightContent = {
+                        GeomarkingBadge(
+                            grade = geoState.geoScore?.let { scoreToGrade(it.floodScore) } ?: "?"
+                        )
+                    }
+                ) {
+                    Text(
+                        text = if (geoState.isReportLoading) "Laster rapport..."
+                        else geoState.aiReport?.floodText ?: "Chat kallet funket ikke",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+            item {
+                ExpandableInfoBox(
+                    title = "\uD83C\uDF27\uFE0F Nedbør",
+                    rightContent = {
+                        GeomarkingBadge(
+                            grade = geoState.geoScore?.let { scoreToGrade(it.precipitationScore) } ?: "?"
+                        )
+                    }
+                ) {
+                    Text(
+                        text = if (geoState.isReportLoading) "Laster rapport..."
+                        else geoState.aiReport?.extremePrecipitationText ?: "",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
         }
     }
 }
@@ -220,66 +286,13 @@ private fun GeomarkingCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            ExpandableInfoBox(
-                title = "☁\uFE0F Storm",
 
-                rightContent = {
-                    GeomarkingBadge(
-                        grade = geoState.geoScore?.let { scoreToGrade(it.windScore) } ?: "?"
-                    )
-                }
-            ) {
-                Text(
-                    text = if (geoState.isReportLoading) "Laster rapport..."
-                    else geoState.aiReport?.extremeWindText ?: "Chat kallet funket ikke",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
 
-            ExpandableInfoBox(
-                title = "⛰\uFE0F Skredfare",
-                rightContent = {
-                    GeomarkingBadge(
-                        grade = geoState.geoScore?.let { scoreToGrade(it.landslideScore) } ?: "?"
-                    )
-                }
-            ) {
-                Text(
-                    text = if (geoState.isReportLoading) "Laster rapport..."
-                    else geoState.aiReport?.landslideText ?: "Chat kallet funket ikke",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
 
-            ExpandableInfoBox(
-                title = "\uD83C\uDF0A Flomrisiko",
-                rightContent = {
-                    GeomarkingBadge(
-                        grade = geoState.geoScore?.let { scoreToGrade(it.floodScore) } ?: "?"
-                    )
-                }
-            ) {
-                Text(
-                    text = if (geoState.isReportLoading) "Laster rapport..."
-                    else geoState.aiReport?.floodText ?: "Chat kallet funket ikke",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
 
-            ExpandableInfoBox(
-                title = "\uD83C\uDF27\uFE0F Nedbør",
-                rightContent = {
-                    GeomarkingBadge(
-                        grade = geoState.geoScore?.let { scoreToGrade(it.precipitationScore) } ?: "?"
-                    )
-                }
-            ) {
-                Text(
-                    text = if (geoState.isReportLoading) "Laster rapport..."
-                    else geoState.aiReport?.extremePrecipitationText ?: "",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
+
+
+
 
         }
 

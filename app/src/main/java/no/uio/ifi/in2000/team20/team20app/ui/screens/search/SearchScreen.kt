@@ -26,6 +26,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -63,14 +64,16 @@ import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
 fun SearchBarObject(
     onOpenSearch: () -> Unit,
     modifier: Modifier = Modifier,
-    theme: MaterialTheme = MaterialTheme
+    theme: ColorScheme = MaterialTheme.colorScheme,
+    text: String = "Søk"
+
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
             .height(56.dp)
             .clip(RoundedCornerShape(28.dp))
-            .background(theme.colorScheme.surfaceContainerLow)
+            .background(theme.surfaceContainerLow)
             .clickable (onClickLabel = "Search address") { onOpenSearch() }
             .padding(horizontal = DEFAULT_PADDING_DP.dp),
         contentAlignment = Alignment.CenterStart
@@ -80,14 +83,14 @@ fun SearchBarObject(
         ) {
             Icon(
                 imageVector = Icons.Default.Search,
-                contentDescription = "Search",
+                contentDescription = "Søk",
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Spacer(modifier = Modifier.width(12.dp))
 
             Text(
-                text = "Søk etter adresse....",
+                text = text,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -188,9 +191,6 @@ fun SearchScreen(
             ,
             verticalArrangement = Arrangement.Top
         ) {
-
-
-
             // her viser vi egen feilmelding hvis brukeren skriver ugyldig input.
             if (uiState.inputError != null) {
                 Spacer(modifier = Modifier.height(8.dp))

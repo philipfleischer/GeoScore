@@ -122,7 +122,7 @@ fun HomeScreen(
             }
         }
         item {
-            SearchBarObject(onOpenSearch = onOpenSearch)
+            SearchBarObject(onOpenSearch = onOpenSearch, text  = "Søk etter en adresse...")
         }
     }
 }
@@ -137,17 +137,16 @@ fun ExpandableInfoBox(
 ) {
     var isExpanded by remember { mutableStateOf(initiallyExpanded) }
 
-    Box(
+    Card(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(onClickLabel = if (!isExpanded) "expand information box" else "close information box") {
+            .clickable(onClickLabel = if (!isExpanded) "utvid informasjonsboks" else "lukk informasjonsboks") {
                 isExpanded = !isExpanded
             }
-            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
         ,
-//        shape = RoundedCornerShape(24.dp),
-//        colors = CardDefaults.cardColors(containerColor = cardColor),
-//        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        shape = if (!isExpanded) RoundedCornerShape(24) else RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding((DEFAULT_PADDING_DP*0.5).dp), verticalArrangement = Arrangement.Center) {
             Row(
@@ -168,21 +167,19 @@ fun ExpandableInfoBox(
 
                 Icon(
                     imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                    contentDescription = if (isExpanded) "Opened $title information box" else "Closed $title information box",
+                    contentDescription = if (isExpanded) "Åpner $title informasjonsboks" else "Lukker $title informasjonsboks",
                     modifier = Modifier.size(28.dp)
                 )
             }
 
             AnimatedVisibility(visible = isExpanded) {
-                Column {
+                Column(modifier = Modifier.padding(DEFAULT_PADDING_DP.dp)) {
                     Spacer(modifier = Modifier.height(12.dp))
                     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                     Spacer(modifier = Modifier.height(12.dp))
                     content()
                 }
             }
-            Spacer(modifier = Modifier.height(12.dp))
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
         }
     }
 }

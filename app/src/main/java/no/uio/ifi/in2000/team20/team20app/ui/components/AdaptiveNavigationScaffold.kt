@@ -74,6 +74,7 @@ fun AdaptiveNavigationScaffold (
                 highlightedDest = highlightedDest,
                 onNavigate = onNavigate,
                 compact = compactScreenWidth,
+                borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
                 modifier = Modifier
                     .align(
                     if(compactScreenWidth) Alignment.BottomCenter
@@ -109,7 +110,8 @@ private fun NavSuiteContent(
     highlightedDest: NavKey?,
     onNavigate: (Screen) -> Unit,
     containerColor: Color = MaterialTheme.colorScheme.surface,
-    compact: Boolean = true
+    borderColor: Color = Color.Transparent,
+    compact: Boolean = true,
 ){
     val theme = MaterialTheme.colorScheme
     Surface(
@@ -123,6 +125,7 @@ private fun NavSuiteContent(
         ,
         shape = RoundedCornerShape(100),
         color = containerColor,
+        border = BorderStroke(1.dp, borderColor)
     ){
         val itemColors = NavigationSuiteDefaults.itemColors(
             navigationBarItemColors = NavigationBarItemDefaults.colors(

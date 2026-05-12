@@ -7,12 +7,11 @@ import androidx.compose.ui.graphics.Color
 // TODO: Remove any unused colors and add all relevant colors
 // TODO: Rename colors to simple names such as LightBlue and DarkGray for easier use
 val White = Color(255, 255, 255)
-val OffWhite = Color(232, 236, 237)
+val OffWhite = Color(243, 245, 246)
 val LightBlue = Color(213, 236, 248)
 val CloudySky = Color(200, 220, 233)
 val MayaBlue = Color(110, 189, 254)
 val DustyBlue = Color(75, 151, 202)
-val AliceBlue = Color(216, 233, 246)
 
 val DarkBlue = Color(22, 93, 131)
 

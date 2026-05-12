@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -57,6 +58,7 @@ import com.google.maps.android.compose.wms.WmsTileOverlay
 import no.uio.ifi.in2000.team20.team20app.R
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchBarObject
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
 import no.uio.ifi.in2000.team20.team20app.util.Constants.SMALL_PADDING_DP
@@ -178,19 +180,29 @@ fun MapScreen(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
             ) {
-                FloatingActionButton(
-                    onClick = onOpenSearch,
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier.clip(CircleShape).size(48.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search",
-                        modifier = Modifier.size(24.dp),
-                        tint = MaterialTheme.colorScheme.onSecondary
-                    )
+                Box(
+                    modifier = Modifier.fillMaxWidth(0.6f)
+                ){
+                    if (chosenPosition == null){
+                        FloatingActionButton(
+                            onClick = onOpenSearch,
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .size(48.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "Search",
+                                modifier = Modifier.size(24.dp),
+                                tint = MaterialTheme.colorScheme.onSecondary
+                            )
+                        }
+                    } else {
+                        SearchBarObject(onOpenSearch = onOpenSearch, text = chosenPosition!!.name)
+                    }
+
                 }
 
                 if (chosenPosition != null) {
@@ -203,17 +215,6 @@ fun MapScreen(
                         Text("Vis rapport", color = MaterialTheme.colorScheme.onSecondary)
                     }
                 }
-            }
-
-            if (chosenPosition != null) {
-                Text(
-                    text = chosenPosition!!.name,
-                    style = MaterialTheme.typography.labelLarge,
-                    fontSize = 20.sp,
-                    color = Color.Black,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.semantics { heading() }
-                )
             }
         }
     }
