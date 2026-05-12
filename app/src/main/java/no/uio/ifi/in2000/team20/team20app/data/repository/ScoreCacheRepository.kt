@@ -141,16 +141,16 @@ class ScoreCacheRepositoryImpl @Inject constructor(
     override suspend fun saveGeoScore(geoScore: GeoScore) {
         totalScoreCacheDao.insert(
             TotalScoreCacheEntity(
-                locationKey        = geoScore.locationKey,
-                hazardScore        = geoScore.hazardScore,
-                exposureScore      = geoScore.exposureScore,
+                locationKey = geoScore.locationKey,
+                hazardScore = geoScore.hazardScore,
+                exposureScore = geoScore.exposureScore,
                 vulnerabilityScore = geoScore.vulnerabilityScore,
-                geoScore           = geoScore.geoScore,
+                geoScore = geoScore.geoScore,
                 precipitationScore = geoScore.precipitationScore,
-                windScore          = geoScore.windScore,
-                floodScore         = geoScore.floodScore,
-                landslideScore     = geoScore.landslideScore,
-                eventCount         = geoScore.extremeWeatherDaysCount
+                windScore = geoScore.windScore,
+                floodScore = geoScore.floodScore,
+                landslideScore = geoScore.landslideScore,
+                eventCount = geoScore.extremeWeatherDaysCount
             )
         )
     }

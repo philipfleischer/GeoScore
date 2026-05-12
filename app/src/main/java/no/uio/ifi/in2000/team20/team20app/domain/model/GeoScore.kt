@@ -10,13 +10,14 @@ package no.uio.ifi.in2000.team20.team20app.domain.model
  * Used across use cases and ViewModels.
  */
 
-fun scoreToGrade(score: Double): String = when {
-    score < 17 -> "A"
+fun scoreToGrade(score: Double?): String = when {
+    score!! < 17 -> "A"
     score < 33 -> "B"
     score < 50 -> "C"
     score < 67 -> "D"
     score < 83 -> "E"
-    else       -> "F"
+    score >= 83 -> "F"
+    else -> "?"
 }
 
 data class WindAndPrecipitationObservationsResult(
@@ -26,15 +27,15 @@ data class WindAndPrecipitationObservationsResult(
 
 data class GeoScore (
     val locationKey: String,
-    val hazardScore: Double,
-    val exposureScore: Double,
-    val vulnerabilityScore: Double,
-    val precipitationScore: Double,
-    val windScore: Double,
+    val hazardScore: Double?,
+    val exposureScore: Double?,
+    val vulnerabilityScore: Double?,
+    val precipitationScore: Double?,
+    val windScore: Double?,
     val floodScore: Double,
     val landslideScore: Double,
-    val extremeWeatherDaysCount: Int,
-    val geoScore: Double
+    val extremeWeatherDaysCount: Int?,
+    val geoScore: Double?
 )
 
 data class HazardScoreResult (

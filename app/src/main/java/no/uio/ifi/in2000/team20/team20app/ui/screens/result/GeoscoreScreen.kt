@@ -40,12 +40,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.semantics.toggleableState
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -132,7 +129,7 @@ fun GeoscoreScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues),
-                message = listOf("Henter data fra koordinatene.","Henter data fra koordinatene..","Henter data fra koordinatene...", "Veier fordeler mot ulemper.", "Veier fordeler mot ulemper..","Veier fordeler mot ulemper...", "Nesten ferdig.", "Nesten ferdig..","Nesten ferdig...", "Er der straks.", "Er der straks..", "Er der straks...", "Formaterer resultatet.", "Formaterer resultatet..", "Formaterer resultatet...", "Alt er starks på plass.", "Alt er starks på plass..", "Alt er starks på plass...", "Siste ferdigstillinger.","Siste ferdigstillinger..", "Siste ferdigstillinger...")
+                message = listOf("Henter data fra koordinatene.","Henter data fra koordinatene..","Henter data fra koordinatene...", "Veier fordeler mot ulemper.", "Veier fordeler mot ulemper..","Veier fordeler mot ulemper...", "Nesten ferdig.", "Nesten ferdig..","Nesten ferdig...", "Er der straks.", "Er der straks..", "Er der straks...", "Formaterer resultatet.", "Formaterer resultatet..", "Formaterer resultatet...", "Alt er straks på plass.", "Alt er straks på plass..", "Alt er straks på plass...", "Siste ferdigstillinger.","Siste ferdigstillinger..", "Siste ferdigstillinger...")
             )
             return@Scaffold
         }
@@ -237,7 +234,7 @@ private fun GeomarkingCard(
 
                 rightContent = {
                     GeomarkingBadge(
-                        grade = geoState.geoScore?.let { scoreToGrade(it.windScore) } ?: "?"
+                        grade = geoState.geoScore?.windScore?.let { scoreToGrade(it) } ?: "?"
                     )
                 }
             ) {
@@ -321,7 +318,7 @@ private fun GeomarkingCard(
                 title = "\uD83C\uDF27\uFE0F Nedbør",
                 rightContent = {
                     GeomarkingBadge(
-                        grade = geoState.geoScore?.let { scoreToGrade(it.precipitationScore) } ?: "?"
+                        grade = geoState.geoScore?.precipitationScore?.let { scoreToGrade(it) } ?: "?"
                     )
                 }
             ) {
@@ -357,5 +354,5 @@ private fun gradeToRiskLabel(grade: String): String = when (grade) {
     "D" -> "Høy risiko"
     "E" -> "Svært høy risiko"
     "F" -> "Kritisk risiko"
-    else -> "Beregner..."
+    else -> "Ikke nokk data..."
 }

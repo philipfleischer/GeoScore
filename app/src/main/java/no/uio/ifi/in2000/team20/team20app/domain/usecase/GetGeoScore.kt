@@ -8,6 +8,7 @@ import no.uio.ifi.in2000.team20.team20app.domain.model.ExposureScoreResult
 import no.uio.ifi.in2000.team20.team20app.domain.model.GeoScore
 import no.uio.ifi.in2000.team20.team20app.domain.model.HazardScoreResult
 import no.uio.ifi.in2000.team20.team20app.domain.model.VulnerabilityScoreResult
+import no.uio.ifi.in2000.team20.team20app.domain.model.WindAndPrecipitationObservationsResult
 import no.uio.ifi.in2000.team20.team20app.util.Constants.EXPOSURESCORE_WEIGHT
 import no.uio.ifi.in2000.team20.team20app.util.Constants.HAZARDSCORE_WEIGHT
 import no.uio.ifi.in2000.team20.team20app.util.Constants.VULNERABILITYSCORE_WEIGHT
@@ -29,30 +30,72 @@ class GetGeoScore @Inject constructor(
         val hazardResult: HazardScoreResult
         val vulnerabilityResult: VulnerabilityScoreResult
         val exposureResult: ExposureScoreResult
+        val observations: WindAndPrecipitationObservationsResult
 
         coroutineScope {
             // observations and vulnerability called in parallel
             val observationsDeferred = async { frostRepository.getWindAndPrecipitationObservations(lat, lon) }
             val vulnerabilityDeferred = async { getVulnerabilityScore.calculateVulnerabilityScore(lat, lon) }
 
-            val observations = observationsDeferred.await()
+            observations = observationsDeferred.await()
             vulnerabilityResult = vulnerabilityDeferred.await()
 
             // hazard and exposure use the already fetched observations
             hazardResult = getHazardScore.calculateHazardScore(lat, lon, observations)
             exposureResult = getExposureScore.calculateExposureScore(lat, lon, observations)
         }
+
+        if(observations.precipitationValues.isEmpty() && observations.windValues.isEmpty()){
+            return GeoScore(
+                locationKey = locationKey,
+                precipitationScore = null,
+                windScore = null,
+                floodScore = vulnerabilityResult.floodScore,
+                landslideScore = vulnerabilityResult.landslideScore,
+                hazardScore = null,
+                exposureScore = null,
+                vulnerabilityScore = vulnerabilityResult.vulnerabilityScore,
+                extremeWeatherDaysCount = null,
+                geoScore = null
+            )
+        } else if(observations.precipitationValues.isEmpty()){
+            return GeoScore(
+                locationKey = locationKey,
+                precipitationScore = null,
+                windScore = hazardResult.windScore,
+                floodScore = vulnerabilityResult.floodScore,
+                landslideScore = vulnerabilityResult.landslideScore,
+                hazardScore = hazardResult.hazardScore,
+                exposureScore = exposureResult.exposureScore,
+                vulnerabilityScore = vulnerabilityResult.vulnerabilityScore,
+                extremeWeatherDaysCount = exposureResult.eventCount,
+                geoScore = (hazardResult.hazardScore * HAZARDSCORE_WEIGHT) + (exposureResult.exposureScore * EXPOSURESCORE_WEIGHT) + (vulnerabilityResult.vulnerabilityScore * VULNERABILITYSCORE_WEIGHT)
+            )
+        } else if(observations.windValues.isEmpty()){
+            return GeoScore(
+                locationKey = locationKey,
+                precipitationScore = hazardResult.precipitationScore,
+                windScore = null,
+                floodScore = vulnerabilityResult.floodScore,
+                landslideScore = vulnerabilityResult.landslideScore,
+                hazardScore = hazardResult.hazardScore,
+                exposureScore = exposureResult.exposureScore,
+                vulnerabilityScore = vulnerabilityResult.vulnerabilityScore,
+                extremeWeatherDaysCount = exposureResult.eventCount,
+                geoScore = (hazardResult.hazardScore * HAZARDSCORE_WEIGHT) + (exposureResult.exposureScore * EXPOSURESCORE_WEIGHT) + (vulnerabilityResult.vulnerabilityScore * VULNERABILITYSCORE_WEIGHT))
+        }
+
         val geoScore = GeoScore(
-            locationKey             = locationKey,
-            precipitationScore      = hazardResult.precipitationScore,
-            windScore               = hazardResult.windScore,
-            floodScore              = vulnerabilityResult.floodScore,
-            landslideScore          = vulnerabilityResult.landslideScore,
-            hazardScore             = hazardResult.hazardScore,
-            exposureScore           = exposureResult.exposureScore,
-            vulnerabilityScore      = vulnerabilityResult.vulnerabilityScore,
+            locationKey = locationKey,
+            precipitationScore = hazardResult.precipitationScore,
+            windScore = hazardResult.windScore,
+            floodScore = vulnerabilityResult.floodScore,
+            landslideScore = vulnerabilityResult.landslideScore,
+            hazardScore = hazardResult.hazardScore,
+            exposureScore = exposureResult.exposureScore,
+            vulnerabilityScore = vulnerabilityResult.vulnerabilityScore,
             extremeWeatherDaysCount = exposureResult.eventCount,
-            geoScore                = (hazardResult.hazardScore * HAZARDSCORE_WEIGHT) + (exposureResult.exposureScore * EXPOSURESCORE_WEIGHT) + (vulnerabilityResult.vulnerabilityScore * VULNERABILITYSCORE_WEIGHT)
+            geoScore = (hazardResult.hazardScore * HAZARDSCORE_WEIGHT) + (exposureResult.exposureScore * EXPOSURESCORE_WEIGHT) + (vulnerabilityResult.vulnerabilityScore * VULNERABILITYSCORE_WEIGHT)
         )
 
         scoreCacheRepository.saveGeoScore(geoScore)

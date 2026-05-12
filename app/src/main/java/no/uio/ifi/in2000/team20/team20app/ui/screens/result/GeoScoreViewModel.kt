@@ -48,11 +48,11 @@ class GeoScoreViewModel @Inject constructor(
             runCatching { getGeoScore.calculateGeoScore(location.lat, location.lon) }
                 .fold(
                     onSuccess = { score ->
-                        _uiState.update {
+                        _uiState.update {it ->
                             it.copy(
                                 isScoreLoading = false,
                                 geoScore = score,
-                                grade = scoreToGrade(score.geoScore)
+                                grade = score.geoScore?.let { scoreToGrade(it) } ?: ""
                             )
                         }
                         loadReport(score)

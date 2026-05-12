@@ -195,46 +195,6 @@ fun ExpandableInfoBox(
     }
 }
 
-@Composable
-fun GeomarkingInfoBox(
-    selectedLocation: String,
-    geomarking: String,
-    riskLabel: String,
-    expandedText: String,
-    modifier: Modifier = Modifier,
-    theme: MaterialTheme = MaterialTheme
-) {
-    ExpandableInfoBox(
-        title = selectedLocation,
-        modifier = modifier,
-        rightContent = {
-            GeomarkingBadge(
-                grade = geomarking
-            )
-        }
-    ) {
-        Text(
-            text = "Samlet vurdering",
-            style = theme.typography.labelLarge,
-            color = theme.colorScheme.onSecondaryContainer.copy(alpha = 0.75f)
-        )
-
-        Spacer(modifier = Modifier.height(6.dp))
-
-        Text(
-            text = riskLabel,
-            style = theme.typography.titleLarge,
-            fontWeight = FontWeight.Bold
-        )
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        Text(
-            text = expandedText,
-            style = theme.typography.bodyMedium
-        )
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -252,6 +212,7 @@ fun GeomarkingBadge(
         "D" -> Color(0xFFFFC56B)
         "E" -> Color(0xFFEFA066)
         "F" -> Color(0xFFE36C5C)
+        "?" -> Color(0xFFFFC107)
         else -> Color(0xFFBDBDBD)
     }
 
@@ -302,22 +263,3 @@ fun GeomarkingBadge(
 
 }
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-private fun HomeScreenLayoutPreview() {
-    MaterialTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            GeomarkingInfoBox(
-                selectedLocation = "Oslo",
-                geomarking = "C",
-                riskLabel = "Moderat georisiko",
-                expandedText = "Dette området har moderate historiske risikofaktorer knyttet til naturhendelser."
-            )
-        }
-    }
-}
