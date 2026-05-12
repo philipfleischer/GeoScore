@@ -25,16 +25,24 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RichTooltip
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipAnchorPosition
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -228,14 +236,15 @@ fun GeomarkingInfoBox(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GeomarkingBadge(
     grade: String,
     modifier: Modifier = Modifier,
     theme: ColorScheme = MaterialTheme.colorScheme,
     iconStyle: Boolean = true,
-
-    ) {
+    showTooltip: Boolean = false,
+) {
     val badgeColor = when (grade.uppercase()) {
         "A" -> Color(0xFF4CAF50)
         "B" -> Color(0xFF8BC34A)
@@ -246,32 +255,49 @@ fun GeomarkingBadge(
         else -> Color(0xFFBDBDBD)
     }
 
-    if(iconStyle) {
-        Card(
-            modifier = modifier,
-            shape = CircleShape,
-            colors = CardDefaults.cardColors(containerColor = badgeColor)
-        ) {
-            Box(
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                contentAlignment = Alignment.Center
+    val tooltipState = rememberTooltipState(isPersistent = true)
+    val scope = rememberCoroutineScope()
+
+    TooltipBox(
+        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Above),
+        tooltip = {
+            RichTooltip(
+                title = { Text("Karakter ${grade.uppercase()}") }
             ) {
-                Text(
-                    text = grade.uppercase(),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
+                Text("Karakter skalaen går fra A til F. Denne karakteren er en samling av flere faktorer ....")
             }
+        },
+        state = tooltipState,
+        enableUserInput = false
+    ) {
+        if (iconStyle) {
+            Card(
+                modifier = if (showTooltip) modifier.clickable { scope.launch { tooltipState.show() } } else modifier,
+                shape = CircleShape,
+                colors = CardDefaults.cardColors(containerColor = badgeColor)
+            ) {
+                Box(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = grade.uppercase(),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
+            }
+        } else {
+            Text(
+                text = grade.uppercase(),
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold,
+                fontSize = 40.sp,
+                color = badgeColor,
+                modifier = if (showTooltip) modifier.clickable { scope.launch { tooltipState.show() } } else modifier
+            )
         }
-    } else {
-        Text(
-            text = grade.uppercase(),
-            style = MaterialTheme.typography.labelLarge,
-            fontWeight = FontWeight.Bold,
-            fontSize = 40.sp,
-            color = badgeColor
-        )
     }
 
 }
