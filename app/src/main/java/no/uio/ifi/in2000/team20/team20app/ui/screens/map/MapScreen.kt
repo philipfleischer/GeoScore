@@ -20,6 +20,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.Layers
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -32,6 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,9 +59,11 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import com.google.maps.android.compose.wms.WmsTileOverlay
+import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team20.team20app.R
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.domain.model.mapLayer.MapLayer
+import no.uio.ifi.in2000.team20.team20app.domain.model.mapLayer.MapLayerDefinition
 import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
@@ -90,6 +95,8 @@ fun MapScreen(
     val layers by mapViewModel.layers.collectAsStateWithLifecycle()
     val layersExpanded by mapViewModel.layersExpanded.collectAsStateWithLifecycle()
 
+    val selectedLayer by mapViewModel.selectedLayer.collectAsStateWithLifecycle()
+
     val compactScreenWidth = !LocalWindowSizeClass.current.isWidthAtLeastBreakpoint(MEDIUM_SCREEN_WIDTH)
 
     val cameraPosition =
@@ -108,6 +115,8 @@ fun MapScreen(
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(cameraPosition, cameraZoom)
     }
+
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(chosenPosition) {
         if(chosenPosition != null) {
@@ -135,9 +144,9 @@ fun MapScreen(
                 minZoomPreference = MIN_ZOOM,
                 mapStyleOptions = mapStyleOptions
             ),
-            onMapLongClick = {latlng ->
-                val lat = BigDecimal(latlng.latitude).setScale(5, RoundingMode.HALF_UP).toDouble()
-                val lon = BigDecimal(latlng.longitude).setScale(5, RoundingMode.HALF_UP).toDouble()
+            onMapLongClick = {latLng ->
+                val lat = BigDecimal(latLng.latitude).setScale(5, RoundingMode.HALF_UP).toDouble()
+                val lon = BigDecimal(latLng.longitude).setScale(5, RoundingMode.HALF_UP).toDouble()
                 sharedViewModel.setSelectedArea(
                     Location(
                         address = "$lat, $lon",
@@ -155,7 +164,7 @@ fun MapScreen(
             layers.forEach { layer ->
                 WmsTileOverlay(
                     urlFormatter = layer.urlFormatter::invoke,
-                    visible = layer.layerId == mapViewModel.selectedLayer.value.layerId
+                    visible = layer.layerId == selectedLayer.layerId
                 )
             }
             if(chosenPosition != null) {
@@ -220,6 +229,29 @@ fun MapScreen(
             }
 
             Row{
+                FloatingActionButton(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.clip(CircleShape).size(48.dp),
+                    onClick = {
+                        if (selectedLayer.type == MapLayerDefinition.DEFAULT) {
+                            {} // Nothing to do here
+                        } else {
+                            scope.launch {
+                                cameraPositionState.animate(
+                                    CameraUpdateFactory.zoomTo(
+                                        selectedLayer.urlFormatter.getRequiredZoom()
+                                    )
+                                )
+                            }
+                        }
+                    }
+                ){
+                    Icon(
+                        imageVector = if(cameraPositionState.position.zoom >= selectedLayer.urlFormatter.getRequiredZoom()) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                        contentDescription = "Visibility",
+                        tint = MaterialTheme.colorScheme.onSecondary
+                    )
+                }
                 Spacer(Modifier.weight(1f))
                 FloatingActionButton(
                     containerColor = MaterialTheme.colorScheme.secondary,
