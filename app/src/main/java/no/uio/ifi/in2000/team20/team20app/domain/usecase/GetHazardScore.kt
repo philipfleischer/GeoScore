@@ -1,8 +1,9 @@
 package no.uio.ifi.in2000.team20.team20app.domain.usecase
 
-import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepositoryService
+import android.util.Log
 import no.uio.ifi.in2000.team20.team20app.data.repository.ScoreCacheRepository
 import no.uio.ifi.in2000.team20.team20app.domain.model.HazardScoreResult
+import no.uio.ifi.in2000.team20.team20app.domain.model.WindAndPrecipitationObservationsResult
 import no.uio.ifi.in2000.team20.team20app.util.Constants.EXTREME_PRECIPITATION_THRESHOLD
 import no.uio.ifi.in2000.team20.team20app.util.Constants.EXTREME_WIND_GUST_THRESHOLD
 import no.uio.ifi.in2000.team20.team20app.util.Constants.PRECIPITATION_WEIGHT
@@ -13,21 +14,21 @@ import javax.inject.Inject
 import kotlin.math.min
 
 class GetHazardScore @Inject constructor(
-    private val frostRepository: FrostRepositoryService,
     private val scoreCacheRepository: ScoreCacheRepository
 ) {
-    suspend fun calculateHazardScore(lat: Double, lon: Double): HazardScoreResult {
+    suspend fun calculateHazardScore(lat: Double, lon: Double, observations: WindAndPrecipitationObservationsResult): HazardScoreResult {
 
-        //make lat and lon more vague and check if location is in the database
         val locationKey = "%.2f, %.2f".format(lat, lon)
         val cachedResult = scoreCacheRepository.getHazardCache(locationKey)
         if (cachedResult != null) {
             return cachedResult
         }
 
-        val windAndPrecipitationObservationsResult = frostRepository.getWindAndPrecipitationObservations(lat, lon)
-        val precipitationResults = windAndPrecipitationObservationsResult.precipitationValues
-        val windResults = windAndPrecipitationObservationsResult.windValues
+        val precipitationResults = observations.precipitationValues
+        val windResults = observations.windValues
+        Log.d("GetHazardScore", "precipitationResults: $precipitationResults")
+        Log.d("GetHazardScore", "windResults: $windResults")
+
 
         val extremePrecipDays = precipitationResults.values.filter { it > EXTREME_PRECIPITATION_THRESHOLD }
 

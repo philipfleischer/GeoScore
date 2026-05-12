@@ -2,6 +2,7 @@ package no.uio.ifi.in2000.team20.team20app.ui.screens.result
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,6 +40,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.unit.dp
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
@@ -57,7 +63,8 @@ fun GeoscoreScreen(
     onHistoricDataClick: () -> Unit,
     frostViewModel: FrostViewModel,
     savedViewModel: SavedViewModel,
-    geoScoreViewModel: GeoScoreViewModel
+    geoScoreViewModel: GeoScoreViewModel,
+    onNavigateToMap: () -> Unit
 ) {
     val isCurrentSaved by savedViewModel.isCurrentSaved.collectAsStateWithLifecycle()
     val geoState by geoScoreViewModel.uiState.collectAsStateWithLifecycle()
@@ -124,7 +131,7 @@ fun GeoscoreScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues),
-                message = "Beregner geoscore..."
+                message = listOf("Henter data fra koordinatene.","Henter data fra koordinatene..","Henter data fra koordinatene...", "Veier fordeler mot ulemper.", "Veier fordeler mot ulemper..","Veier fordeler mot ulemper...", "Nesten ferdig.", "Nesten ferdig..","Nesten ferdig...", "Er der straks.", "Er der straks..", "Er der straks...", "Formaterer resultatet.", "Formaterer resultatet..", "Formaterer resultatet...", "Alt er straks på plass.", "Alt er straks på plass..", "Alt er straks på plass...", "Siste ferdigstillinger.","Siste ferdigstillinger..", "Siste ferdigstillinger...")
             )
             return@Scaffold
         }
@@ -148,7 +155,8 @@ fun GeoscoreScreen(
                         } else {
                             savedViewModel.addSaved(location)
                         }
-                    }
+                    },
+                    onNavigateToMap = onNavigateToMap
                 )
             }
 
@@ -226,8 +234,13 @@ private fun GeomarkingCard(
     location: Location,
     geoState: GeoScoreUiState,
     isCurrentSaved: Boolean,
-    onSavedToggle: (Boolean) -> Unit
+    onSavedToggle: (Boolean) -> Unit,
+    onNavigateToMap: () -> Unit
 ) {
+
+    val NVEtiltakLink = "https://kommunikasjon.ntb.no/pressemelding/18558016/nve-sikrer-norge-mot-naturfarer-se-kart-bilder-og-tiltak-fra-hele-landet?publisherId=89280&lang=no"
+    val uriHandler = LocalUriHandler.current
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -246,7 +259,7 @@ private fun GeomarkingCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                GeomarkingBadge( grade = geoState.grade.ifEmpty { "?" }, iconStyle = false)
+                GeomarkingBadge( grade = geoState.grade.ifEmpty { "?" }, iconStyle = false, showTooltip = true)
 
                 Column(
                     modifier = Modifier
@@ -265,32 +278,147 @@ private fun GeomarkingCard(
                     )
                 }
 
-                IconButton(
-                    modifier = Modifier.semantics {
-                        onClick(
-                            label = if (isCurrentSaved) "Remove address from saved" else "Save address",
-                            action = {
-                                onSavedToggle(isCurrentSaved)
-                                true
-                            })
-                    },
-                    onClick = { onSavedToggle(isCurrentSaved) }
-                ) {
-                    Icon(
-                        imageVector = if (isCurrentSaved) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
-                        contentDescription = if (isCurrentSaved) "Address saved" else "Address not saved",
-                        tint = MaterialTheme.colorScheme.secondary
+                Column(){
+                    IconButton(
+                        modifier = Modifier.semantics {
+                            onClick(
+                                label = if (isCurrentSaved) "Remove address from saved" else "Save address",
+                                action = {
+                                    onSavedToggle(isCurrentSaved)
+                                    true
+                                })
+                        },
+                        onClick = { onSavedToggle(isCurrentSaved) }
+                        ){
+                        Icon(
+                            imageVector = if (isCurrentSaved) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+                            contentDescription = if (isCurrentSaved) "Address saved" else "Address not saved",
+                            tint = MaterialTheme.colorScheme.secondary
+                        )
+                        }
+
+                    Text(
+                        text = "vis i kart",
+                        modifier = Modifier.clickable{onNavigateToMap()},
+                        textDecoration = TextDecoration.Underline
                     )
                 }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            ExpandableInfoBox(
+                title = "☁\uFE0F Storm",
 
+                rightContent = {
+                    GeomarkingBadge(
+                        grade = geoState.geoScore?.windScore?.let { scoreToGrade(it) } ?: "?"
+                    )
+                }
+            ) {
+                Text(
+                    text = if (geoState.isReportLoading) "Laster rapport..."
+                    else geoState.aiReport?.extremeWindText ?: "Chat kallet funket ikke",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                if (!geoState.isReportLoading && geoState.aiReport != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(SpanStyle(
+                            color = MaterialTheme.colorScheme.primary,
+                            textDecoration = TextDecoration.Underline
+                        )) { append("Les mer på NVE.no") }
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.clickable { uriHandler.openUri(NVEtiltakLink) }
+                )
+            }
+            }
 
+            ExpandableInfoBox(
+                title = "⛰\uFE0F Skredfare",
+                rightContent = {
+                    GeomarkingBadge(
+                        grade = geoState.geoScore?.let { scoreToGrade(it.landslideScore) } ?: "?"
+                    )
+                }
+            ) {
+                Text(
+                    text = if (geoState.isReportLoading) "Laster rapport..."
+                    else geoState.aiReport?.landslideText ?: "Chat kallet funket ikke",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                if (!geoState.isReportLoading && geoState.aiReport != null) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(SpanStyle(
+                                color = MaterialTheme.colorScheme.primary,
+                                textDecoration = TextDecoration.Underline
+                            )) { append("Les mer på NVE.no") }
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.clickable { uriHandler.openUri(NVEtiltakLink) }
+                    )
+                }
+            }
 
+            ExpandableInfoBox(
+                title = "\uD83C\uDF0A Flomrisiko",
+                rightContent = {
+                    GeomarkingBadge(
+                        grade = geoState.geoScore?.let { scoreToGrade(it.floodScore) } ?: "?"
+                    )
+                }
+            ) {
+                Text(
+                    text = if (geoState.isReportLoading) "Laster rapport..."
+                    else geoState.aiReport?.floodText ?: "Chat kallet funket ikke",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                if (!geoState.isReportLoading && geoState.aiReport != null) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(SpanStyle(
+                                color = MaterialTheme.colorScheme.primary,
+                                textDecoration = TextDecoration.Underline
+                            )) { append("Les mer på NVE.no") }
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.clickable { uriHandler.openUri(NVEtiltakLink) }
+                    )
+                }
+            }
 
-
+            ExpandableInfoBox(
+                title = "\uD83C\uDF27\uFE0F Nedbør",
+                rightContent = {
+                    GeomarkingBadge(
+                        grade = geoState.geoScore?.precipitationScore?.let { scoreToGrade(it) } ?: "?"
+                    )
+                }
+            ) {
+                Text(
+                    text = if (geoState.isReportLoading) "Laster rapport..."
+                    else geoState.aiReport?.extremePrecipitationText ?: "",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                if (!geoState.isReportLoading && geoState.aiReport != null) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(SpanStyle(
+                                color = MaterialTheme.colorScheme.primary,
+                                textDecoration = TextDecoration.Underline
+                            )) { append("Les mer på NVE.no") }
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.clickable { uriHandler.openUri(NVEtiltakLink) }
+                    )
+                }
+            }
 
 
 
@@ -306,5 +434,5 @@ private fun gradeToRiskLabel(grade: String): String = when (grade) {
     "D" -> "Høy risiko"
     "E" -> "Svært høy risiko"
     "F" -> "Kritisk risiko"
-    else -> "Beregner..."
+    else -> "Ikke nok data..."
 }

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -42,16 +43,16 @@ class GeoScoreViewModel @Inject constructor(
     val uiState: StateFlow<GeoScoreUiState> = _uiState.asStateFlow()
 
     fun load(location: Location) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) { // Moved of main thread, all functions called by this one will inherit this scope. {
             _uiState.update { it.copy(isScoreLoading = true, scoreError = null) }
             runCatching { getGeoScore.calculateGeoScore(location.lat, location.lon) }
                 .fold(
                     onSuccess = { score ->
-                        _uiState.update {
+                        _uiState.update {it ->
                             it.copy(
                                 isScoreLoading = false,
                                 geoScore = score,
-                                grade = scoreToGrade(score.geoScore)
+                                grade = score.geoScore?.let { scoreToGrade(it) } ?: ""
                             )
                         }
                         loadReport(score)

@@ -32,8 +32,8 @@ class ChatGPTRemoteDataSource @Inject constructor(
                             "- 83-100 = Kritisk risiko (karakter F)\n" +
                             "\n" +
                             "Scorer for denne lokasjonen:\n" +
-                            "- Nedbør: ${geoScore.precipitationScore}\n" +
-                            "- Vind/storm: ${geoScore.windScore}\n" +
+                            "- Nedbør: ${geoScore.precipitationScore ?: "INGEN_DATA"}\n" +
+                            "- Vind/storm: ${geoScore.windScore ?: "INGEN_DATA"}\n" +
                             "- Flom: ${geoScore.floodScore}\n" +
                             "- Skred: ${geoScore.landslideScore}\n" +
                             "\n" +
@@ -44,8 +44,10 @@ class ChatGPTRemoteDataSource @Inject constructor(
                             "- Beskrive risikonivået basert på scoren\n" +
                             "- Forklare hva risikoen innebærer for området og boliger\n" +
                             "- Være skrevet på norsk i en saklig, informativ tone\n" +
-                            "- Kan ikke inneholde overskrifter. men kan inneholde punktlister, tall eller emojis\n" +
+                            "- Kan ikke inneholde overskrifter.\n" +
+                            "- Skal inneholde en punktliste av tiltak for boliger dersom karakteren for avsnittet er lavere enn en B\n" +
                             "- Kan nevne karakteren men ikke scoren\n" +
+                            "- Hvis scoren for et avsnitt er 'INGEN_DATA', skriv KUN denne setningen for akkurat det avsnittet: 'Vi har ikke tilstrekkelig data til å beregne denne risikoen for dette stedet.' De andre avsnittene skal behandles normalt basert på sine scorer.\n" +
                             "\n" +
                             "VIKTIG FORMATERING:\n" +
                             "Separer de fire avsnittene med nøyaktig denne separatoren på en egen linje:\n" +

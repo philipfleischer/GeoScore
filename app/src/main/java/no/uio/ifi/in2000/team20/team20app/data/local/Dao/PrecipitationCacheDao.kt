@@ -9,8 +9,8 @@ import no.uio.ifi.in2000.team20.team20app.data.local.Entity.PrecipitationCacheEn
 @Dao
 interface PrecipitationCacheDao {
 
-    @Query("SELECT * FROM precipitation_cache WHERE locationKey = :locationKey")
-    suspend fun getByKey(locationKey: String): PrecipitationCacheEntity?
+    @Query("SELECT * FROM precipitation_cache WHERE stationId = :stationId")
+    suspend fun getByKey(stationId: String): PrecipitationCacheEntity?
 
     @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
     suspend fun insert(entity: PrecipitationCacheEntity)

@@ -23,11 +23,7 @@ class AppViewModel @Inject constructor(
     // App starts with no selected location, except for in the context of a OS-initiated process death
     val selectedLocation = state.getStateFlow<Location?>(KEY_SELECTED_LOCATION, null)
 
-    //TODO: Why is this here? Consider moving...
-    val defaultCameraPosition = LatLng(
-        DEFAULT_LATITUDE,
-        DEFAULT_LONGITUDE
-    )
+
 
     fun setSelectedArea(location: Location) {
         state[KEY_SELECTED_LOCATION] = location

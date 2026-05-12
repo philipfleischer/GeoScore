@@ -9,8 +9,8 @@ import no.uio.ifi.in2000.team20.team20app.data.local.Entity.WindCacheEntity
 @Dao
 interface WindCacheDao {
 
-    @Query("SELECT * FROM wind_cache WHERE locationKey = :locationKey")
-    suspend fun getByKey(locationKey: String): WindCacheEntity?
+    @Query("SELECT * FROM wind_cache WHERE stationId = :stationId")
+    suspend fun getByKey(stationId: String): WindCacheEntity?
 
     @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
     suspend fun insert(entity: WindCacheEntity)

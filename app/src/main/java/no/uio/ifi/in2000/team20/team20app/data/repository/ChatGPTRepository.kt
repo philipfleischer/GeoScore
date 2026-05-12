@@ -10,6 +10,7 @@ import javax.inject.Inject
 interface ChatGPTRepository {
     suspend fun getAiGeneratedReport(geoScore: GeoScore): Report
     suspend fun generateReport(geoScore: GeoScore): Report
+
 }
 
 class ChatGPTRepositoryImpl @Inject constructor(
@@ -59,4 +60,6 @@ class ChatGPTRepositoryImpl @Inject constructor(
         )
         return report
     }
+
+
 }

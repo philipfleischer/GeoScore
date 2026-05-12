@@ -25,16 +25,24 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RichTooltip
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipAnchorPosition
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -184,55 +192,16 @@ fun ExpandableInfoBox(
     }
 }
 
-@Composable
-fun GeomarkingInfoBox(
-    selectedLocation: String,
-    geomarking: String,
-    riskLabel: String,
-    expandedText: String,
-    modifier: Modifier = Modifier,
-    theme: MaterialTheme = MaterialTheme
-) {
-    ExpandableInfoBox(
-        title = selectedLocation,
-        modifier = modifier,
-        rightContent = {
-            GeomarkingBadge(
-                grade = geomarking
-            )
-        }
-    ) {
-        Text(
-            text = "Samlet vurdering",
-            style = theme.typography.labelLarge,
-            color = theme.colorScheme.onSecondaryContainer.copy(alpha = 0.75f)
-        )
 
-        Spacer(modifier = Modifier.height(6.dp))
-
-        Text(
-            text = riskLabel,
-            style = theme.typography.titleLarge,
-            fontWeight = FontWeight.Bold
-        )
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        Text(
-            text = expandedText,
-            style = theme.typography.bodyMedium
-        )
-    }
-}
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GeomarkingBadge(
     grade: String,
     modifier: Modifier = Modifier,
     theme: ColorScheme = MaterialTheme.colorScheme,
     iconStyle: Boolean = true,
-
-    ) {
+    showTooltip: Boolean = false,
+) {
     val badgeColor = when (grade.uppercase()) {
         "A" -> Color(0xFF4CAF50)
         "B" -> Color(0xFF8BC34A)
@@ -240,55 +209,54 @@ fun GeomarkingBadge(
         "D" -> Color(0xFFFFC56B)
         "E" -> Color(0xFFEFA066)
         "F" -> Color(0xFFE36C5C)
+        "?" -> Color(0xFFFFC107)
         else -> Color(0xFFBDBDBD)
     }
 
-    if(iconStyle) {
-        Card(
-            modifier = modifier,
-            shape = CircleShape,
-            colors = CardDefaults.cardColors(containerColor = badgeColor)
-        ) {
-            Box(
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                contentAlignment = Alignment.Center
+    val tooltipState = rememberTooltipState(isPersistent = true)
+    val scope = rememberCoroutineScope()
+
+    TooltipBox(
+        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Above),
+        tooltip = {
+            RichTooltip(
+                title = { Text("Karakter ${grade.uppercase()}") }
             ) {
-                Text(
-                    text = grade.uppercase(),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
+                Text("Merkingen er gitt utifra fra en skala fra A-F, der A betyr minst samlet risiko")
             }
-        }
-    } else {
-        Text(
-            text = grade.uppercase(),
-            style = MaterialTheme.typography.labelLarge,
-            fontWeight = FontWeight.Bold,
-            fontSize = 40.sp,
-            color = badgeColor
-        )
-    }
-
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-private fun HomeScreenLayoutPreview() {
-    MaterialTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            GeomarkingInfoBox(
-                selectedLocation = "Oslo",
-                geomarking = "C",
-                riskLabel = "Moderat georisiko",
-                expandedText = "Dette området har moderate historiske risikofaktorer knyttet til naturhendelser."
+        },
+        state = tooltipState,
+        enableUserInput = false
+    ) {
+        if (iconStyle) {
+            Card(
+                modifier = if (showTooltip) modifier.clickable { scope.launch { tooltipState.show() } } else modifier,
+                shape = CircleShape,
+                colors = CardDefaults.cardColors(containerColor = badgeColor)
+            ) {
+                Box(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = grade.uppercase(),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
+            }
+        } else {
+            Text(
+                text = grade.uppercase(),
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold,
+                fontSize = 40.sp,
+                color = badgeColor,
+                modifier = if (showTooltip) modifier.clickable { scope.launch { tooltipState.show() } } else modifier
             )
         }
     }
+
 }
+
