@@ -232,7 +232,8 @@ private fun GeomarkingCard(
 
                     Text(
                         text = "vis i kart",
-                        modifier = Modifier.clickable{onNavigateToMap()}
+                        modifier = Modifier.clickable{onNavigateToMap()},
+                        textDecoration = TextDecoration.Underline
                     )
                 }
 
