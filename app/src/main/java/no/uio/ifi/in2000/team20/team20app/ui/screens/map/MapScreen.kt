@@ -287,7 +287,7 @@ fun MapScreen(
             ) {
                 if (layersExpanded) {
                     Column(
-                        modifier = Modifier.padding(bottom = contentPadding.calculateBottomPadding())
+                        modifier = modifier
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically
@@ -344,12 +344,12 @@ fun MapLayerSelectable(
         ) {
             AsyncImage(
                 model = layer.imageURI,
-                contentDescription = layer.type.title //TODO: Link layer to translation
+                contentDescription = layer.type.title
             )
         }
         Text(
             modifier = Modifier.fillMaxWidth(1f),
-            text = layer.type.title, //TODO: Link layer to translation
+            text = layer.type.title,
             textAlign = TextAlign.Center,
         )
     }
