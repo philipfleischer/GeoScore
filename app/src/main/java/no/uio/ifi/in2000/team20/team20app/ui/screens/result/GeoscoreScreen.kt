@@ -63,7 +63,8 @@ fun GeoscoreScreen(
     onHistoricDataClick: () -> Unit,
     frostViewModel: FrostViewModel,
     savedViewModel: SavedViewModel,
-    geoScoreViewModel: GeoScoreViewModel
+    geoScoreViewModel: GeoScoreViewModel,
+    onNavigateToMap: () -> Unit
 ) {
     val isCurrentSaved by savedViewModel.isCurrentSaved.collectAsStateWithLifecycle()
     val geoState by geoScoreViewModel.uiState.collectAsStateWithLifecycle()
@@ -153,7 +154,8 @@ fun GeoscoreScreen(
                         } else {
                             savedViewModel.addSaved(location)
                         }
-                    }
+                    },
+                    onNavigateToMap = onNavigateToMap
                 )
             }
         }
@@ -165,7 +167,8 @@ private fun GeomarkingCard(
     location: Location,
     geoState: GeoScoreUiState,
     isCurrentSaved: Boolean,
-    onSavedToggle: (Boolean) -> Unit
+    onSavedToggle: (Boolean) -> Unit,
+    onNavigateToMap: () -> Unit
 ) {
 
     val NVEtiltakLink = "https://kommunikasjon.ntb.no/pressemelding/18558016/nve-sikrer-norge-mot-naturfarer-se-kart-bilder-og-tiltak-fra-hele-landet?publisherId=89280&lang=no"
@@ -208,23 +211,31 @@ private fun GeomarkingCard(
                     )
                 }
 
-                IconButton(
-                    modifier = Modifier.semantics {
-                        onClick(
-                            label = if (isCurrentSaved) "Remove address from saved" else "Save address",
-                            action = {
-                                onSavedToggle(isCurrentSaved)
-                                true
-                            })
-                    },
-                    onClick = { onSavedToggle(isCurrentSaved) }
-                ) {
-                    Icon(
-                        imageVector = if (isCurrentSaved) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
-                        contentDescription = if (isCurrentSaved) "Address saved" else "Address not saved",
-                        tint = MaterialTheme.colorScheme.secondary
+                Column(){
+                    IconButton(
+                        modifier = Modifier.semantics {
+                            onClick(
+                                label = if (isCurrentSaved) "Remove address from saved" else "Save address",
+                                action = {
+                                    onSavedToggle(isCurrentSaved)
+                                    true
+                                })
+                        },
+                        onClick = { onSavedToggle(isCurrentSaved) }
+                        ){
+                        Icon(
+                            imageVector = if (isCurrentSaved) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+                            contentDescription = if (isCurrentSaved) "Address saved" else "Address not saved",
+                            tint = MaterialTheme.colorScheme.secondary
+                        )
+                        }
+
+                    Text(
+                        text = "vis i kart",
+                        modifier = Modifier.clickable{onNavigateToMap()}
                     )
                 }
+
             }
 
             Spacer(modifier = Modifier.height(8.dp))

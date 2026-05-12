@@ -148,7 +148,9 @@ fun NavigationRoot() {
                         },
                         frostViewModel = frostViewModel,
                         savedViewModel = savedViewModel,
-                        geoScoreViewModel = geoScoreViewModel
+                        geoScoreViewModel = geoScoreViewModel,
+                        onNavigateToMap = {appViewModel.setSelectedArea(destination.location)
+                            backStack.add(Route.MapDestination)}
                     )
                 }
             }
@@ -159,6 +161,7 @@ fun NavigationRoot() {
 
                 AdaptiveNavigationScaffold(
                     highlightedDest = Screen.HOME.route,
+
                     onNavigate = onNavigate,
                 ) { insets ->
                     SearchScreen(
