@@ -48,6 +48,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -91,7 +92,9 @@ fun SearchBarObject(
 
             Text(
                 text = text,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }
@@ -102,9 +105,9 @@ fun SearchBarObject(
 fun SearchScreen(
     onBackClick: () -> Unit,
     onLocationSelected: (Location) -> Unit,
+    modifier: Modifier = Modifier,
     theme: MaterialTheme = MaterialTheme,
     searchViewModel: SearchViewModel = hiltViewModel(),
-    modifier: Modifier = Modifier,
 ) {
     val uiState by searchViewModel.uiState.collectAsStateWithLifecycle()
 
