@@ -96,7 +96,7 @@ val LightColorScheme = lightColorScheme(
     onPrimary = Charcoal,
     secondary = DarkBlue,
     onSecondary = White,
-    outline = DarkBlue,
+    outline = SlateGray,
     error = Salmon,
 )
 

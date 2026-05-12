@@ -103,7 +103,6 @@ fun NavigationRoot() {
                 ) { insets ->
                     MapScreen(
                         modifier = Modifier.padding(insets),
-                        contentPadding = insets,
                         sharedViewModel = appViewModel,
                         savedViewModel = savedViewModel,
                         mapViewModel = mapViewModel,

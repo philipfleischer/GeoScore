@@ -69,7 +69,6 @@ fun GeoscoreScreen(
     val isCurrentSaved by savedViewModel.isCurrentSaved.collectAsStateWithLifecycle()
     val geoState by geoScoreViewModel.uiState.collectAsStateWithLifecycle()
 
-
     LaunchedEffect(location) {
 
         Log.d("GeoScoreScreen", "LaunchedEffect called with $location")
@@ -80,6 +79,8 @@ fun GeoscoreScreen(
     }
 
     Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        contentWindowInsets = WindowInsets(0),
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             Box(
@@ -157,6 +158,72 @@ fun GeoscoreScreen(
                     },
                     onNavigateToMap = onNavigateToMap
                 )
+            }
+
+            item {
+                ExpandableInfoBox(
+                    title = "☁\uFE0F Storm",
+
+                    rightContent = {
+                        GeomarkingBadge(
+                            grade = geoState.geoScore?.let { scoreToGrade(it.windScore) } ?: "?"
+                        )
+                    }
+                ) {
+                    Text(
+                        text = if (geoState.isReportLoading) "Laster rapport..."
+                        else geoState.aiReport?.extremeWindText ?: "Chat kallet funket ikke",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+            item {
+                ExpandableInfoBox(
+                    title = "⛰\uFE0F Skredfare",
+                    rightContent = {
+                        GeomarkingBadge(
+                            grade = geoState.geoScore?.let { scoreToGrade(it.landslideScore) } ?: "?"
+                        )
+                    }
+                ) {
+                    Text(
+                        text = if (geoState.isReportLoading) "Laster rapport..."
+                        else geoState.aiReport?.landslideText ?: "Chat kallet funket ikke",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+            item {
+                ExpandableInfoBox(
+                    title = "\uD83C\uDF0A Flomrisiko",
+                    rightContent = {
+                        GeomarkingBadge(
+                            grade = geoState.geoScore?.let { scoreToGrade(it.floodScore) } ?: "?"
+                        )
+                    }
+                ) {
+                    Text(
+                        text = if (geoState.isReportLoading) "Laster rapport..."
+                        else geoState.aiReport?.floodText ?: "Chat kallet funket ikke",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+            item {
+                ExpandableInfoBox(
+                    title = "\uD83C\uDF27\uFE0F Nedbør",
+                    rightContent = {
+                        GeomarkingBadge(
+                            grade = geoState.geoScore?.let { scoreToGrade(it.precipitationScore) } ?: "?"
+                        )
+                    }
+                ) {
+                    Text(
+                        text = if (geoState.isReportLoading) "Laster rapport..."
+                        else geoState.aiReport?.extremePrecipitationText ?: "",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
             }
         }
     }
@@ -236,7 +303,6 @@ private fun GeomarkingCard(
                         textDecoration = TextDecoration.Underline
                     )
                 }
-
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -354,6 +420,8 @@ private fun GeomarkingCard(
                 }
             }
 
+
+
         }
 
     }
@@ -366,5 +434,5 @@ private fun gradeToRiskLabel(grade: String): String = when (grade) {
     "D" -> "Høy risiko"
     "E" -> "Svært høy risiko"
     "F" -> "Kritisk risiko"
-    else -> "Ikke nokk data..."
+    else -> "Ikke nok data..."
 }
