@@ -5,7 +5,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import no.uio.ifi.in2000.team20.team20app.data.repository.MapLayerRepository
+import no.uio.ifi.in2000.team20.team20app.domain.model.mapLayer.MapLayer
 import javax.inject.Inject
 
 /**
@@ -20,11 +21,13 @@ import javax.inject.Inject
  */
 
 @HiltViewModel
-class MapViewModel @Inject constructor() : ViewModel() {
-    private val _layers: MutableStateFlow<List<MapLayer>> = MutableStateFlow(MapLayers.layers)
-    val layers: StateFlow<List<MapLayer>> = _layers.asStateFlow()
+class MapViewModel @Inject constructor(
+    private val mapLayerRepository: MapLayerRepository
+) : ViewModel() {
+    private val _layers = MutableStateFlow(mapLayerRepository.getMapLayers())
+    val layers = _layers.asStateFlow()
 
-    private val _selectedLayer: MutableStateFlow<MapLayer> = MutableStateFlow(MapLayers.layers[0])
+    private val _selectedLayer: MutableStateFlow<MapLayer> = MutableStateFlow(_layers.value[0])
     val selectedLayer: StateFlow<MapLayer> = _selectedLayer.asStateFlow()
     private val _layersExpanded: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val layersExpanded: StateFlow<Boolean> = _layersExpanded.asStateFlow()
@@ -36,16 +39,4 @@ class MapViewModel @Inject constructor() : ViewModel() {
     fun setActiveLayer(layer: MapLayer) {
         _selectedLayer.value = layer
     }
-//    fun toggleLayer(layerId: Int){
-//        _layers.update { layers ->
-//            layers.map { layer ->
-//                if (layer.layerId == layerId) {
-//                    layer.copy(toggled = !layer.toggled)
-//                } else {
-//                    layer.copy(toggled = false)
-//                }
-//            }
-//        }
-//    }
-
 }

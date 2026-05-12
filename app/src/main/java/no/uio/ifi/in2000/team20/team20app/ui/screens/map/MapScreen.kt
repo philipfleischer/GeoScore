@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team20.team20app.ui.screens.map
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,14 +14,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Layers
 import androidx.compose.material3.Button
@@ -62,6 +58,7 @@ import com.google.maps.android.compose.rememberUpdatedMarkerState
 import com.google.maps.android.compose.wms.WmsTileOverlay
 import no.uio.ifi.in2000.team20.team20app.R
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
+import no.uio.ifi.in2000.team20.team20app.domain.model.mapLayer.MapLayer
 import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
@@ -157,7 +154,7 @@ fun MapScreen(
         ) {
             layers.forEach { layer ->
                 WmsTileOverlay(
-                    urlFormatter = layer.formatter,
+                    urlFormatter = layer.urlFormatter::invoke,
                     visible = layer.layerId == mapViewModel.selectedLayer.value.layerId
                 )
             }
@@ -266,7 +263,7 @@ fun MapScreen(
                                 )
                             }
                         }
-                        LazyRow() {
+                        LazyRow{
                             item {
                                 layers.forEach { layer ->
                                     MapLayerSelectable(
@@ -303,12 +300,12 @@ fun MapLayerSelectable(
         ) {
             AsyncImage(
                 model = layer.imageURI,
-                contentDescription = layer.name
+                contentDescription = layer.type.title //TODO: Link layer to translation
             )
         }
         Text(
             modifier = Modifier.fillMaxWidth(1f),
-            text = layer.name,
+            text = layer.type.title, //TODO: Link layer to translation
             textAlign = TextAlign.Center,
         )
     }
