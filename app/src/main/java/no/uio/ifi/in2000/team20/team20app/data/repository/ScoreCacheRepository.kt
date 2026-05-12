@@ -130,12 +130,11 @@ class ScoreCacheRepositoryImpl @Inject constructor(
             exposureScore = entity.exposureScore,
             vulnerabilityScore = entity.vulnerabilityScore,
             geoScore = entity.geoScore,
-            // Sub-scores not stored in TotalScoreCacheEntity — use defaults
-            precipitationScore = 0.0,
-            windScore = 0.0,
-            floodScore = 0.0,
-            landslideScore = 0.0,
-            extremeWeatherDaysCount = 0
+            precipitationScore  = entity.precipitationScore,
+            windScore = entity.windScore,
+            floodScore = entity.floodScore,
+            landslideScore = entity.landslideScore,
+            extremeWeatherDaysCount = entity.eventCount
         )
     }
 
@@ -146,7 +145,12 @@ class ScoreCacheRepositoryImpl @Inject constructor(
                 hazardScore = geoScore.hazardScore,
                 exposureScore = geoScore.exposureScore,
                 vulnerabilityScore = geoScore.vulnerabilityScore,
-                geoScore = geoScore.geoScore
+                geoScore = geoScore.geoScore,
+                precipitationScore = geoScore.precipitationScore,
+                windScore = geoScore.windScore,
+                floodScore = geoScore.floodScore,
+                landslideScore = geoScore.landslideScore,
+                eventCount = geoScore.extremeWeatherDaysCount
             )
         )
     }

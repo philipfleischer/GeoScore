@@ -3,6 +3,8 @@ package no.uio.ifi.in2000.team20.team20app.ui.navigation
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.entryProvider
@@ -101,7 +103,6 @@ fun NavigationRoot() {
                 ) { insets ->
                     MapScreen(
                         modifier = Modifier.padding(insets),
-                        contentPadding = insets,
                         sharedViewModel = appViewModel,
                         savedViewModel = savedViewModel,
                         mapViewModel = mapViewModel,
@@ -148,7 +149,9 @@ fun NavigationRoot() {
                         },
                         frostViewModel = frostViewModel,
                         savedViewModel = savedViewModel,
-                        geoScoreViewModel = geoScoreViewModel
+                        geoScoreViewModel = geoScoreViewModel,
+                        onNavigateToMap = {appViewModel.setSelectedArea(destination.location)
+                            backStack.add(Route.MapDestination)}
                     )
                 }
             }
@@ -159,6 +162,7 @@ fun NavigationRoot() {
 
                 AdaptiveNavigationScaffold(
                     highlightedDest = Screen.HOME.route,
+
                     onNavigate = onNavigate,
                 ) { insets ->
                     SearchScreen(

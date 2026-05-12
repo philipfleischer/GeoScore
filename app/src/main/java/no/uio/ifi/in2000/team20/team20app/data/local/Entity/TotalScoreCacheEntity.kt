@@ -8,8 +8,13 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "total_score_cache")
 data class TotalScoreCacheEntity(
     @PrimaryKey val locationKey: String,
-    val hazardScore: Double,
-    val vulnerabilityScore: Double,
-    val exposureScore: Double,
-    val geoScore: Double
+    val hazardScore: Double?,
+    val vulnerabilityScore: Double?,
+    val exposureScore: Double?,
+    val geoScore: Double?,
+    val precipitationScore: Double?,
+    val windScore: Double?,
+    val floodScore: Double,
+    val landslideScore: Double,
+    val eventCount: Int?
 )

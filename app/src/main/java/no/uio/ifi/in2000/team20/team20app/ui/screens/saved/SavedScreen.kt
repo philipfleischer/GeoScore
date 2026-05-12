@@ -6,12 +6,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,11 +42,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.CollectionInfo
 import androidx.compose.ui.semantics.CollectionItemInfo
 import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.collectionInfo
 import androidx.compose.ui.semantics.collectionItemInfo
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -82,15 +86,16 @@ fun SavedScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface)
+            .windowInsetsPadding(WindowInsets(0))
     ){
         Column(
             modifier = modifier
                 .fillMaxSize()
                 .padding(
-                    top = if (compactScreenWidth) (DEFAULT_PADDING_DP*3).dp else (DEFAULT_PADDING_DP*2).dp,
+                    top = if (compactScreenWidth) (DEFAULT_PADDING_DP * 3).dp else (DEFAULT_PADDING_DP * 2).dp,
                     start = if (compactScreenWidth) DEFAULT_PADDING_DP.dp else LARGE_PADDING_DP.dp,
-                    end = if (compactScreenWidth) DEFAULT_PADDING_DP.dp else (DEFAULT_PADDING_DP*5).dp,
-                    bottom = if(compactScreenWidth) (DEFAULT_PADDING_DP*2).dp else LARGE_PADDING_DP.dp
+                    end = if (compactScreenWidth) DEFAULT_PADDING_DP.dp else (DEFAULT_PADDING_DP * 5).dp,
+                    bottom = if (compactScreenWidth) (DEFAULT_PADDING_DP * 2).dp else LARGE_PADDING_DP.dp
                 )
             ,
             verticalArrangement = if (!saved.isEmpty()) Arrangement.spacedBy(DEFAULT_PADDING_DP.dp) else Arrangement.Center
@@ -106,7 +111,9 @@ fun SavedScreen(
                     contentAlignment = Alignment.Center
                 ){
                     Text( // Could be in the center of the screen
-                        modifier = Modifier.fillMaxWidth().padding(SMALL_PADDING_DP.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(SMALL_PADDING_DP.dp),
                         text = "Når du har lagret et sted, vil det vises her.",
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center,
@@ -165,7 +172,8 @@ private fun SavedLocationCard(
             onConfirm = {
                 onSavedToggle(true)
                 showDeleteDialog.value = false
-            }
+            },
+            location = location.name
         )
     }
 
@@ -180,19 +188,19 @@ private fun SavedLocationCard(
             .semantics(mergeDescendants = true) {
                 customActions = listOf(
                     CustomAccessibilityAction(
-                        label = "Delete saved address",
+                        label = "Slett lagret adresse ${location.name}",
                         action = {
-                            onSavedToggle(true)
+                            showDeleteDialog.value = true
                             true
                         }
                     ),
                     CustomAccessibilityAction(
-                        label = "Open geoscore repport",
+                        label = "Åpne georapport for lagret adresse ${location.name}",
                         action = {
                             onOpenReport()
                             true
                         }
-                    )
+                    ),
                 )
             }
         ,
@@ -214,7 +222,7 @@ private fun SavedLocationCard(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
-                    .semantics{ isTraversalGroup = true }
+                    .semantics { isTraversalGroup = true }
                 ,
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
@@ -238,18 +246,6 @@ private fun SavedLocationCard(
                     .padding(top = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(0.dp)
             ) {
-                // TODO: Add share functionality ;)
-//                IconButton(
-//                    onClick = { },
-//                    modifier = Modifier.size(32.dp)
-//                ) {
-//                    Icon(
-//                        imageVector = Icons.Default.Share,
-//                        contentDescription = "Del",
-//                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-//                        modifier = Modifier.size(20.dp)
-//                    )
-//                }
 
                 IconButton(
                     onClick = { },
@@ -281,7 +277,7 @@ private fun SavedLocationCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 12.dp)
-                .clearAndSetSemantics{},
+                .clearAndSetSemantics {},
 
             horizontalArrangement = Arrangement.End
         ) {
@@ -325,19 +321,39 @@ private fun GradeBadge(grade: String) {
 @Composable
 private fun DeleteLocationDialog(
     onDismiss: () -> Unit,
-    onConfirm: () -> Unit
+    onConfirm: () -> Unit,
+    location: String
 ){
     AlertDialog(
+        modifier = Modifier.semantics(mergeDescendants = true){
+            liveRegion = LiveRegionMode.Polite
+            customActions = listOf(
+                CustomAccessibilityAction(
+                    label = "Bekreft for å slette lagret adresse $location",
+                    action = {
+                        onConfirm()
+                        true
+                    }
+                ),
+                CustomAccessibilityAction(
+                    label = "Avbryt å slette lagret adresse $location",
+                    action = {
+                        onDismiss()
+                        true
+                    }
+                )
+            )
+                                     },
         onDismissRequest = onDismiss,
         title = { Text("Fjern lokasjon") },
         text = { Text("Er du sikker på at du vil fjerne denne lokasjonen?")},
         confirmButton = {
-            TextButton(onClick = onConfirm) {
+            TextButton(modifier = Modifier.clearAndSetSemantics{} ,onClick = onConfirm) {
                 Text("Fjern", color = Color.Red)
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(modifier = Modifier.clearAndSetSemantics{}, onClick = onDismiss) {
                 Text("Avbryt")
             }
         }

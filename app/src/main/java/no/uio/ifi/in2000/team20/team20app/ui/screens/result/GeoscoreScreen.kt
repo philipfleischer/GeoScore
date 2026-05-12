@@ -40,12 +40,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.semantics.toggleableState
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -66,11 +63,11 @@ fun GeoscoreScreen(
     onHistoricDataClick: () -> Unit,
     frostViewModel: FrostViewModel,
     savedViewModel: SavedViewModel,
-    geoScoreViewModel: GeoScoreViewModel
+    geoScoreViewModel: GeoScoreViewModel,
+    onNavigateToMap: () -> Unit
 ) {
     val isCurrentSaved by savedViewModel.isCurrentSaved.collectAsStateWithLifecycle()
     val geoState by geoScoreViewModel.uiState.collectAsStateWithLifecycle()
-
 
     LaunchedEffect(location) {
 
@@ -82,6 +79,8 @@ fun GeoscoreScreen(
     }
 
     Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        contentWindowInsets = WindowInsets(0),
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             Box(
@@ -132,7 +131,7 @@ fun GeoscoreScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues),
-                message = "Beregner geoscore..."
+                message = listOf("Henter data fra koordinatene.","Henter data fra koordinatene..","Henter data fra koordinatene...", "Veier fordeler mot ulemper.", "Veier fordeler mot ulemper..","Veier fordeler mot ulemper...", "Nesten ferdig.", "Nesten ferdig..","Nesten ferdig...", "Er der straks.", "Er der straks..", "Er der straks...", "Formaterer resultatet.", "Formaterer resultatet..", "Formaterer resultatet...", "Alt er straks på plass.", "Alt er straks på plass..", "Alt er straks på plass...", "Siste ferdigstillinger.","Siste ferdigstillinger..", "Siste ferdigstillinger...")
             )
             return@Scaffold
         }
@@ -156,8 +155,75 @@ fun GeoscoreScreen(
                         } else {
                             savedViewModel.addSaved(location)
                         }
-                    }
+                    },
+                    onNavigateToMap = onNavigateToMap
                 )
+            }
+
+            item {
+                ExpandableInfoBox(
+                    title = "☁\uFE0F Storm",
+
+                    rightContent = {
+                        GeomarkingBadge(
+                            grade = geoState.geoScore?.let { scoreToGrade(it.windScore) } ?: "?"
+                        )
+                    }
+                ) {
+                    Text(
+                        text = if (geoState.isReportLoading) "Laster rapport..."
+                        else geoState.aiReport?.extremeWindText ?: "Chat kallet funket ikke",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+            item {
+                ExpandableInfoBox(
+                    title = "⛰\uFE0F Skredfare",
+                    rightContent = {
+                        GeomarkingBadge(
+                            grade = geoState.geoScore?.let { scoreToGrade(it.landslideScore) } ?: "?"
+                        )
+                    }
+                ) {
+                    Text(
+                        text = if (geoState.isReportLoading) "Laster rapport..."
+                        else geoState.aiReport?.landslideText ?: "Chat kallet funket ikke",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+            item {
+                ExpandableInfoBox(
+                    title = "\uD83C\uDF0A Flomrisiko",
+                    rightContent = {
+                        GeomarkingBadge(
+                            grade = geoState.geoScore?.let { scoreToGrade(it.floodScore) } ?: "?"
+                        )
+                    }
+                ) {
+                    Text(
+                        text = if (geoState.isReportLoading) "Laster rapport..."
+                        else geoState.aiReport?.floodText ?: "Chat kallet funket ikke",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+            item {
+                ExpandableInfoBox(
+                    title = "\uD83C\uDF27\uFE0F Nedbør",
+                    rightContent = {
+                        GeomarkingBadge(
+                            grade = geoState.geoScore?.let { scoreToGrade(it.precipitationScore) } ?: "?"
+                        )
+                    }
+                ) {
+                    Text(
+                        text = if (geoState.isReportLoading) "Laster rapport..."
+                        else geoState.aiReport?.extremePrecipitationText ?: "",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
             }
         }
     }
@@ -168,7 +234,8 @@ private fun GeomarkingCard(
     location: Location,
     geoState: GeoScoreUiState,
     isCurrentSaved: Boolean,
-    onSavedToggle: (Boolean) -> Unit
+    onSavedToggle: (Boolean) -> Unit,
+    onNavigateToMap: () -> Unit
 ) {
 
     val NVEtiltakLink = "https://kommunikasjon.ntb.no/pressemelding/18558016/nve-sikrer-norge-mot-naturfarer-se-kart-bilder-og-tiltak-fra-hele-landet?publisherId=89280&lang=no"
@@ -192,7 +259,7 @@ private fun GeomarkingCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                GeomarkingBadge( grade = geoState.grade.ifEmpty { "?" }, iconStyle = false)
+                GeomarkingBadge( grade = geoState.grade.ifEmpty { "?" }, iconStyle = false, showTooltip = true)
 
                 Column(
                     modifier = Modifier
@@ -211,21 +278,29 @@ private fun GeomarkingCard(
                     )
                 }
 
-                IconButton(
-                    modifier = Modifier.semantics {
-                        onClick(
-                            label = if (isCurrentSaved) "Remove address from saved" else "Save address",
-                            action = {
-                                onSavedToggle(isCurrentSaved)
-                                true
-                            })
-                    },
-                    onClick = { onSavedToggle(isCurrentSaved) }
-                ) {
-                    Icon(
-                        imageVector = if (isCurrentSaved) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
-                        contentDescription = if (isCurrentSaved) "Address saved" else "Address not saved",
-                        tint = MaterialTheme.colorScheme.secondary
+                Column(){
+                    IconButton(
+                        modifier = Modifier.semantics {
+                            onClick(
+                                label = if (isCurrentSaved) "Remove address from saved" else "Save address",
+                                action = {
+                                    onSavedToggle(isCurrentSaved)
+                                    true
+                                })
+                        },
+                        onClick = { onSavedToggle(isCurrentSaved) }
+                        ){
+                        Icon(
+                            imageVector = if (isCurrentSaved) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+                            contentDescription = if (isCurrentSaved) "Address saved" else "Address not saved",
+                            tint = MaterialTheme.colorScheme.secondary
+                        )
+                        }
+
+                    Text(
+                        text = "vis i kart",
+                        modifier = Modifier.clickable{onNavigateToMap()},
+                        textDecoration = TextDecoration.Underline
                     )
                 }
             }
@@ -237,7 +312,7 @@ private fun GeomarkingCard(
 
                 rightContent = {
                     GeomarkingBadge(
-                        grade = geoState.geoScore?.let { scoreToGrade(it.windScore) } ?: "?"
+                        grade = geoState.geoScore?.windScore?.let { scoreToGrade(it) } ?: "?"
                     )
                 }
             ) {
@@ -321,7 +396,7 @@ private fun GeomarkingCard(
                 title = "\uD83C\uDF27\uFE0F Nedbør",
                 rightContent = {
                     GeomarkingBadge(
-                        grade = geoState.geoScore?.let { scoreToGrade(it.precipitationScore) } ?: "?"
+                        grade = geoState.geoScore?.precipitationScore?.let { scoreToGrade(it) } ?: "?"
                     )
                 }
             ) {
@@ -345,6 +420,8 @@ private fun GeomarkingCard(
                 }
             }
 
+
+
         }
 
     }
@@ -357,5 +434,5 @@ private fun gradeToRiskLabel(grade: String): String = when (grade) {
     "D" -> "Høy risiko"
     "E" -> "Svært høy risiko"
     "F" -> "Kritisk risiko"
-    else -> "Beregner..."
+    else -> "Ikke nok data..."
 }

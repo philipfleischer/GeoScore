@@ -67,6 +67,8 @@ fun ClimateStatsScreen(
     }
 
     Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        contentWindowInsets = WindowInsets(0),
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             Box(
@@ -535,7 +537,7 @@ private fun ChartLoadingPlaceholder(height: Dp) {
             .fillMaxWidth()
             .height(height)
             .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.secondaryContainer),
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh),
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -557,7 +559,7 @@ private fun ChartErrorPlaceholder(
             .fillMaxWidth()
             .height(height)
             .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant),
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh),
         contentAlignment = Alignment.Center
     ) {
         ErrorState(

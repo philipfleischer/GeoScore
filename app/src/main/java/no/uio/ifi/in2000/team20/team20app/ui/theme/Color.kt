@@ -12,7 +12,6 @@ val LightBlue = Color(213, 236, 248)
 val CloudySky = Color(200, 220, 233)
 val MayaBlue = Color(110, 189, 254)
 val DustyBlue = Color(75, 151, 202)
-val AliceBlue = Color(216, 233, 246)
 
 val DarkBlue = Color(22, 93, 131)
 
