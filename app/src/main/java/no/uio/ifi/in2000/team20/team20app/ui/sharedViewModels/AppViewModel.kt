@@ -13,17 +13,26 @@ import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_LONGITUDE
 import no.uio.ifi.in2000.team20.team20app.util.Constants.KEY_SELECTED_LOCATION
 import javax.inject.Inject
 
-//TODO: Dokumenter at AppState nå er en felles viewModel. Dette er gjort fordi selectedLocation aksesseres av flere skjermer og repoer som skal hente data for stedet.
-//
+/**
+ * Shared ViewModel for App-level selectedLocation state.
+ *
+ * Reponsibility:
+ * - Provide the selected location for Ui and API-calls
+ * - Presist the selected location to a SavedStateHandle
+ *
+ * Why:
+ * Shared across multiple screens to achieve the flow we want for the app
+ *
+ * @param state SavedStateHandle used to persist data across configuration and process death.
+ * @property selectedLocation MutableStateFlow containing the selected location. This is accessed by the map and for getting data.
+ */
 @HiltViewModel
 class AppViewModel @Inject constructor(
     private val state: SavedStateHandle
 ) : ViewModel() {
 
-    // App starts with no selected location, except for in the context of a OS-initiated process death
+    // App starts with no selected location, except for in the context of an OS-initiated process death
     val selectedLocation = state.getStateFlow<Location?>(KEY_SELECTED_LOCATION, null)
-
-
 
     fun setSelectedArea(location: Location) {
         state[KEY_SELECTED_LOCATION] = location

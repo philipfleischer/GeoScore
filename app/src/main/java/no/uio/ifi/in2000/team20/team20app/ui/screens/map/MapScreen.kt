@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
@@ -64,9 +62,10 @@ import com.google.maps.android.compose.wms.WmsTileOverlay
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team20.team20app.R
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
+import no.uio.ifi.in2000.team20.team20app.domain.model.Location.Companion.roundToStandard
 import no.uio.ifi.in2000.team20.team20app.domain.model.mapLayer.MapLayer
 import no.uio.ifi.in2000.team20.team20app.domain.model.mapLayer.MapLayerDefinition
-import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchBarObject
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
@@ -76,8 +75,6 @@ import no.uio.ifi.in2000.team20.team20app.util.Constants.MEDIUM_SCREEN_WIDTH
 import no.uio.ifi.in2000.team20.team20app.util.config.MapConfig.MIN_ZOOM
 import no.uio.ifi.in2000.team20.team20app.util.config.MapConfig.ZOOM_ON_LOCATION
 import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
-import java.math.BigDecimal
-import java.math.RoundingMode
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -85,31 +82,31 @@ import java.math.RoundingMode
 fun MapScreen(
     modifier: Modifier = Modifier,
     sharedViewModel: AppViewModel = hiltViewModel(),
-    savedViewModel: SavedViewModel,
     mapViewModel: MapViewModel = hiltViewModel(),
     onOpenSearch: () -> Unit = {},
     onOpenReport: () -> Unit = {}
 ) {
-
+    // UI
     val padding = DEFAULT_PADDING_DP
-    val chosenPosition by sharedViewModel.selectedLocation.collectAsStateWithLifecycle()
-    // TODO: isCurrentSaved not used in Map! We can decouple selectedLocation and isCurrent saved!
-    val isCurrentSaved by savedViewModel.isCurrentSaved.collectAsStateWithLifecycle()
-    val layers by mapViewModel.layers.collectAsStateWithLifecycle()
-    val layersExpanded by mapViewModel.layersExpanded.collectAsStateWithLifecycle()
-
-    val selectedLayer by mapViewModel.selectedLayer.collectAsStateWithLifecycle()
-
     val compactScreenWidth = !LocalWindowSizeClass.current.isWidthAtLeastBreakpoint(MEDIUM_SCREEN_WIDTH)
 
+    // Location
+    val selectedLocation by sharedViewModel.selectedLocation.collectAsStateWithLifecycle()
+
+    // Map-layers
+    val layers by mapViewModel.layers.collectAsStateWithLifecycle()
+    val layersExpanded by mapViewModel.layersExpanded.collectAsStateWithLifecycle()
+    val selectedLayer by mapViewModel.selectedLayer.collectAsStateWithLifecycle()
+
+    // Camera position
     val cameraPosition =
-        if(chosenPosition != null) {
-            LatLng(chosenPosition!!.lat, chosenPosition!!.lon)
+        if(selectedLocation != null) {
+            LatLng(selectedLocation!!.lat, selectedLocation!!.lon)
         }else{
             mapViewModel.defaultCameraPosition
         }
     val cameraZoom =
-        if(chosenPosition!= null) {
+        if(selectedLocation!= null) {
             ZOOM_ON_LOCATION
         }else{
             DEFAULT_ZOOM
@@ -121,12 +118,11 @@ fun MapScreen(
 
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(chosenPosition) {
-        if(chosenPosition != null) {
-            savedViewModel.checkIfSaved(chosenPosition!!)
+    LaunchedEffect(selectedLocation) {
+        if(selectedLocation != null) {
             cameraPositionState.animate(
                 CameraUpdateFactory.newLatLngZoom(
-                    LatLng(chosenPosition!!.lat, chosenPosition!!.lon), cameraZoom
+                    LatLng(selectedLocation!!.lat, selectedLocation!!.lon), cameraZoom
                 )
             )
         }
@@ -148,8 +144,8 @@ fun MapScreen(
                 mapStyleOptions = mapStyleOptions
             ),
             onMapLongClick = {latLng ->
-                val lat = BigDecimal(latLng.latitude).setScale(5, RoundingMode.HALF_UP).toDouble()
-                val lon = BigDecimal(latLng.longitude).setScale(5, RoundingMode.HALF_UP).toDouble()
+                val lat = roundToStandard(latLng.latitude)
+                val lon = roundToStandard(latLng.longitude)
                 sharedViewModel.setSelectedArea(
                     Location(
                         address = "$lat, $lon",
@@ -170,11 +166,12 @@ fun MapScreen(
                     visible = layer.layerId == selectedLayer.layerId
                 )
             }
-            if(chosenPosition != null) {
+            // Display a map-tack on the selected location
+            if(selectedLocation != null) {
                 Marker(
                     state = markerPosition,
-                    title = chosenPosition!!.name,
-                    snippet = "Markør for ${chosenPosition!!.name}"
+                    title = selectedLocation!!.name,
+                    snippet = "Markør for ${selectedLocation!!.name}"
                 )
             }
         }
@@ -197,7 +194,7 @@ fun MapScreen(
                 Box(
                     modifier = Modifier.fillMaxWidth(0.6f)
                 ){
-                    if (chosenPosition == null){
+                    if (selectedLocation == null){
                         FloatingActionButton(
                             onClick = onOpenSearch,
                             containerColor = MaterialTheme.colorScheme.secondary,
@@ -213,12 +210,12 @@ fun MapScreen(
                             )
                         }
                     } else {
-                        SearchBarObject(onOpenSearch = onOpenSearch, text = chosenPosition!!.name)
+                        SearchBarObject(onOpenSearch = onOpenSearch, text = selectedLocation!!.name)
                     }
 
                 }
 
-                if (chosenPosition != null) {
+                if (selectedLocation != null) {
                     Button(
                         onClick = onOpenReport,
                         colors = ButtonDefaults.buttonColors(
@@ -230,9 +227,9 @@ fun MapScreen(
                 }
             }
 
-            if (chosenPosition != null) {
+            if (selectedLocation != null) {
                 Text(
-                    text = chosenPosition!!.name,
+                    text = selectedLocation!!.name,
                     style = MaterialTheme.typography.labelLarge,
                     fontSize = 20.sp,
                     color = Color.Black,
@@ -261,7 +258,7 @@ fun MapScreen(
                 ){
                     Icon(
                         imageVector = if(cameraPositionState.position.zoom >= selectedLayer.urlFormatter.getRequiredZoom()) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                        contentDescription = "Visibility",
+                        contentDescription = "",
                         tint = MaterialTheme.colorScheme.onSecondary
                     )
                 }

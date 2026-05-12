@@ -53,7 +53,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchBarObject
-import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
 import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
@@ -67,10 +67,9 @@ import no.uio.ifi.in2000.team20.team20app.util.Constants.MEDIUM_SCREEN_WIDTH
 fun HomeScreen(
     modifier: Modifier = Modifier,
     onOpenSearch: () -> Unit,
-    viewModel: HomeViewModel = hiltViewModel(),
     sharedViewModel: AppViewModel = hiltViewModel(),
-    savedViewModel: SavedViewModel,
-    frostViewModel: FrostViewModel,
+    savedViewModel: SavedViewModel = hiltViewModel(),
+    frostViewModel: FrostViewModel = hiltViewModel(),
     theme: MaterialTheme = MaterialTheme,
 ) {
     val location by sharedViewModel.selectedLocation.collectAsStateWithLifecycle()

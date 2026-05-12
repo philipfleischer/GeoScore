@@ -46,7 +46,7 @@ data class GeoScoreUiState(
  * @property uiState The current state of _uiState collected as a StateFlow
  */
 @HiltViewModel
-class GeoScoreViewModel @Inject constructor(
+class GeoScoreViewModel @Inject constructor( // TODO: Does the usage of this viewModel constitute a sharedViewModel?
     private val getGeoScore: GetGeoScore,
     private val getAiReport: GetAiReport
 ) : ViewModel() {

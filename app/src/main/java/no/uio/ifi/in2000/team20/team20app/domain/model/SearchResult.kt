@@ -6,6 +6,8 @@ import kotlinx.parcelize.Parcelize
 import no.uio.ifi.in2000.team20.team20app.data.dto.Address
 import no.uio.ifi.in2000.team20.team20app.data.dto.AddressMetadata
 import no.uio.ifi.in2000.team20.team20app.util.Constants.HTTP_OK
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 data class SearchResult(
     val locations: List<Location> = emptyList(),
@@ -29,4 +31,10 @@ data class Location(
     val lat: Double,
     val lon: Double,
     val savedAt: Long = 0L
-):Parcelable
+):Parcelable{
+    companion object{
+        fun roundToStandard(coordinate: Double): Double{
+            return BigDecimal(coordinate).setScale(5, RoundingMode.HALF_UP).toDouble()
+        }
+    }
+}
