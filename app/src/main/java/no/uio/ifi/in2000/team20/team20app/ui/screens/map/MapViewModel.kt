@@ -1,12 +1,15 @@
 package no.uio.ifi.in2000.team20.team20app.ui.screens.map
 
 import androidx.lifecycle.ViewModel
+import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import no.uio.ifi.in2000.team20.team20app.data.repository.MapLayerRepository
+import no.uio.ifi.in2000.team20.team20app.data.repository.map.MapLayerRepository
 import no.uio.ifi.in2000.team20.team20app.domain.model.mapLayer.MapLayer
+import no.uio.ifi.in2000.team20.team20app.util.config.MapConfig.DEFAULT_LATITUDE
+import no.uio.ifi.in2000.team20.team20app.util.config.MapConfig.DEFAULT_LONGITUDE
 import javax.inject.Inject
 
 /**
@@ -24,11 +27,17 @@ import javax.inject.Inject
 class MapViewModel @Inject constructor(
     private val mapLayerRepository: MapLayerRepository
 ) : ViewModel() {
+
+    val defaultCameraPosition = LatLng(
+        DEFAULT_LATITUDE,
+        DEFAULT_LONGITUDE
+    )
     private val _layers = MutableStateFlow(mapLayerRepository.getMapLayers())
     val layers = _layers.asStateFlow()
 
     private val _selectedLayer: MutableStateFlow<MapLayer> = MutableStateFlow(_layers.value[0])
     val selectedLayer: StateFlow<MapLayer> = _selectedLayer.asStateFlow()
+
     private val _layersExpanded: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val layersExpanded: StateFlow<Boolean> = _layersExpanded.asStateFlow()
 

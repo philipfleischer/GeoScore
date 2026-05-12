@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team20.team20app.data.repository
+package no.uio.ifi.in2000.team20.team20app.data.repository.map
 
 import no.uio.ifi.in2000.team20.team20app.domain.model.mapLayer.MapLayer
 import no.uio.ifi.in2000.team20.team20app.domain.model.mapLayer.MapLayerDefinition

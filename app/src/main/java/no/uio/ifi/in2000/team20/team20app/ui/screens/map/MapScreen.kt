@@ -62,11 +62,11 @@ import no.uio.ifi.in2000.team20.team20app.domain.model.mapLayer.MapLayer
 import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
-import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_ZOOM
-import no.uio.ifi.in2000.team20.team20app.util.Constants.MAX_ZOOM
+import no.uio.ifi.in2000.team20.team20app.util.config.MapConfig.DEFAULT_ZOOM
+import no.uio.ifi.in2000.team20.team20app.util.config.MapConfig.MAX_ZOOM
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MEDIUM_SCREEN_WIDTH
-import no.uio.ifi.in2000.team20.team20app.util.Constants.MIN_ZOOM
-import no.uio.ifi.in2000.team20.team20app.util.Constants.ZOOM_ON_LOCATION
+import no.uio.ifi.in2000.team20.team20app.util.config.MapConfig.MIN_ZOOM
+import no.uio.ifi.in2000.team20.team20app.util.config.MapConfig.ZOOM_ON_LOCATION
 import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -96,7 +96,7 @@ fun MapScreen(
         if(chosenPosition != null) {
             LatLng(chosenPosition!!.lat, chosenPosition!!.lon)
         }else{
-            sharedViewModel.defaultCameraPosition
+            mapViewModel.defaultCameraPosition
         }
     val cameraZoom =
         if(chosenPosition!= null) {
