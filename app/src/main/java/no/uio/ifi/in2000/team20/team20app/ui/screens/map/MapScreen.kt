@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -141,7 +142,7 @@ fun MapScreen(
             properties = MapProperties(
                 maxZoomPreference = MAX_ZOOM,
                 minZoomPreference = MIN_ZOOM,
-                mapStyleOptions = mapStyleOptions
+                //mapStyleOptions = mapStyleOptions
             ),
             onMapLongClick = {latLng ->
                 val lat = roundToStandard(latLng.latitude)
@@ -225,17 +226,6 @@ fun MapScreen(
                         Text("Vis rapport", color = MaterialTheme.colorScheme.onSecondary)
                     }
                 }
-            }
-
-            if (selectedLocation != null) {
-                Text(
-                    text = selectedLocation!!.name,
-                    style = MaterialTheme.typography.labelLarge,
-                    fontSize = 20.sp,
-                    color = Color.Black,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.semantics { heading() }
-                )
             }
 
             Row{
