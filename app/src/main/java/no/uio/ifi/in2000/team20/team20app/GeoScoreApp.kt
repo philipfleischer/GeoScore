@@ -18,3 +18,4 @@ class GeoScoreApp : Application()
 //TODO: Delete type?
 //TODO: Delete sharedTopAppBar? Feels like topAppBar has been a huge focus though?
 //TODO: Delete infoBox?
+//TODO: Fix GeoScoreTest!!
