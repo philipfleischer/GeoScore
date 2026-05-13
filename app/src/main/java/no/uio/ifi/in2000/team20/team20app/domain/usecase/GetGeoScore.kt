@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team20.team20app.domain.usecase
 
+import android.util.Log
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepositoryService
@@ -31,6 +32,7 @@ class GetGeoScore @Inject constructor(
     suspend fun calculateGeoScore(lat: Double, lon: Double): GeoScore {
 
         val locationKey = "%.2f, %.2f".format(lat, lon)
+        Log.d("GetGeoScore", "Calculating GeoScore for $locationKey")
         val cachedTotal = scoreCacheRepository.getGeoScoreCache(locationKey)
         if (cachedTotal != null) return cachedTotal
 
