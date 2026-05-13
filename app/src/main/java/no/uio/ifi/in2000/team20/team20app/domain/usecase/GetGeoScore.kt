@@ -32,7 +32,6 @@ class GetGeoScore @Inject constructor(
     suspend fun calculateGeoScore(lat: Double, lon: Double): GeoScore {
 
         val locationKey = "%.2f, %.2f".format(lat, lon)
-        Log.d("GetGeoScore", "Calculating GeoScore for $locationKey")
         val cachedTotal = scoreCacheRepository.getGeoScoreCache(locationKey)
         if (cachedTotal != null) return cachedTotal
 
@@ -91,7 +90,8 @@ class GetGeoScore @Inject constructor(
                 exposureScore = exposureResult.exposureScore,
                 vulnerabilityScore = vulnerabilityResult.vulnerabilityScore,
                 extremeWeatherDaysCount = exposureResult.eventCount,
-                geoScore = (hazardResult.hazardScore * HAZARDSCORE_WEIGHT) + (exposureResult.exposureScore * EXPOSURESCORE_WEIGHT) + (vulnerabilityResult.vulnerabilityScore * VULNERABILITYSCORE_WEIGHT))
+                geoScore = null
+            )
         }
 
         val geoScore = GeoScore(
@@ -104,7 +104,7 @@ class GetGeoScore @Inject constructor(
             exposureScore = exposureResult.exposureScore,
             vulnerabilityScore = vulnerabilityResult.vulnerabilityScore,
             extremeWeatherDaysCount = exposureResult.eventCount,
-            geoScore = (hazardResult.hazardScore * HAZARDSCORE_WEIGHT) + (exposureResult.exposureScore * EXPOSURESCORE_WEIGHT) + (vulnerabilityResult.vulnerabilityScore * VULNERABILITYSCORE_WEIGHT)
+            geoScore = null
         )
 
         scoreCacheRepository.saveGeoScore(geoScore)
