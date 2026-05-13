@@ -77,7 +77,7 @@ class GetGeoScore @Inject constructor(
                 exposureScore = exposureResult.exposureScore,
                 vulnerabilityScore = vulnerabilityResult.vulnerabilityScore,
                 extremeWeatherDaysCount = exposureResult.eventCount,
-                geoScore = (hazardResult.hazardScore * HAZARDSCORE_WEIGHT) + (exposureResult.exposureScore * EXPOSURESCORE_WEIGHT) + (vulnerabilityResult.vulnerabilityScore * VULNERABILITYSCORE_WEIGHT)
+                geoScore = null
             )
         } else if(observations.windValues.isEmpty()){
             return GeoScore(
@@ -104,7 +104,7 @@ class GetGeoScore @Inject constructor(
             exposureScore = exposureResult.exposureScore,
             vulnerabilityScore = vulnerabilityResult.vulnerabilityScore,
             extremeWeatherDaysCount = exposureResult.eventCount,
-            geoScore = null
+            geoScore = (hazardResult.hazardScore * HAZARDSCORE_WEIGHT) + (exposureResult.exposureScore * EXPOSURESCORE_WEIGHT) + (vulnerabilityResult.vulnerabilityScore * VULNERABILITYSCORE_WEIGHT)
         )
 
         scoreCacheRepository.saveGeoScore(geoScore)
