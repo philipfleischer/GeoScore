@@ -49,6 +49,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.unit.dp
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.domain.model.scoreToGrade
+import no.uio.ifi.in2000.team20.team20app.ui.components.ErrorState
 import no.uio.ifi.in2000.team20.team20app.ui.components.LoadingState
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.ExpandableInfoBox
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.GeomarkingBadge
@@ -135,6 +136,16 @@ fun GeoScoreScreen(
             )
             return@Scaffold
         }
+        if (geoState.scoreError != null) {
+            ErrorState(
+                message = "Ingen internettforbindelse. Sjekk nettverket ditt.",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                onRetry = { geoScoreViewModel.load(location) }
+            )
+            return@Scaffold
+        }
 
         LazyColumn(
             modifier = Modifier
@@ -172,7 +183,7 @@ private fun GeomarkingCard(
     onNavigateToMap: () -> Unit
 ) {
 
-    val NVEtiltakLink = "https://kommunikasjon.ntb.no/pressemelding/18558016/nve-sikrer-norge-mot-naturfarer-se-kart-bilder-og-tiltak-fra-hele-landet?publisherId=89280&lang=no"
+    val NVEtiltakLink = "https://veiledere.nve.no/sikringshandboka/moduler/modul-f1-300-mulige-tiltak-mot-flom-og-oversvommelse/"
     val uriHandler = LocalUriHandler.current
 
     Card(
