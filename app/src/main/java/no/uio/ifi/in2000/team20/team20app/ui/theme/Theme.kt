@@ -35,7 +35,6 @@ data class CustomTheme (
     val isLight: Boolean,
     )
 
-//TODO: Change light theme colors
 val lightThemeColors = CustomTheme(
     background = LightBlue,
     onBackground = DarkGray,
@@ -60,7 +59,6 @@ val lightThemeColors = CustomTheme(
     isLight = true,
 )
 
-//TODO: Change dark theme colors
 val darkThemeColors = CustomTheme(
     background = Black,
     onBackground = OffWhite,

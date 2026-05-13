@@ -1,7 +1,5 @@
 package no.uio.ifi.in2000.team20.team20app.ui.theme
 
-//TODO: Make custom typography style
-
 // Set of Material typography styles to start with
 //val Typography = Typography(
 //    bodyLarge = TextStyle(

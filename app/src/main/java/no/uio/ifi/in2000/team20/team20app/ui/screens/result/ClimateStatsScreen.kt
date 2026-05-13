@@ -170,7 +170,7 @@ fun ClimateStatsScreen(
                         errorMessage = frostUiState.temperatureError,
                         onRetry = { frostViewModel.loadFrostStats(location) }
                     ) {
-                        if (frostUiState.temperatureMean != null) { //TODO: ChatGPT driven chart semantics?
+                        if (frostUiState.temperatureMean != null) {
                             GenericLineChart(
                                 data = remember(frostUiState.temperatureMean, frostUiState.temperatureMax, frostUiState.temperatureMin) {
                                     listOf(

@@ -10,8 +10,6 @@ import no.uio.ifi.in2000.team20.team20app.BuildConfig
  * that are used across multiple layers of the application.
  *
  * Examples:
- * - API base URLs
- * - Timeout values
  * - Default map settings
  * - Padding, spacing and UI layout constants
  * - Risk thresholds
@@ -24,11 +22,12 @@ import no.uio.ifi.in2000.team20.team20app.BuildConfig
  * NOTE:
  * Sensitive API keys should NOT be hardcoded here in production.
  * They should be stored securely (e.g., in local.properties).
+ * They are however hardcoded in app-level build.gradle.kts, as this was needed for grading per project advisor
  */
 
-//TODO: This is just a template, need to be revised
 object Constants {
 
+    // GeoSearch
     val ADDRESS_URL_FORMATTER = {encodedQuery:String -> "https://ws.geonorge.no/adresser/v1/sok?sok=$encodedQuery&fuzzy=false&utkoordsys=4258&treffPerSide=10&side=0&asciiKompatibel=true"}
 
     const val FROST_CLIENT_ID = BuildConfig.FROST_V0_CLIENT_ID

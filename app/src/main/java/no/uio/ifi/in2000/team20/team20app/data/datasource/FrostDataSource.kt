@@ -83,7 +83,6 @@ class FrostDataSource @Inject constructor(
     // Requests 10 nearest stations to aggregate climate normals client-side (1991-2020).
     // All 10 stations contribute to monthly averages for temperature, wind, snow, and precipitation,
     // providing robust normals less sensitive to data gaps at individual stations.
-    // TODO: create fallback if no stations are found? look into this
     private suspend fun findNearestV0Sources(lat: Double, lon: Double, maxCount: Int = 10): String {
         val lonStr = String.format(java.util.Locale.US, "%.4f", lon)
         val latStr = String.format(java.util.Locale.US, "%.4f", lat)
