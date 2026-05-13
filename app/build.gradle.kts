@@ -130,7 +130,7 @@ dependencies {
 
     // Adaptive navigation dependencies
     implementation(libs.androidx.compose.material3.adaptive.navigation)
-    implementation("androidx.compose.material3:material3-adaptive-navigation-suite")
+    implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
 
     // Compose charts
     implementation(libs.compose.charts)
