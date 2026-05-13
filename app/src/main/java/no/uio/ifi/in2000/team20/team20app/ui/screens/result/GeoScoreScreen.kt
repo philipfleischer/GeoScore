@@ -183,7 +183,7 @@ private fun GeomarkingCard(
     onNavigateToMap: () -> Unit
 ) {
 
-    val NVEtiltakLink = "https://veiledere.nve.no/sikringshandboka/moduler/modul-f1-300-mulige-tiltak-mot-flom-og-oversvommelse/"
+    val nveTiltakLink = "https://veiledere.nve.no/sikringshandboka/moduler/modul-f1-300-mulige-tiltak-mot-flom-og-oversvommelse/"
     val uriHandler = LocalUriHandler.current
 
     Card(
@@ -195,7 +195,7 @@ private fun GeomarkingCard(
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
     ) {
-        Column(){
+        Column{
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -223,7 +223,7 @@ private fun GeomarkingCard(
                     )
                 }
 
-                Column(){
+                Column{
                     IconButton(
                         modifier = Modifier.semantics {
                             onClick(
@@ -276,7 +276,7 @@ private fun GeomarkingCard(
                         )) { append("Les mer på NVE.no") }
                     },
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.clickable { uriHandler.openUri(NVEtiltakLink) }
+                    modifier = Modifier.clickable { uriHandler.openUri(nveTiltakLink) }
                 )
             }
             }
@@ -304,7 +304,7 @@ private fun GeomarkingCard(
                             )) { append("Les mer på NVE.no") }
                         },
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.clickable { uriHandler.openUri(NVEtiltakLink) }
+                        modifier = Modifier.clickable { uriHandler.openUri(nveTiltakLink) }
                     )
                 }
             }
@@ -332,7 +332,7 @@ private fun GeomarkingCard(
                             )) { append("Les mer på NVE.no") }
                         },
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.clickable { uriHandler.openUri(NVEtiltakLink) }
+                        modifier = Modifier.clickable { uriHandler.openUri(nveTiltakLink) }
                     )
                 }
             }
@@ -360,7 +360,7 @@ private fun GeomarkingCard(
                             )) { append("Les mer på NVE.no") }
                         },
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.clickable { uriHandler.openUri(NVEtiltakLink) }
+                        modifier = Modifier.clickable { uriHandler.openUri(nveTiltakLink) }
                     )
                 }
             }

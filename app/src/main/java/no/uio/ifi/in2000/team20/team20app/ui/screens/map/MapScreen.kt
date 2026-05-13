@@ -39,7 +39,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -48,7 +47,6 @@ import coil.compose.AsyncImage
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.Marker
@@ -56,7 +54,6 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import com.google.maps.android.compose.wms.WmsTileOverlay
 import kotlinx.coroutines.launch
-import no.uio.ifi.in2000.team20.team20app.R
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location.Companion.roundToStandard
 import no.uio.ifi.in2000.team20.team20app.domain.model.mapLayer.MapLayer
@@ -124,8 +121,6 @@ fun MapScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        val context = LocalContext.current
-        val mapStyleOptions = MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style)
         GoogleMap(
             modifier = Modifier
                 .fillMaxSize()
@@ -227,9 +222,7 @@ fun MapScreen(
                     containerColor = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.clip(CircleShape).size(48.dp),
                     onClick = {
-                        if (selectedLayer.type == MapLayerDefinition.DEFAULT) {
-                            {} // Nothing to do here
-                        } else {
+                        if (selectedLayer.type != MapLayerDefinition.DEFAULT) {
                             scope.launch {
                                 cameraPositionState.animate(
                                     CameraUpdateFactory.zoomTo(

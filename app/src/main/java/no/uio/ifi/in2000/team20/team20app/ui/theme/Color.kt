@@ -25,7 +25,7 @@ val TrafficRed    = Color(0xFFD45E00)
 
 // Material3 color scheme support
 val SlateGray = Color(0xFF69808C)
-val SteelGray = Color(0xFF9BA3AE)
+//val SteelGray = Color(0xFF9BA3AE)
 
 // Dark mode
 

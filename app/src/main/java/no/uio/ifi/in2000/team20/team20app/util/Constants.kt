@@ -29,11 +29,6 @@ import no.uio.ifi.in2000.team20.team20app.BuildConfig
 //TODO: This is just a template, need to be revised
 object Constants {
 
-    // API CONFIGURATION
-    const val FROST_BASE_URL = "https://frost.met.no/"
-    const val NVE_BASE_URL = "https://api.nve.no/"
-    const val TIMEOUT_SECONDS = 30L
-
     val ADDRESS_URL_FORMATTER = {encodedQuery:String -> "https://ws.geonorge.no/adresser/v1/sok?sok=$encodedQuery&fuzzy=false&utkoordsys=4258&treffPerSide=10&side=0&asciiKompatibel=true"}
 
     const val FROST_CLIENT_ID = BuildConfig.FROST_V0_CLIENT_ID
@@ -49,16 +44,6 @@ object Constants {
     const val HTTP_SERVER_ERROR = 500
     const val NO_INTERNET = -100
     const val CANCELLED_SEARCH = -200
-
-    // MAP DEFAULT SETTINGS
-    const val DEFAULT_ZOOM = 8f
-    const val ZOOM_ON_LOCATION = 15f
-    // IFI as default
-    const val DEFAULT_LATITUDE = 59.94376
-    const val DEFAULT_LONGITUDE = 10.71889
-
-    const val MAX_ZOOM: Float = 19.0f
-    const val MIN_ZOOM: Float = 4.0f
 
     // RISK THRESHOLDS
     const val SUM_YEARS_ANALYZED = 30
@@ -89,11 +74,11 @@ object Constants {
     const val SMALL_PADDING_DP = 8
     const val LARGE_PADDING_DP = 24
 
-    const val CARD_CORNER_RADIUS_DP = 16
-    const val MAP_LEGEND_HEIGHT_DP = 120
+//    const val CARD_CORNER_RADIUS_DP = 16
+//    const val MAP_LEGEND_HEIGHT_DP = 120
 
     const val MEDIUM_SCREEN_WIDTH = WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND
 
     // DATA REFRESH SETTINGS
-    const val AUTO_REFRESH_INTERVAL_MINUTES = 2
+//    const val AUTO_REFRESH_INTERVAL_MINUTES = 2
 }

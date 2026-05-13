@@ -50,7 +50,7 @@ class NveRepositoryTest {
         assertFalse(repo.isInLandslideZone(flomLat, flomLon))
     }
 
-    //This test will fail with the given coordinates because i cant find coordinates in a Landslide zone
+    //This test will fail with the given coordinates because it cant find coordinates in a Landslide zone
     @Test
     fun skredKoordinaterErISkredsone() = runBlocking {
         assertTrue(repo.isInLandslideZone(skredLat, skredLon))

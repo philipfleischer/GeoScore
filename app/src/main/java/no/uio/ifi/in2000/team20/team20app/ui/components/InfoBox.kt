@@ -31,7 +31,7 @@ fun InfoBox( // InfoBox is just a placeholder before the actual results, doublin
     borderColor: Color = Color.Black
 ){
     Box(
-        modifier = Modifier.background(background).sizeIn(minWidth = sizeRatio, minHeight = sizeRatio).drawBehind{
+        modifier = modifier.background(background).sizeIn(minWidth = sizeRatio, minHeight = sizeRatio).drawBehind{
             drawRoundRect(
                 color = borderColor,
                 style = Stroke(

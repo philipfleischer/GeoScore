@@ -1,13 +1,13 @@
 package no.uio.ifi.in2000.team20.team20app.data.repository
 
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.ExposureCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.HazardCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.TotalScoreCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.VulnerabilityCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.ExposureCacheEntity
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.HazardCacheEntity
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.TotalScoreCacheEntity
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.VulnerabilityCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.ExposureCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.HazardCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.TotalScoreCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.VulnerabilityCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.entity.ExposureCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.entity.HazardCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.entity.TotalScoreCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.entity.VulnerabilityCacheEntity
 import no.uio.ifi.in2000.team20.team20app.domain.model.ExposureScoreResult
 import no.uio.ifi.in2000.team20.team20app.domain.model.GeoScore
 import no.uio.ifi.in2000.team20.team20app.domain.model.HazardScoreResult

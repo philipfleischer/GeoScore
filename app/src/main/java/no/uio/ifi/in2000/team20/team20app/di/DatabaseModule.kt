@@ -8,28 +8,29 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import no.uio.ifi.in2000.team20.team20app.data.local.AppDatabase
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.ExposureCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.HazardCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.PrecipitationCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.ReportCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.SavedLocationDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.SnowCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.SunshineCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.TemperatureCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.TotalScoreCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.VulnerabilityCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.WindCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.ExposureCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.HazardCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.PrecipitationCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.ReportCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.SavedLocationDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.SnowCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.SunshineCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.TemperatureCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.TotalScoreCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.VulnerabilityCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.WindCacheDao
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
+@Suppress("unused") // Hilt uses this data at compile-time
 object DatabaseModule {
 
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): AppDatabase =
         Room.databaseBuilder(context, AppDatabase::class.java, "team20_app_db")
-            .fallbackToDestructiveMigration()
+            .fallbackToDestructiveMigration() //TODO: Deprecation thingy
             .build()
 
     @Provides
