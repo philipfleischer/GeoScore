@@ -6,7 +6,6 @@ import com.aallam.openai.api.chat.ChatRole
 import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.OpenAI
 import no.uio.ifi.in2000.team20.team20app.domain.model.GeoScore
-import no.uio.ifi.in2000.team20.team20app.domain.model.Report
 import javax.inject.Inject
 
 class ChatGPTRemoteDataSource @Inject constructor(

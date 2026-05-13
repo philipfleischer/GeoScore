@@ -10,7 +10,6 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import no.uio.ifi.in2000.team20.team20app.data.datasource.FrostDataSource
-import no.uio.ifi.in2000.team20.team20app.util.Constants
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test

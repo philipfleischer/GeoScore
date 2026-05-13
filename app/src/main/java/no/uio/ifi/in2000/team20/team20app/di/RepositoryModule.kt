@@ -10,14 +10,14 @@ import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepository
 import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepositoryService
 import no.uio.ifi.in2000.team20.team20app.data.repository.GeoSearchRepository
 import no.uio.ifi.in2000.team20.team20app.data.repository.GeoSearchRepositoryService
-import no.uio.ifi.in2000.team20.team20app.data.repository.map.MapLayerRepository
-import no.uio.ifi.in2000.team20.team20app.data.repository.map.MapLayerRepositoryImpl
 import no.uio.ifi.in2000.team20.team20app.data.repository.NveZonesRepository
 import no.uio.ifi.in2000.team20.team20app.data.repository.NveZonesRepositoryService
 import no.uio.ifi.in2000.team20.team20app.data.repository.SavedRepository
 import no.uio.ifi.in2000.team20.team20app.data.repository.SavedRepositoryImpl
 import no.uio.ifi.in2000.team20.team20app.data.repository.ScoreCacheRepository
 import no.uio.ifi.in2000.team20.team20app.data.repository.ScoreCacheRepositoryImpl
+import no.uio.ifi.in2000.team20.team20app.data.repository.map.MapLayerRepository
+import no.uio.ifi.in2000.team20.team20app.data.repository.map.MapLayerRepositoryImpl
 import no.uio.ifi.in2000.team20.team20app.data.repository.map.UrlFormatterRepository
 import no.uio.ifi.in2000.team20.team20app.data.repository.map.UrlFormatterRepositoryImpl
 import javax.inject.Singleton

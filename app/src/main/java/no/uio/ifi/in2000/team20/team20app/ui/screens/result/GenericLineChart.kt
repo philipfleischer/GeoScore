@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team20.team20app.ui.screens.result
 
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ir.ehsannarmani.compose_charts.LineChart
 import ir.ehsannarmani.compose_charts.models.GridProperties
+import ir.ehsannarmani.compose_charts.models.GridProperties.AxisProperties
 import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
 import ir.ehsannarmani.compose_charts.models.IndicatorCount
 import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
@@ -24,11 +26,9 @@ import ir.ehsannarmani.compose_charts.models.Line
 import ir.ehsannarmani.compose_charts.models.PopupProperties
 import ir.ehsannarmani.compose_charts.models.StrokeStyle
 import ir.ehsannarmani.compose_charts.models.ZeroLineProperties
-import no.uio.ifi.in2000.team20.team20app.ui.theme.White
 import no.uio.ifi.in2000.team20.team20app.ui.theme.Charcoal
 import no.uio.ifi.in2000.team20.team20app.ui.theme.SlateGray
-import androidx.compose.animation.core.tween
-import ir.ehsannarmani.compose_charts.models.GridProperties.AxisProperties
+import no.uio.ifi.in2000.team20.team20app.ui.theme.White
 import kotlin.math.abs
 
 @Composable

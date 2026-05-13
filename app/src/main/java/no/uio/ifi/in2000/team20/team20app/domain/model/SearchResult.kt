@@ -1,8 +1,8 @@
 package no.uio.ifi.in2000.team20.team20app.domain.model
 
 import android.os.Parcelable
-import kotlinx.serialization.Serializable
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 import no.uio.ifi.in2000.team20.team20app.data.dto.Address
 import no.uio.ifi.in2000.team20.team20app.data.dto.AddressMetadata
 import no.uio.ifi.in2000.team20.team20app.util.Constants.HTTP_OK
