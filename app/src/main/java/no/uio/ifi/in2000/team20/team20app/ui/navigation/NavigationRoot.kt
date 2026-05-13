@@ -1,10 +1,7 @@
 package no.uio.ifi.in2000.team20.team20app.ui.navigation
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.entryProvider
@@ -13,11 +10,10 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.ui.NavDisplay
 import no.uio.ifi.in2000.team20.team20app.ui.components.AdaptiveNavigationScaffold
 import no.uio.ifi.in2000.team20.team20app.ui.screens.result.ClimateStatsScreen
-import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GeoscoreScreen
+import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GeoScoreScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedScreen
-import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeScreen
-import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GeoScoreViewModel
@@ -70,9 +66,6 @@ fun NavigationRoot() {
         onBack = goBack,
         entryProvider = entryProvider {
             entry<Route.HomeDestination> {
-                // Screen-specific ViewModel scoped to this nav entry
-                val homeViewModel: HomeViewModel = hiltViewModel()
-
                 AdaptiveNavigationScaffold(
 //                    title = Screen.HOME.title,
                     onNavigate = onNavigate,
@@ -82,7 +75,6 @@ fun NavigationRoot() {
                     HomeScreen(
                         onOpenSearch = goToSearch,
                         modifier = Modifier.padding(insets),
-                        viewModel = homeViewModel,
                         sharedViewModel = appViewModel,
                         savedViewModel = savedViewModel,
                         frostViewModel = frostViewModel
@@ -104,7 +96,6 @@ fun NavigationRoot() {
                     MapScreen(
                         modifier = Modifier.padding(insets),
                         sharedViewModel = appViewModel,
-                        savedViewModel = savedViewModel,
                         mapViewModel = mapViewModel,
                         onOpenSearch = goToSearch,
                         onOpenReport = {
@@ -141,7 +132,7 @@ fun NavigationRoot() {
                     highlightedDest = Screen.SAVED.route,
                     onNavigate = onNavigate,
                 ) {
-                    GeoscoreScreen(
+                    GeoScoreScreen(
                         location = destination.location,
                         onBackClick = goBack,
                         onHistoricDataClick = {

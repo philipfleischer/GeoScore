@@ -52,12 +52,12 @@ import no.uio.ifi.in2000.team20.team20app.domain.model.scoreToGrade
 import no.uio.ifi.in2000.team20.team20app.ui.components.LoadingState
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.ExpandableInfoBox
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.GeomarkingBadge
-import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GeoscoreScreen(
+fun GeoScoreScreen(
     location: Location,
     onBackClick: () -> Unit,
     onHistoricDataClick: () -> Unit,

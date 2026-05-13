@@ -16,16 +16,22 @@ import javax.inject.Inject
  * ViewModel for MapScreen.
  *
  * Responsibility:
- * - Manage map layers
- * - Fetch hazard data
+ * - Get map layers from repository
+ * - Keep track of selected map layer
  *
  * Why:
  * Keeps map logic outside UI.
+ *
+ * @param mapLayerRepository Repository for fetching map layers
+ * @property defaultCameraPosition Default camera position for the map
+ * @property layers Flow of all map layers
+ * @property selectedLayer Currently selected map layer
+ * @property layersExpanded Whether the list of map layers is expanded
  */
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    private val mapLayerRepository: MapLayerRepository
+    mapLayerRepository: MapLayerRepository
 ) : ViewModel() {
 
     val defaultCameraPosition = LatLng(

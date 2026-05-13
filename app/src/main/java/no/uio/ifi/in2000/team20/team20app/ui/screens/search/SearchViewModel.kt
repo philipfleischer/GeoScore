@@ -19,19 +19,45 @@ import no.uio.ifi.in2000.team20.team20app.util.Constants.HTTP_SERVER_ERROR
 import no.uio.ifi.in2000.team20.team20app.util.Constants.NO_INTERNET
 import javax.inject.Inject
 
+/**
+ * UiState for SearchScreen
+ * @property query The current search query
+ * @property isLoading Whether the search is currently loading
+ * @property results The list of locations that match the search query
+ * @property error The error message if the search fails
+ * @property inputError The error message if the input is invalid
+ * @property recentlySearched The list of recently searched locations
+ */
+data class SearchUiState(
+    val query: String = "",
+    val isLoading: Boolean = false,
+    val results: List<Location> = emptyList(),
+    val error: String? = null,
+    val inputError: String? = null,
+    val recentlySearched: List<Location> = emptyList()
+)
+
+/**
+ * ViewModel for SearchScreen
+ * @property repository GeoSearchRepository for fetching search results
+ * @property _uiState The current state of the UI. Private and mutable
+ * @property uiState The current state of _uiState collected as a StateFlow
+ * @property searchJob The current search that is in waiting or execution. Used for canceling.
+ */
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     private val repository: GeoSearchRepositoryService
 ) : ViewModel() {
 
     companion object {
+        // To limit API-calls and make searching smoother there is a debounce delay between entered characters to the search query.
         private const val DEBOUNCE_DELAY_MS = 300L
     }
 
     private val _uiState = MutableStateFlow(SearchUiState())
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
-    // Holds the active search job so it can be cancelled when the query changes.
+    // Holds the active search job so it can be canceled when the query changes.
     private var searchJob: Job? = null
 
     /**

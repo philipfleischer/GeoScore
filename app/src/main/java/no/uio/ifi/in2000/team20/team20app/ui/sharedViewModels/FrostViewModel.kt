@@ -54,6 +54,11 @@ data class FrostUiState(
  * Shared across HomeScreen and FavoriteDetailsScreen so both tabs observe
  * the same state without duplicating fetch logic.
  * Accepts FrostRepositoryService so it can be tested with a fake repository.
+ *
+ * @param repo FrostRepositoryService for fetching climate data
+ * @property _uiState MutableStateFlow containing FrostUiState. Private and mutable.
+ * @property uiState StateFlow containing FrostUiState.
+ * @property loadFrostStats Launches all parameters concurrently, each fails independently via Result.
  */
 @HiltViewModel
 class FrostViewModel @Inject constructor(
@@ -87,7 +92,7 @@ class FrostViewModel @Inject constructor(
                 val tempData = tempResult.getOrNull()
                 val windData = windResult.getOrNull()
                 val snowData = snowResult.getOrNull()
-                val precipData = precipitationResult.getOrNull()
+                val precipitationData = precipitationResult.getOrNull()
 
                 _uiState.update {
                     it.copy(
@@ -107,8 +112,8 @@ class FrostViewModel @Inject constructor(
                         snowMean           = snowData?.first,
                         snowMax            = snowData?.second,
                         snowError          = snowResult.exceptionOrNull()?.message,
-                        precipitationMean  = precipData?.second,
-                        precipitationDays  = precipData?.first,
+                        precipitationMean  = precipitationData?.second,
+                        precipitationDays  = precipitationData?.first,
                         precipitationError = precipitationResult.exceptionOrNull()?.message,
                     )
                 }

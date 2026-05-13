@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team20.team20app.ui.screens.saved
+package no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,6 +13,12 @@ import no.uio.ifi.in2000.team20.team20app.data.repository.SavedRepository
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import javax.inject.Inject
 
+/**
+ * ViewModel for managing saved locations.
+ * @property repository Repository for accessing saved locations
+ * @property saved Flow of all saved locations
+ * @property isCurrentSaved Whether the current location is saved
+ */
 @HiltViewModel
 class SavedViewModel @Inject constructor(
     private val repository: SavedRepository
