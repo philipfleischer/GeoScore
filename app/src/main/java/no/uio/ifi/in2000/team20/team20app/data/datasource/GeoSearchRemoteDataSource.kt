@@ -28,7 +28,6 @@ class AddressRemoteDataSource @Inject constructor(
 ) : AddressApiService {
     override suspend fun searchAddress(query: String): AddressResponseWrapper {
 
-        // TODO(Is this a blocking call?)
         val encodedQuery = URLEncoder.encode(query, "UTF-8")
 
         Log.d("GeoSearch", "Encoded query: $encodedQuery")
@@ -58,8 +57,6 @@ class AddressRemoteDataSource @Inject constructor(
                     status = HTTP_SERVER_ERROR
                 )
             } else {
-                //TODO: Check what the status codes not being caught are.
-
                 Log.d("GeoSearch", "Adresse API-kall feilet. Statuskode: ${response.status.value}")
 
                 throw Exception("Adresse API-kall feilet. Statuskode: ${response.status.value}")

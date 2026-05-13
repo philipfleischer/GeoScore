@@ -98,8 +98,6 @@ fun HomeScreen(
         verticalArrangement = Arrangement.spacedBy(25.dp),
         horizontalArrangement = Arrangement.spacedBy(25.dp)
     ) {
-        //TODO: Update InfoBox component (rename to WelcomeInfoBox) so it fit current design
-        //TODO: Remove hardcoded info box section and replace with updated InfoBox component
         item {
             //Column for header and infotext
             Column(
