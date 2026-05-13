@@ -15,7 +15,7 @@ interface NveZonesRemoteDataSourceService {
 }
 
 class NveZonesRemoteDataSource @Inject constructor(
-    @NveZonesClient private val client: HttpClient
+    @param:NveZonesClient private val client: HttpClient
 ) : NveZonesRemoteDataSourceService {
     override suspend fun getLandslideZoneData(lon:Double, lat:Double): ArcGisResponseDto {
         val response: ArcGisResponseDto = client.get(
