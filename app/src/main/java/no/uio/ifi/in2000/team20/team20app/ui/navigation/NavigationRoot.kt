@@ -4,23 +4,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
-import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.ui.NavDisplay
 import no.uio.ifi.in2000.team20.team20app.ui.components.AdaptiveNavigationScaffold
-import no.uio.ifi.in2000.team20.team20app.ui.screens.result.ClimateStatsScreen
-import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GeoScoreScreen
-import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedScreen
-import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.screens.result.ClimateStatsScreen
+import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GeoScoreScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GeoScoreViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Screen
 
 @Composable

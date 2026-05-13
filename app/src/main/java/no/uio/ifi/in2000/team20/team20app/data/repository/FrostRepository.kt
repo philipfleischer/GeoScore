@@ -5,7 +5,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.json.Json
 import no.uio.ifi.in2000.team20.team20app.data.datasource.FrostDataSourceService
-import javax.inject.Inject
 import no.uio.ifi.in2000.team20.team20app.data.dto.FrostV0ObservationResponseDto
 import no.uio.ifi.in2000.team20.team20app.data.dto.FrostV1ResponseDto
 import no.uio.ifi.in2000.team20.team20app.data.local.Dao.PrecipitationCacheDao
@@ -19,6 +18,7 @@ import no.uio.ifi.in2000.team20.team20app.data.local.Entity.SunshineCacheEntity
 import no.uio.ifi.in2000.team20.team20app.data.local.Entity.TemperatureCacheEntity
 import no.uio.ifi.in2000.team20.team20app.data.local.Entity.WindCacheEntity
 import no.uio.ifi.in2000.team20.team20app.domain.model.WindAndPrecipitationObservationsResult
+import javax.inject.Inject
 
 /**
  * Interface for fetching processed Frost API climate data.

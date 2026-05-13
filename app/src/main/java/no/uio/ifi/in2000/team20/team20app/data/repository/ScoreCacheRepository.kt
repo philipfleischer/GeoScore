@@ -9,9 +9,9 @@ import no.uio.ifi.in2000.team20.team20app.data.local.Entity.HazardCacheEntity
 import no.uio.ifi.in2000.team20.team20app.data.local.Entity.TotalScoreCacheEntity
 import no.uio.ifi.in2000.team20.team20app.data.local.Entity.VulnerabilityCacheEntity
 import no.uio.ifi.in2000.team20.team20app.domain.model.ExposureScoreResult
+import no.uio.ifi.in2000.team20.team20app.domain.model.GeoScore
 import no.uio.ifi.in2000.team20.team20app.domain.model.HazardScoreResult
 import no.uio.ifi.in2000.team20.team20app.domain.model.VulnerabilityScoreResult
-import no.uio.ifi.in2000.team20.team20app.domain.model.GeoScore
 import javax.inject.Inject
 
 /**

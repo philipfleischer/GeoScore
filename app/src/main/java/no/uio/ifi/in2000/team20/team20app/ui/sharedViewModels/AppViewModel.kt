@@ -2,14 +2,8 @@ package no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
-import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_LATITUDE
-import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_LONGITUDE
 import no.uio.ifi.in2000.team20.team20app.util.Constants.KEY_SELECTED_LOCATION
 import javax.inject.Inject
 

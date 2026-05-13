@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -41,12 +40,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.semantics.heading
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
@@ -66,16 +61,15 @@ import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location.Companion.roundToStandard
 import no.uio.ifi.in2000.team20.team20app.domain.model.mapLayer.MapLayer
 import no.uio.ifi.in2000.team20.team20app.domain.model.mapLayer.MapLayerDefinition
-import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchBarObject
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
+import no.uio.ifi.in2000.team20.team20app.util.Constants.MEDIUM_SCREEN_WIDTH
+import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
 import no.uio.ifi.in2000.team20.team20app.util.config.MapConfig.DEFAULT_ZOOM
 import no.uio.ifi.in2000.team20.team20app.util.config.MapConfig.MAX_ZOOM
-import no.uio.ifi.in2000.team20.team20app.util.Constants.MEDIUM_SCREEN_WIDTH
 import no.uio.ifi.in2000.team20.team20app.util.config.MapConfig.MIN_ZOOM
 import no.uio.ifi.in2000.team20.team20app.util.config.MapConfig.ZOOM_ON_LOCATION
-import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
 
 
 @OptIn(ExperimentalMaterial3Api::class)
