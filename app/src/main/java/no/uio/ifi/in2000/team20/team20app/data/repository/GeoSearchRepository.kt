@@ -17,7 +17,7 @@ class GeoSearchRepository @Inject constructor(
 
     private fun Address.toDomain(): Location? {
         val lat = representasjonspunkt?.lat ?: return null
-        val lon = representasjonspunkt?.lon ?: return null
+        val lon = representasjonspunkt.lon
         val name = adressetekst ?: adressenavn ?: return null
         return Location(
             address = name,

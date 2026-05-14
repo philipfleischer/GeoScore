@@ -2,7 +2,6 @@ package no.uio.ifi.in2000.team20.team20app.data.datasource
 
 import android.util.Log
 import io.ktor.client.HttpClient
-import io.ktor.client.call.DoubleReceiveException
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -56,11 +55,11 @@ interface FrostDataSourceService {
 }
 
 class FrostDataSource @Inject constructor(
-    @FrostClient private val client: HttpClient
+    @param:FrostClient private val client: HttpClient
 ) : FrostDataSourceService {
 
     private val authHeader: String
-        get() = "Basic " + "${Constants.FROST_CLIENT_ID}:${Constants.FROST_CLIENT_SECRET}".encodeBase64()
+        get() = "Basic " + "${Constants.FROST_CLIENT_ID}:${Constants.FROST_CLIENT_SECRET}".encodeBase64() //TODO: Deprecated
 
     // Checks HTTP status and throws with Frost's error body on non-2xx responses
     private suspend inline fun <reified T> io.ktor.client.statement.HttpResponse.frostBody(): T {
@@ -84,7 +83,6 @@ class FrostDataSource @Inject constructor(
     // Requests 10 nearest stations to aggregate climate normals client-side (1991-2020).
     // All 10 stations contribute to monthly averages for temperature, wind, snow, and precipitation,
     // providing robust normals less sensitive to data gaps at individual stations.
-    // TODO: create fallback if no stations are found? look into this
     private suspend fun findNearestV0Sources(lat: Double, lon: Double, maxCount: Int = 10): String {
         val lonStr = String.format(java.util.Locale.US, "%.4f", lon)
         val latStr = String.format(java.util.Locale.US, "%.4f", lat)

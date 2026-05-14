@@ -5,20 +5,20 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.json.Json
 import no.uio.ifi.in2000.team20.team20app.data.datasource.FrostDataSourceService
-import javax.inject.Inject
 import no.uio.ifi.in2000.team20.team20app.data.dto.FrostV0ObservationResponseDto
 import no.uio.ifi.in2000.team20.team20app.data.dto.FrostV1ResponseDto
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.PrecipitationCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.SnowCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.SunshineCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.TemperatureCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.WindCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.PrecipitationCacheEntity
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.SnowCacheEntity
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.SunshineCacheEntity
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.TemperatureCacheEntity
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.WindCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.PrecipitationCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.SnowCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.SunshineCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.TemperatureCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.WindCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.entity.PrecipitationCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.entity.SnowCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.entity.SunshineCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.entity.TemperatureCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.entity.WindCacheEntity
 import no.uio.ifi.in2000.team20.team20app.domain.model.WindAndPrecipitationObservationsResult
+import javax.inject.Inject
 
 /**
  * Interface for fetching processed Frost API climate data.

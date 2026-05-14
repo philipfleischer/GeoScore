@@ -1,10 +1,10 @@
-package no.uio.ifi.in2000.team20.team20app.data.local.Dao
+package no.uio.ifi.in2000.team20.team20app.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.WindCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.entity.WindCacheEntity
 
 @Dao
 interface WindCacheDao {
@@ -12,6 +12,6 @@ interface WindCacheDao {
     @Query("SELECT * FROM wind_cache WHERE stationId = :stationId")
     suspend fun getByKey(stationId: String): WindCacheEntity?
 
-    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: WindCacheEntity)
 }

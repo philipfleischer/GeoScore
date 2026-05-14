@@ -6,21 +6,20 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
-import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.ui.NavDisplay
 import no.uio.ifi.in2000.team20.team20app.ui.components.AdaptiveNavigationScaffold
-import no.uio.ifi.in2000.team20.team20app.ui.screens.result.ClimateStatsScreen
-import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GeoScoreScreen
-import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedScreen
-import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.HomeScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.map.MapViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.screens.result.ClimateStatsScreen
+import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GeoScoreScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GeoScoreViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.screens.saved.SavedScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchScreen
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Screen
 
 @Composable
@@ -45,21 +44,20 @@ fun NavigationRoot() {
         screen -> backStack.add(screen.route as Route)
     }
 
-    val goToSettings: () -> Unit = { backStack.add(Route.SettingsDestination) }
     val goToSearch: () -> Unit = { backStack.add(Route.SearchDestination) }
 
     // Helper to pop back to (but not including) a destination matching the predicate
-    val popBackTo: ((NavKey) -> Boolean) -> Boolean = { predicate ->
-        val targetIndex = backStack.indexOfLast { predicate(it) }
-        if (targetIndex >= 0) {
-            while (backStack.size > targetIndex + 1) {
-                backStack.removeLastOrNull()
-            }
-            true
-        } else {
-            false
-        }
-    }
+//    val popBackTo: ((NavKey) -> Boolean) -> Boolean = { predicate ->
+//        val targetIndex = backStack.indexOfLast { predicate(it) }
+//        if (targetIndex >= 0) {
+//            while (backStack.size > targetIndex + 1) {
+//                backStack.removeLastOrNull()
+//            }
+//            true
+//        } else {
+//            false
+//        }
+//    }
 
     NavDisplay(
         backStack = backStack,
@@ -67,9 +65,7 @@ fun NavigationRoot() {
         entryProvider = entryProvider {
             entry<Route.HomeDestination> {
                 AdaptiveNavigationScaffold(
-//                    title = Screen.HOME.title,
                     onNavigate = onNavigate,
-//                    onOpenSettings = goToSettings,
                     highlightedDest = Screen.HOME.route,
                 ) { insets ->
                     HomeScreen(
@@ -87,9 +83,7 @@ fun NavigationRoot() {
                 val mapViewModel: MapViewModel = hiltViewModel()
 
                 AdaptiveNavigationScaffold(
-//                    title = Screen.MAP.title,
                     onNavigate = onNavigate,
-//                    onOpenSettings = goToSettings,
                     highlightedDest = Screen.MAP.route,
                     floatingNav = true
                 ) { insets ->
@@ -107,9 +101,7 @@ fun NavigationRoot() {
 
             entry<Route.SavedDestination> {
                 AdaptiveNavigationScaffold(
-//                    title = Screen.SAVED.title,
                     onNavigate = onNavigate,
-//                    onOpenSettings = goToSettings,
                     highlightedDest = Screen.SAVED.route
                 ) { insets ->
                     SavedScreen(

@@ -2,8 +2,8 @@ package no.uio.ifi.in2000.team20.team20app.data.repository
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.SavedLocationDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.SavedLocationEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.SavedLocationDao
+import no.uio.ifi.in2000.team20.team20app.data.local.entity.SavedLocationEntity
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import javax.inject.Inject
 

@@ -2,28 +2,28 @@ package no.uio.ifi.in2000.team20.team20app.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.ExposureCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.HazardCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.PrecipitationCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.ReportCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.SavedLocationDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.SnowCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.SunshineCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.TemperatureCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.TotalScoreCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.VulnerabilityCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.WindCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.ExposureCacheEntity
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.HazardCacheEntity
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.PrecipitationCacheEntity
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.ReportCacheEntity
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.SavedLocationEntity
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.SnowCacheEntity
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.SunshineCacheEntity
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.TemperatureCacheEntity
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.TotalScoreCacheEntity
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.VulnerabilityCacheEntity
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.WindCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.ExposureCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.HazardCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.PrecipitationCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.ReportCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.SavedLocationDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.SnowCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.SunshineCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.TemperatureCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.TotalScoreCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.VulnerabilityCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.WindCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.entity.ExposureCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.entity.HazardCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.entity.PrecipitationCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.entity.ReportCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.entity.SavedLocationEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.entity.SnowCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.entity.SunshineCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.entity.TemperatureCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.entity.TotalScoreCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.entity.VulnerabilityCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.entity.WindCacheEntity
 
 @Database(
     entities = [

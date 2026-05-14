@@ -24,7 +24,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -42,26 +41,25 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchBarObject
-import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
-import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
-import androidx.compose.ui.semantics.heading
-import androidx.compose.ui.semantics.isTraversalGroup
-import androidx.compose.ui.semantics.semantics
+import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MEDIUM_SCREEN_WIDTH
+import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
 
 @Composable
 fun HomeScreen(
@@ -99,8 +97,6 @@ fun HomeScreen(
         verticalArrangement = Arrangement.spacedBy(25.dp),
         horizontalArrangement = Arrangement.spacedBy(25.dp)
     ) {
-        //TODO: Update InfoBox component (rename to WelcomeInfoBox) so it fit current design
-        //TODO: Remove hardcoded info box section and replace with updated InfoBox component
         item {
             //Column for header and infotext
             Column(
@@ -197,7 +193,6 @@ fun ExpandableInfoBox(
 fun GeomarkingBadge(
     grade: String,
     modifier: Modifier = Modifier,
-    theme: ColorScheme = MaterialTheme.colorScheme,
     iconStyle: Boolean = true,
     showTooltip: Boolean = false,
 ) {

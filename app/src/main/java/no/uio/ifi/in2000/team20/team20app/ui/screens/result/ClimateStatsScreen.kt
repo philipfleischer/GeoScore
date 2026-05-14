@@ -13,9 +13,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Home
@@ -23,8 +24,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,24 +34,30 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import no.uio.ifi.in2000.team20.team20app.domain.model.Location
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.Dp
-import no.uio.ifi.in2000.team20.team20app.ui.components.ErrorState
-import no.uio.ifi.in2000.team20.team20app.ui.components.SectionCard
-import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
-import no.uio.ifi.in2000.team20.team20app.ui.theme.*
-import ir.ehsannarmani.compose_charts.models.Line
-import ir.ehsannarmani.compose_charts.models.DotProperties
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ir.ehsannarmani.compose_charts.models.DotProperties
 import ir.ehsannarmani.compose_charts.models.IndicatorCount
+import ir.ehsannarmani.compose_charts.models.Line
+import no.uio.ifi.in2000.team20.team20app.domain.model.Location
+import no.uio.ifi.in2000.team20.team20app.ui.components.ErrorState
+import no.uio.ifi.in2000.team20.team20app.ui.components.SectionCard
+import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.theme.DarkBlue
+import no.uio.ifi.in2000.team20.team20app.ui.theme.DustyBlue
+import no.uio.ifi.in2000.team20.team20app.ui.theme.MayaBlue
+import no.uio.ifi.in2000.team20.team20app.ui.theme.RoyalGold
+import no.uio.ifi.in2000.team20.team20app.ui.theme.Salmon
+import no.uio.ifi.in2000.team20.team20app.ui.theme.TrafficGreen
+import no.uio.ifi.in2000.team20.team20app.ui.theme.TrafficRed
+import no.uio.ifi.in2000.team20.team20app.ui.theme.White
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -153,17 +160,18 @@ fun ClimateStatsScreen(
                 item {
                     ChartSection(
                         title = "Temperatur",
-                        description = "Dette diagrammet viser gjennomsnittlig temperatur per måned, basert på målinger fra 1991–2020. " +
-                                "Snittkurven viser den typiske månedstemperaturen i perioden. " +
-                                "Maks-kurven viser gjennomsnittet av dagens høyeste temperaturer i hver måned, " +
-                                "og min-kurven viser gjennomsnittet av dagens laveste temperaturer. " +
-                                "Til sammen gir dette et bilde av hvor varme dagene og hvor kalde nettene vanligvis er.",
+                        description =
+                            "Grafen presenterer temperaturen i området basert på målinger fra 1991 til 2020.\n" +
+                            "Maks er snittet av høytemperatur. " +
+                            "Min er snittet av lavtemperatur. "+
+                            "Snitt er snittet av den typisk temperatur.\n" +
+                            "Til sammen gir dette innsikt i områdets temperaturprofil i moderne tid",
                         chartHeight = 280.dp,
                         isLoading = frostUiState.isLoading,
                         errorMessage = frostUiState.temperatureError,
                         onRetry = { frostViewModel.loadFrostStats(location) }
                     ) {
-                        if (frostUiState.temperatureMean != null) { //TODO: ChatGPT driven chart semantics?
+                        if (frostUiState.temperatureMean != null) {
                             GenericLineChart(
                                 data = remember(frostUiState.temperatureMean, frostUiState.temperatureMax, frostUiState.temperatureMin) {
                                     listOf(
@@ -233,11 +241,13 @@ fun ClimateStatsScreen(
                 item {
                     ChartSection(
                         title = "Vind",
-                        description = "Gjennomsnittlig vindstyrke per måned viser hvor mye det vanligvis blåser i perioden. " +
-                                "Høyeste målte middelvind per måned viser hvor kraftig og vedvarende vinden kan bli, " +
-                                "typisk opp mot stormstyrke i de mest utsatte månedene. " +
-                                "Høyeste målte vindkast per måned viser hvor kraftige de kortvarige kastene kan være, " +
-                                "noe som er viktig for vurdering av for eksempel vindutsatt infrastruktur, skog og bygg.",
+                        description =
+                                "Grafen presenterer vindforholdene i området basert på målinger fra 1991 til 2020.\n" +
+                                "Middelvind er snitt av typisk vindhastighet. " +
+                                "Maks middelvind er snittet av dager med høy vindhastighet. " +
+                                "Maks vindkast er snittet av høyeste vindkast per dag.\n" +
+                                "Til sammen gir dette innsikt i områdets vindprofil i moderne tid. Særlig maks vindkast er viktig å ta til vurdering da dette er spesielt skadelig."
+                        ,
                         chartHeight = 200.dp,
                         isLoading = frostUiState.isLoading,
                         errorMessage = frostUiState.windError,
@@ -305,9 +315,8 @@ fun ClimateStatsScreen(
                 item {
                     ChartSection(
                         title = "Soltimer",
-                        description = "Diagrammet viser hvor mange timer solen i gjennomsnitt skinner direkte på målestasjonen per dag i hver måned. " +
-                                "Det handler om solskinn, ikke om hvor lenge det er lyst. " +
-                                "Tallene er beregnet ut fra målinger i perioden 1991–2020.",
+                        description =
+                            "Grafen presenterer timer med direkte sollys i området basert på målinger fra 1991 til 2020.",
                         chartHeight = 200.dp,
                         isLoading = frostUiState.isLoading,
                         errorMessage = frostUiState.sunshineError,
@@ -358,10 +367,11 @@ fun ClimateStatsScreen(
                 item {
                     ChartSection(
                         title = "Nedbør",
-                        description = "Nedbørsdager viser typisk antall dager per måned med minst 1,0 mm målbar nedbør. " +
-                                "Merk at i vintermånedene kan nedbøren komme som snø. " +
-                                "Høyeste daglige nedbør per måned viser hvor kraftige regn eller snøværet typisk er. " +
-                                "Høye verdier indikerer økt risiko for styrtregn, overvann og lokale oversvømmelser.",
+                        description =
+                            "Den første grafen presenterer antall nedbørsdager i området basert på målinger fra 1991 til 2020.\n"+
+                            "En nedbørsdag er definert som en dag med minst 1,0 mm målbar nedbør.\n"+
+                            "Den andre grafen presenterer snittet av den største nedbørsdagen.\n"+
+                            "Merk at for begge grafer inkluderer nedbør både regn og snø.",
                         chartHeight = 200.dp,
                         isLoading = frostUiState.isLoading,
                         errorMessage = frostUiState.precipitationError,
@@ -435,8 +445,10 @@ fun ClimateStatsScreen(
                 item {
                     ChartSection(
                         title = "Snø",
-                        description = "Diagrammet viser gjennomsnittlig og høyeste målte snødybde per måned, basert på målinger fra 1991–2020. " +
-                                "Høye verdier kan påvirke fremkommelighet, behov for snørydding og belastning på tak.",
+                        description = "Grafen presenterer snødybden i området basert på målinger fra 1991–2020.\n" +
+                                "Snittdybde er snittet av snødybde." +
+                                "Maksdybde er snittet av høyest snødybde.\n"+
+                                "Til sammen gir dette innsikt i områdets snøprofil i moderne tid.",
                         chartHeight = 240.dp,
                         isLoading = frostUiState.isLoading,
                         errorMessage = frostUiState.snowError,

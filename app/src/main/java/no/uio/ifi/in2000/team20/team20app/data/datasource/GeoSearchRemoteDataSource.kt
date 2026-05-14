@@ -6,6 +6,8 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.http.takeFrom
 import io.ktor.utils.io.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import no.uio.ifi.in2000.team20.team20app.data.dto.AddressResponse
 import no.uio.ifi.in2000.team20.team20app.di.GeoSearchClient
 import no.uio.ifi.in2000.team20.team20app.domain.model.AddressResponseWrapper
@@ -24,12 +26,13 @@ interface AddressApiService {
 }
 
 class AddressRemoteDataSource @Inject constructor(
-    @GeoSearchClient private val client: HttpClient
+    @param:GeoSearchClient private val client: HttpClient
 ) : AddressApiService {
     override suspend fun searchAddress(query: String): AddressResponseWrapper {
 
-        // TODO(Is this a blocking call?)
-        val encodedQuery = URLEncoder.encode(query, "UTF-8")
+        val encodedQuery = withContext(Dispatchers.IO) {
+            URLEncoder.encode(query, "UTF-8")
+        }
 
         Log.d("GeoSearch", "Encoded query: $encodedQuery")
 
@@ -58,8 +61,6 @@ class AddressRemoteDataSource @Inject constructor(
                     status = HTTP_SERVER_ERROR
                 )
             } else {
-                //TODO: Check what the status codes not being caught are.
-
                 Log.d("GeoSearch", "Adresse API-kall feilet. Statuskode: ${response.status.value}")
 
                 throw Exception("Adresse API-kall feilet. Statuskode: ${response.status.value}")

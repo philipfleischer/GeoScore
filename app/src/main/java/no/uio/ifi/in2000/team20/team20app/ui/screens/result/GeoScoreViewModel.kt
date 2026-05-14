@@ -46,7 +46,7 @@ data class GeoScoreUiState(
  * @property uiState The current state of _uiState collected as a StateFlow
  */
 @HiltViewModel
-class GeoScoreViewModel @Inject constructor( // TODO: Does the usage of this viewModel constitute a sharedViewModel?
+class GeoScoreViewModel @Inject constructor(
     private val getGeoScore: GetGeoScore,
     private val getAiReport: GetAiReport
 ) : ViewModel() {
@@ -83,7 +83,6 @@ class GeoScoreViewModel @Inject constructor( // TODO: Does the usage of this vie
                     },
                     onFailure = { e ->
                         _uiState.update {
-                            //TODO noen exceptions kastes inne i GeoScore algoritmen sjekk hvordan det funker med denne onFailure funksjonen
                             it.copy(isScoreLoading = false, scoreError = e.message ?: "Ukjent feil")
                         }
                     }

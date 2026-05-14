@@ -32,21 +32,19 @@ class GetHazardScore @Inject constructor(
 
         val extremePrecipDays = precipitationResults.values.filter { it > EXTREME_PRECIPITATION_THRESHOLD }
 
-        val precipOverTheThreshold: Double
-        if (extremePrecipDays.isEmpty()) {
-            precipOverTheThreshold = 0.0
+        val precipOverTheThreshold = if (extremePrecipDays.isEmpty()) {
+            0.0
         } else {
             //How much over the threshold is the extreme precipitation on average
-            precipOverTheThreshold = extremePrecipDays.map { it - EXTREME_PRECIPITATION_THRESHOLD }.average()
+            extremePrecipDays.map { it - EXTREME_PRECIPITATION_THRESHOLD }.average()
         }
 
         val extremeWindDays = windResults.values.filter { it > EXTREME_WIND_GUST_THRESHOLD }
-        val windOverTheThreshold: Double
-        if (extremeWindDays.isEmpty()) {
-            windOverTheThreshold = 0.0
+        val windOverTheThreshold = if (extremeWindDays.isEmpty()) {
+            0.0
         } else {
             //How much over the threshold is the extreme wind on average
-            windOverTheThreshold = extremeWindDays.map { it - EXTREME_WIND_GUST_THRESHOLD }.average()
+            extremeWindDays.map { it - EXTREME_WIND_GUST_THRESHOLD }.average()
         }
 
         //0-100 for wind and precipitation scores

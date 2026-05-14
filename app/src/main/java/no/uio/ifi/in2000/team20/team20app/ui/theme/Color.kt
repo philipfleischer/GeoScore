@@ -4,8 +4,6 @@ import androidx.compose.ui.graphics.Color
 
 
 // Light mode
-// TODO: Remove any unused colors and add all relevant colors
-// TODO: Rename colors to simple names such as LightBlue and DarkGray for easier use
 val White = Color(255, 255, 255)
 val OffWhite = Color(243, 245, 246)
 val LightBlue = Color(213, 236, 248)
@@ -25,7 +23,7 @@ val TrafficRed    = Color(0xFFD45E00)
 
 // Material3 color scheme support
 val SlateGray = Color(0xFF69808C)
-val SteelGray = Color(0xFF9BA3AE)
+//val SteelGray = Color(0xFF9BA3AE)
 
 // Dark mode
 

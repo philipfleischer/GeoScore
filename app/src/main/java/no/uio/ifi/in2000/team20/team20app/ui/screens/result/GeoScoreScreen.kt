@@ -15,8 +15,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -37,24 +37,24 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.domain.model.scoreToGrade
 import no.uio.ifi.in2000.team20.team20app.ui.components.ErrorState
 import no.uio.ifi.in2000.team20.team20app.ui.components.LoadingState
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.ExpandableInfoBox
 import no.uio.ifi.in2000.team20.team20app.ui.screens.home.GeomarkingBadge
-import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.SavedViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -183,7 +183,7 @@ private fun GeomarkingCard(
     onNavigateToMap: () -> Unit
 ) {
 
-    val NVEtiltakLink = "https://veiledere.nve.no/sikringshandboka/moduler/modul-f1-300-mulige-tiltak-mot-flom-og-oversvommelse/"
+    val nveTiltakLink = "https://veiledere.nve.no/sikringshandboka/moduler/modul-f1-300-mulige-tiltak-mot-flom-og-oversvommelse/"
     val uriHandler = LocalUriHandler.current
 
     Card(
@@ -195,7 +195,7 @@ private fun GeomarkingCard(
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
     ) {
-        Column(){
+        Column{
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -223,7 +223,7 @@ private fun GeomarkingCard(
                     )
                 }
 
-                Column(){
+                Column{
                     IconButton(
                         modifier = Modifier.semantics {
                             onClick(
@@ -276,7 +276,7 @@ private fun GeomarkingCard(
                         )) { append("Les mer på NVE.no") }
                     },
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.clickable { uriHandler.openUri(NVEtiltakLink) }
+                    modifier = Modifier.clickable { uriHandler.openUri(nveTiltakLink) }
                 )
             }
             }
@@ -304,7 +304,7 @@ private fun GeomarkingCard(
                             )) { append("Les mer på NVE.no") }
                         },
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.clickable { uriHandler.openUri(NVEtiltakLink) }
+                        modifier = Modifier.clickable { uriHandler.openUri(nveTiltakLink) }
                     )
                 }
             }
@@ -332,7 +332,7 @@ private fun GeomarkingCard(
                             )) { append("Les mer på NVE.no") }
                         },
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.clickable { uriHandler.openUri(NVEtiltakLink) }
+                        modifier = Modifier.clickable { uriHandler.openUri(nveTiltakLink) }
                     )
                 }
             }
@@ -360,7 +360,7 @@ private fun GeomarkingCard(
                             )) { append("Les mer på NVE.no") }
                         },
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.clickable { uriHandler.openUri(NVEtiltakLink) }
+                        modifier = Modifier.clickable { uriHandler.openUri(nveTiltakLink) }
                     )
                 }
             }

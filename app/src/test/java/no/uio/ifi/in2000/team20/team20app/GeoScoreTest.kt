@@ -12,16 +12,16 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import no.uio.ifi.in2000.team20.team20app.data.datasource.FrostDataSource
 import no.uio.ifi.in2000.team20.team20app.data.datasource.NveZonesRemoteDataSource
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.PrecipitationCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.PrecipitationCacheEntity
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.SnowCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.SnowCacheEntity
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.SunshineCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.SunshineCacheEntity
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.TemperatureCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.TemperatureCacheEntity
-import no.uio.ifi.in2000.team20.team20app.data.local.Dao.WindCacheDao
-import no.uio.ifi.in2000.team20.team20app.data.local.Entity.WindCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.PrecipitationCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.SnowCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.SunshineCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.TemperatureCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.dao.WindCacheDao
+import no.uio.ifi.in2000.team20.team20app.data.local.entity.PrecipitationCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.entity.SnowCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.entity.SunshineCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.entity.TemperatureCacheEntity
+import no.uio.ifi.in2000.team20.team20app.data.local.entity.WindCacheEntity
 import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepository
 import no.uio.ifi.in2000.team20.team20app.data.repository.NveZonesRepository
 import no.uio.ifi.in2000.team20.team20app.data.repository.ScoreCacheRepository
@@ -42,7 +42,7 @@ import org.junit.Test
  * Makes real API calls to Frost and NVE – requires internet connection.
  */
 class GeoScoreTest {
-
+    //TODO: FIXXXX
     companion object {
         private val frostClient = HttpClient(CIO) {
             install(ContentNegotiation) {

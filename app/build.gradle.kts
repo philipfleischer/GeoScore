@@ -23,7 +23,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        //TODO: Figure out how to use the secrets plugin for this instead
+
         val keystoreFile = project.rootProject.file("local.properties")
         val properties = Properties()
         properties.load(keystoreFile.inputStream())
@@ -56,6 +56,10 @@ android {
     buildFeatures {
         buildConfig = true
         compose = true
+    }
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true
     }
 
     packaging {
@@ -121,7 +125,6 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.ktor.client.logging)
     implementation(libs.logback.classic)
-    implementation(libs.kotlinx.serialization.json.v163)
 
     // ROOM
     implementation(libs.androidx.room.runtime)
@@ -130,7 +133,7 @@ dependencies {
 
     // Adaptive navigation dependencies
     implementation(libs.androidx.compose.material3.adaptive.navigation)
-    implementation("androidx.compose.material3:material3-adaptive-navigation-suite")
+    implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
 
     // Compose charts
     implementation(libs.compose.charts)

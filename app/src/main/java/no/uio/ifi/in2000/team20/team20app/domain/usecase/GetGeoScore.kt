@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team20.team20app.domain.usecase
 
-import android.util.Log
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import no.uio.ifi.in2000.team20.team20app.data.repository.FrostRepositoryService
