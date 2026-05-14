@@ -1,5 +1,71 @@
 # MODELING.md 
 
+## Use Case 1: Vise historisk klimadata for en valgt lokasjon
+
+## Mål
+Brukeren skal kunne se historisk klimadata for en bolig de er interessert i.
+
+## Aktører
+Primær aktør: Bruker
+Sekundær aktører: Geonorge adresse-API, Frost API (V0), Google maps composable
+
+## Betingelser
+Prebetingelser:
+- Brukeren er tilkoblet internett
+- Brukeren har åpnet appen
+
+Postbetingelser:
+- Historisk klimadata for valgt lokasjon er vist på skjermen
+- Rådataen er cachet lokalt i Room DB for fremtidig bruk
+
+## Hovedflyt
+1. Brukeren åpner appen og ser hjemskjermen med et søkefelt
+2. Brukeren trykker på søkefeltet og skriver inn ønsket adresse
+3. Appen sender et API-kall til Geonorge sitt adresse-API
+4. Geonorge returnerer en liste med adresseforslag
+5. Brukeren velger en adresse fra listen
+6. Appen viser den valgte adressen som en pin på kartet
+7. Brukeren trykker på "Generer rapport" for den valgte lokasjonen
+8. Brukeren blir sent til et loading screen
+9. Appen sender API-kall til Frost V0 og V1 og henter klimadata
+   (nedbør, vind, temperatur, osv.) for lokasjonen
+10. Frost returnerer klimadataen
+11. Appen cacher rådataen i Room DB og aggregerer den
+12. Appen navigerer brukeren til rapportskjermen
+13. Brukeren trykker på "Historisk klimadata"
+14. Brukeren blir sendt til historisk klimadata-skjermen og kan se dataen plottet i grafer
+
+## Alternativ flyt
+
+### A1: Brukeren velger lokasjon via kart (alternativ til steg 1–6)
+A1.1 Brukeren trykker på kartikonet og navigerer til kartskjermen
+A1.2 Brukeren trykker på ønsket lokasjon i kartet
+A1.3 Appen viser en pin på valgt lokasjon
+A1.4 Fortsetter fra steg 7 i hovedflyten
+
+### A2: Klimadata er allerede cachet (alternativ til steg 8–10)
+A2.1 Appen oppdager at data for denne lokasjonen allerede finnes i Room DB
+A2.2 Appen henter cachet data lokalt uten å gjøre API-kall
+A2.3 Fortsetter fra steg 11 i hovedflyten
+
+## Unntak
+U1: Ingen internettforbindelse
+- Appen varsler brukeren om manglende tilkobling
+- Dersom lokasjonen er cachet tidligere, tilbys brukeren å se cachet data
+
+U2: Frost API returnerer feil eller tomt svar
+- Appen varsler brukeren om at klimadata ikke kunne hentes
+- Brukeren kan forsøke igjen eller velge en annen lokasjon
+
+
+## Use-case diagram
+Dette diagrammet viser brukerens ulike handlinger når de skal hente historisk klima data for en valgt lokasjon:
+
+<img src="Diagrams/Use_case_diagram_1.png" width="1376" height="1236"  alt="Use case diagram for use case 1"/>
+
+Fargene i diagrammet angir hva Brukeren gjorde (grønn), muligheter (blå) og funksjoner som er tilgjengelig mens om ikke ble brukt i denne flyten (gul)
+
+
 ### Sekvensdiagram
 Her er et sekvensdiagram som modellerer dataflyten til Frost API, med caching, alternativ flyt og spesialbehandlingen av solskinnsdata.
 Dette viser hele dataflyten fra UI ned til API og tilbake, inkludert:
@@ -116,3 +182,11 @@ U1: Ingen internettforbindelse
 
 U2: Frost API returnerer tomt svar
 - Appen varsler brukeren om at det ikke finnes tilstrekkelig data for å beregne scoren
+
+
+## Use-case diagram
+Dette diagrammet viser brukerens ulike handlinger når de generere og utforske GeoScore data for en valgt lokasjon:
+
+<img src="Diagrams/Use_case_diagram_2.png" width="1356" height="1306"  alt="Use case diagram for use case 2"/>
+
+Fargene i diagrammet angir hva Brukeren gjorde (grønn), muligheter (blå) og funksjoner som er tilgjengelig men som ikke ble brukt i denne flyten (gul)
