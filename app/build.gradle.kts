@@ -1,5 +1,3 @@
-import java.util.Properties
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -24,18 +22,22 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        val keystoreFile = project.rootProject.file("local.properties")
-        val properties = Properties()
-        properties.load(keystoreFile.inputStream())
+        buildConfigField(
+            "String",
+            "FROST_V0_CLIENT_ID",
+            "\"3672f8b6-dfce-4af1-aadb-83acb1e1eaa6\"")
 
-        val FROST_V0_CLIENT_ID = properties.getProperty("FROST_V0_CLIENT_ID") ?: ""
-        buildConfigField("String", "FROST_V0_CLIENT_ID", "\"$FROST_V0_CLIENT_ID\"")
+        buildConfigField(
+            "String",
+            "FROST_V0_CLIENT_SECRET",
+            "\"8c09a90b-f218-4f08-9170-9dab3be01ede\""
+        )
 
-        val FROST_V0_CLIENT_SECRET = properties.getProperty("FROST_V0_CLIENT_SECRET") ?: ""
-        buildConfigField("String", "FROST_V0_CLIENT_SECRET", "\"$FROST_V0_CLIENT_SECRET\"")
-
-        val CHATGPT_API_KEY = properties.getProperty("CHATGPT_API_KEY") ?: ""
-        buildConfigField("String", "CHATGPT_API_KEY", "\"$CHATGPT_API_KEY\"")
+        buildConfigField(
+            "String",
+            "CHATGPT_API_KEY",
+            "\"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\""
+        )
     }
 
     buildTypes {
