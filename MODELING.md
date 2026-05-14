@@ -1,15 +1,15 @@
-# MODELING.md 
-
+# MODELING.md
+---
 ## Use Case 1: Vise historisk klimadata for en valgt lokasjon
 
-## Mål
+### Mål
 Brukeren skal kunne se historisk klimadata for en bolig de er interessert i.
 
-## Aktører
+### Aktører
 Primær aktør: Bruker
 Sekundær aktører: Geonorge adresse-API, Frost API (V0), Google maps composable
 
-## Betingelser
+### Betingelser
 Prebetingelser:
 - Brukeren er tilkoblet internett
 - Brukeren har åpnet appen
@@ -18,7 +18,7 @@ Postbetingelser:
 - Historisk klimadata for valgt lokasjon er vist på skjermen
 - Rådataen er cachet lokalt i Room DB for fremtidig bruk
 
-## Hovedflyt
+### Hovedflyt
 1. Brukeren åpner appen og ser hjemskjermen med et søkefelt
 2. Brukeren trykker på søkefeltet og skriver inn ønsket adresse
 3. Appen sender et API-kall til Geonorge sitt adresse-API
@@ -35,20 +35,20 @@ Postbetingelser:
 13. Brukeren trykker på "Historisk klimadata"
 14. Brukeren blir sendt til historisk klimadata-skjermen og kan se dataen plottet i grafer
 
-## Alternativ flyt
+### Alternativ flyt
 
-### A1: Brukeren velger lokasjon via kart (alternativ til steg 1–6)
+**A1: Brukeren velger lokasjon via kart (alternativ til steg 1–6)**
 A1.1 Brukeren trykker på kartikonet og navigerer til kartskjermen
 A1.2 Brukeren trykker på ønsket lokasjon i kartet
 A1.3 Appen viser en pin på valgt lokasjon
 A1.4 Fortsetter fra steg 7 i hovedflyten
 
-### A2: Klimadata er allerede cachet (alternativ til steg 8–10)
+**A2: Klimadata er allerede cachet (alternativ til steg 8–10)**
 A2.1 Appen oppdager at data for denne lokasjonen allerede finnes i Room DB
 A2.2 Appen henter cachet data lokalt uten å gjøre API-kall
 A2.3 Fortsetter fra steg 11 i hovedflyten
 
-## Unntak
+### Unntak
 U1: Ingen internettforbindelse
 - Appen varsler brukeren om manglende tilkobling
 - Dersom lokasjonen er cachet tidligere, tilbys brukeren å se cachet data
@@ -65,8 +65,8 @@ Dette diagrammet viser brukerens ulike handlinger når de skal hente historisk k
 
 Fargene i diagrammet angir hva Brukeren gjorde (grønn), muligheter (blå) og funksjoner som er tilgjengelig mens om ikke ble brukt i denne flyten (gul)
 
-
-### Sekvensdiagram
+---
+### Sekvensdiagram som illustrerer use case 1
 Her er et sekvensdiagram som modellerer dataflyten til Frost API, med caching, alternativ flyt og spesialbehandlingen av solskinnsdata.
 Dette viser hele dataflyten fra UI ned til API og tilbake, inkludert:
 
@@ -129,17 +129,18 @@ participant API as Frost API
     Repo-->>VM: returnerer solskinndata
     VM-->>UI: oppdaterer FrostUiState (komplett)
 ```
+---
 
 ## Use Case 2: Beregne og utforske GeoScore for en valgt lokasjon
 
-## Mål
+### Mål
 Brukeren skal kunne velge en lokasjon og beregne GeoScoren for den
 
-## Aktører
+### Aktører
 Primær aktør: Bruker
 Sekundær aktører: Geonorge adresse-API, Frost API (V1), Google maps composable og ArcGis NveZones API
 
-## Betingelser
+### Betingelser
 Prebetingelser:
 - Brukeren er tilkoblet internett
 - Brukeren har åpnet appen
@@ -148,7 +149,7 @@ Postbetingelser:
 - GeoScoren er beregnet og vises på skjermen
 - Scoren er cachet lokalt i Room DB for fremtidig bruk
 
-## Hovedflyt
+### Hovedflyt
 1. Brukeren åpner appen og ser hjemskjermen med et søkefelt
 2. Brukeren trykker på søkefeltet og skriver inn ønsket adresse
 3. Appen sender et API-kall til Geonorge sitt adresse-API
@@ -168,9 +169,9 @@ Postbetingelser:
 17. brukeren navigerer seg gjennom Raport skjermen og utforsker GeoScoren
 
 
-## Alternativ flyt
+### Alternativ flyt
 
-### A1: GeoScoren er allerede cachet (alternativ til steg 8–10)
+**A1: GeoScoren er allerede cachet (alternativ til steg 8–10)**
 A2.1 Appen oppdager at data for denne lokasjonen allerede finnes i Room DB
 A2.2 Appen henter cachet data lokalt uten å gjøre API-kall
 A2.3 Fortsetter fra steg 16 i hovedflyten
@@ -190,3 +191,300 @@ Dette diagrammet viser brukerens ulike handlinger når de generere og utforske G
 <img src="Diagrams/Use_case_diagram_2.png" width="1356" height="1306"  alt="Use case diagram for use case 2"/>
 
 Fargene i diagrammet angir hva Brukeren gjorde (grønn), muligheter (blå) og funksjoner som er tilgjengelig men som ikke ble brukt i denne flyten (gul)
+
+---
+## Klassediagram
+
+Klassediagrammet viser de relevante klassene og deres relasjoner for use casene.
+
+```mermaid
+---
+config:
+  layout: elk
+---
+classDiagram
+    %% UI Layer
+
+    class HomeScreen {
+    }
+    class SearchScreen {
+        +onLocationSelected(location: Location)
+    }
+    class ClimateStatsScreen {
+    }
+    class GeoScoreScreen {
+        +onSaveLocation()
+    }
+
+    HomeScreen "1" --> "0..1" SearchScreen : navigates to
+    HomeScreen "1" --> "0..1" ClimateStatsScreen : navigates to
+    HomeScreen "1" --> "0..1" GeoScoreScreen : navigates to
+
+    %% ViewModel Layer
+
+    class AppViewModel {
+        +selectedLocation: StateFlow~Location?~
+        +setSelectedArea(location: Location)
+    }
+    class SearchViewModel {
+        +uiState: StateFlow~SearchUiState~
+        +updateInput(text: String)
+        +addRecentlySearched(location: Location)
+    }
+    class FrostViewModel {
+        +uiState: StateFlow~FrostUiState~
+        +loadFrostStats(location: Location)
+    }
+    class FrostUiState {
+        +isLoading: Boolean
+        +temperatureMean: List~Double~?
+        +windMean: List~Double~?
+        +sunshineHours: List~Double~?
+        +snowMean: List~Double~?
+        +precipitationMean: List~Double~?
+    }
+    class GeoScoreViewModel {
+        +uiState: StateFlow~GeoScoreUiState~
+        +load(location: Location)
+    }
+    class GeoScoreUiState {
+        +isScoreLoading: Boolean
+        +geoScore: GeoScore?
+        +grade: String
+        +scoreError: String?
+        +isReportLoading: Boolean
+        +aiReport: Report?
+        +reportError: String?
+    }
+    class SavedViewModel {
+        +saved: StateFlow~List~Location~~
+        +addSaved(location: Location)
+        +removeSaved(location: Location)
+    }
+
+    HomeScreen "1" o-- "1" AppViewModel : uses
+    HomeScreen "1" o-- "1" FrostViewModel : uses
+    ClimateStatsScreen "1" o-- "1" FrostViewModel : uses
+    GeoScoreScreen "1" o-- "1" GeoScoreViewModel : uses
+    GeoScoreScreen "1" o-- "1" SavedViewModel : uses
+    SearchScreen "1" o-- "1" SearchViewModel : uses
+
+    FrostViewModel "1" --> "1" FrostUiState : manages
+    GeoScoreViewModel "1" --> "1" GeoScoreUiState : manages
+
+    %% Domain Model
+
+    class Location {
+        +address: String
+        +name: String
+        +municipality: String?
+        +county: String?
+        +lat: Double
+        +lon: Double
+        +savedAt: Long
+    }
+    class GeoScore {
+        +locationKey: String
+        +geoScore: Double?
+        +hazardScore: Double?
+        +exposureScore: Double?
+        +vulnerabilityScore: Double?
+        +precipitationScore: Double?
+        +windScore: Double?
+        +floodScore: Double
+        +landslideScore: Double
+        +extremeWeatherDaysCount: Int?
+    }
+    class Report {
+        +locationKey: String
+        +extremePrecipitationText: String?
+        +extremeWindText: String?
+        +floodText: String?
+        +landslideText: String?
+    }
+
+    AppViewModel "1" --> "0..1" Location : manages
+    SearchViewModel "1" --> "*" Location : returns
+    FrostViewModel "1" --> "1" Location : receives
+    GeoScoreViewModel "1" --> "1" Location : receives
+    GeoScoreViewModel "1" --> "0..1" GeoScore : manages
+    GeoScoreViewModel "1" --> "0..1" Report : manages
+
+    %% Use Case Layer
+
+    class GetGeoScore {
+        +calculateGeoScore(lat: Double, lon: Double): GeoScore
+    }
+    class GetHazardScore {
+        +calculateHazardScore(lat: Double, lon: Double, observations): HazardScoreResult
+    }
+    class GetExposureScore {
+        +calculateExposureScore(lat: Double, lon: Double, observations): ExposureScoreResult
+    }
+    class GetVulnerabilityScore {
+        +calculateVulnerabilityScore(lat: Double, lon: Double): VulnerabilityScoreResult
+    }
+    class GetAiReport {
+        +generateReport(geoScore: GeoScore): Report
+    }
+
+    GeoScoreViewModel "1" --> "1" GetGeoScore : depends on
+    GeoScoreViewModel "1" --> "1" GetAiReport : depends on
+
+    GetGeoScore "1" --> "1" GetHazardScore : uses
+    GetGeoScore "1" --> "1" GetExposureScore : uses
+    GetGeoScore "1" --> "1" GetVulnerabilityScore : uses
+
+    %% Repository Layer
+
+    class GeoSearchRepositoryService {
+        <<interface>>
+        +getSearchResults(query: String): SearchResult
+    }
+    class GeoSearchRepository {
+        +getSearchResults(query: String): SearchResult
+    }
+    class FrostRepositoryService {
+        <<interface>>
+        +getTemperatureData(lat: Double, lon: Double): Result
+        +getWindData(lat: Double, lon: Double): Result
+        +getSunshineData(lat: Double, lon: Double): Result
+        +getSnowData(lat: Double, lon: Double): Result
+        +getPrecipitationData(lat: Double, lon: Double): Result
+        +getWindAndPrecipitationObservations(lat: Double, lon: Double): WindAndPrecipitationObservationsResult
+    }
+    class FrostRepository {
+        -stationCache: Map~String, String~
+        -sunshineStationCache: Map~String, String~
+        +getTemperatureData(lat: Double, lon: Double): Result
+        +getWindData(lat: Double, lon: Double): Result
+        +getSunshineData(lat: Double, lon: Double): Result
+        +getSnowData(lat: Double, lon: Double): Result
+        +getPrecipitationData(lat: Double, lon: Double): Result
+        +getWindAndPrecipitationObservations(lat: Double, lon: Double): WindAndPrecipitationObservationsResult
+    }
+    class NveZonesRepositoryService {
+        <<interface>>
+        +isInFloodZone(lat: Double, lon: Double): Boolean
+        +isInLandslideZone(lat: Double, lon: Double): Boolean
+    }
+    class NveZonesRepository {
+        +isInFloodZone(lat: Double, lon: Double): Boolean
+        +isInLandslideZone(lat: Double, lon: Double): Boolean
+    }
+    class ScoreCacheRepository {
+        <<interface>>
+        +getGeoScoreCache(locationKey: String): GeoScore?
+        +saveGeoScore(geoScore: GeoScore)
+        +getHazardCache(locationKey: String): HazardScoreResult?
+        +saveHazardScore(locationKey: String, result: HazardScoreResult)
+        +getExposureCache(locationKey: String): ExposureScoreResult?
+        +saveExposureScore(locationKey: String, result: ExposureScoreResult)
+        +getVulnerabilityCache(locationKey: String): VulnerabilityScoreResult?
+        +saveVulnerabilityScore(locationKey: String, result: VulnerabilityScoreResult, isInFloodZone: Boolean, isInLandslideZone: Boolean)
+    }
+    class ScoreCacheRepositoryImpl {
+        +getGeoScoreCache(locationKey: String): GeoScore?
+        +saveGeoScore(geoScore: GeoScore)
+        +getHazardCache(locationKey: String): HazardScoreResult?
+        +saveHazardScore(locationKey: String, result: HazardScoreResult)
+        +getExposureCache(locationKey: String): ExposureScoreResult?
+        +saveExposureScore(locationKey: String, result: ExposureScoreResult)
+        +getVulnerabilityCache(locationKey: String): VulnerabilityScoreResult?
+        +saveVulnerabilityScore(locationKey: String, result: VulnerabilityScoreResult, isInFloodZone: Boolean, isInLandslideZone: Boolean)
+    }
+    class SavedRepository {
+        <<interface>>
+        +getAllSaved(): Flow~List~Location~~
+        +addSaved(location: Location)
+        +removeSaved(location: Location)
+    }
+    class SavedRepositoryImpl {
+        +getAllSaved(): Flow~List~Location~~
+        +addSaved(location: Location)
+        +removeSaved(location: Location)
+    }
+    class ChatGPTRepository {
+        <<interface>>
+        +generateReport(geoScore: GeoScore): Report
+    }
+    class ChatGPTRepositoryImpl {
+        +generateReport(geoScore: GeoScore): Report
+    }
+
+    GeoSearchRepository ..|> GeoSearchRepositoryService : implements
+    FrostRepository ..|> FrostRepositoryService : implements
+    NveZonesRepository ..|> NveZonesRepositoryService : implements
+    ScoreCacheRepositoryImpl ..|> ScoreCacheRepository : implements
+    SavedRepositoryImpl ..|> SavedRepository : implements
+    ChatGPTRepositoryImpl ..|> ChatGPTRepository : implements
+
+    SearchViewModel "1" --> "1" GeoSearchRepositoryService : depends on
+    FrostViewModel "1" --> "1" FrostRepositoryService : depends on
+    SavedViewModel "1" --> "1" SavedRepository : depends on
+    GetGeoScore "1" --> "1" FrostRepositoryService : depends on
+    GetGeoScore "1" --> "1" ScoreCacheRepository : depends on
+    GetHazardScore "1" --> "1" ScoreCacheRepository : depends on
+    GetExposureScore "1" --> "1" ScoreCacheRepository : depends on
+    GetVulnerabilityScore "1" --> "1" NveZonesRepositoryService : depends on
+    GetVulnerabilityScore "1" --> "1" ScoreCacheRepository : depends on
+    GetAiReport "1" --> "1" ChatGPTRepository : depends on
+
+    %% Data Source Layer
+
+    class FrostDataSourceService {
+        <<interface>>
+        +getStationsNearby(lat: Double, lon: Double): String
+        +getSunshineStationNearby(lat: Double, lon: Double): String
+        +getTemperatureNormals(lat: Double, lon: Double, sources: String): FrostV0ObservationResponseDto
+        +getWindHistory(lat: Double, lon: Double, sources: String): FrostV0ObservationResponseDto
+        +getSunshineNormals(lat: Double, lon: Double, stationId: String): SunshineRawResult
+        +getSnowDepthHistory(lat: Double, lon: Double, sources: String): FrostV0ObservationResponseDto
+        +getPrecipitationNormals(lat: Double, lon: Double, sources: String): FrostV0ObservationResponseDto
+        +getPrecipitationHistory(lat: Double, lon: Double, sources: String): FrostV0ObservationResponseDto
+        +getRankedObservationsForWind(lat: Double, lon: Double): FrostV1ResponseDto
+        +getRankedObservationsForPrecipitation(lat: Double, lon: Double): FrostV1ResponseDto
+    }
+    class FrostDataSource {
+        -httpClient: HttpClient
+        +getStationsNearby(lat: Double, lon: Double): String
+        +getSunshineStationNearby(lat: Double, lon: Double): String
+        +getTemperatureNormals(lat: Double, lon: Double, sources: String): FrostV0ObservationResponseDto
+        +getWindHistory(lat: Double, lon: Double, sources: String): FrostV0ObservationResponseDto
+    }
+    class AddressApiService {
+        <<interface>>
+        +searchAddress(query: String): AddressResponseWrapper
+    }
+    class AddressRemoteDataSource {
+        -httpClient: HttpClient
+        +searchAddress(query: String): AddressResponseWrapper
+    }
+    class NveZonesRemoteDataSource {
+        -httpClient: HttpClient
+        +getLandslideZoneData(lat: Double, lon: Double): ArcGisResponseDto
+        +getFloodZoneData(lat: Double, lon: Double): ArcGisResponseDto
+    }
+    class ChatGPTRemoteDataSource {
+        +getReport(geoScore: GeoScore): Report
+    }
+
+    FrostDataSource ..|> FrostDataSourceService : implements
+    AddressRemoteDataSource ..|> AddressApiService : implements
+
+    FrostRepository "1" --> "1" FrostDataSourceService : depends on
+    GeoSearchRepository "1" --> "1" AddressApiService : depends on
+    NveZonesRepository "1" --> "1" NveZonesRemoteDataSource : depends on
+    ChatGPTRepositoryImpl "1" --> "1" ChatGPTRemoteDataSource : depends on
+
+    %% Database
+
+    class AppDatabase {
+        <<abstract>>
+    }
+
+    FrostRepository "1" *-- "1" AppDatabase : uses
+    ScoreCacheRepositoryImpl "1" *-- "1" AppDatabase : uses
+    SavedRepositoryImpl "1" *-- "1" AppDatabase : uses
+
+```
