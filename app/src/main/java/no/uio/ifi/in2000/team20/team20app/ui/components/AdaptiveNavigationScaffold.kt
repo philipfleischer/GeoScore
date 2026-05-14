@@ -30,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -78,7 +79,7 @@ fun AdaptiveNavigationScaffold (
                     if(compactScreenWidth) Alignment.BottomCenter
                     else Alignment.CenterStart
                     )
-                    //.onGloballyPositioned { navSize = it.size }
+                    .onGloballyPositioned { navSize = it.size }
                 ,
             )
         }
