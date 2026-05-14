@@ -58,6 +58,10 @@ android {
         compose = true
     }
 
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
+
     packaging {
         resources {
             // Exclude duplicate META-INF files from logback-classic and logback-core
