@@ -14,6 +14,6 @@ class GeoScoreApp : Application()
 //TODO: All import to latest version?
 //TODO: Evaluate: The option setting 'android.disallowKotlinSourceSets=false' is experimental.
 //TODO: Delete type?
-//TODO: Delete sharedTopAppBar? Feels like topAppBar has been a huge focus though?
+//TODO: Delete sharedTopAppBar? Feels like topAppBar has been a huge focus though? DELETE
 //TODO: Delete infoBox?
 //TODO: Fix GeoScoreTest!!
