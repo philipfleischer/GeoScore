@@ -54,44 +54,44 @@ import no.uio.ifi.in2000.team20.team20app.ui.components.LoadingState
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
 import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
 
-@Composable
-fun SearchBarObject(
-    onOpenSearch: () -> Unit,
-    modifier: Modifier = Modifier,
-    theme: ColorScheme = MaterialTheme.colorScheme,
-    text: String = "Søk"
-
-) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(56.dp)
-            .clip(RoundedCornerShape(28.dp))
-            .background(theme.surfaceContainerLow)
-            .clickable (onClickLabel = "Search address") { onOpenSearch() }
-            .padding(horizontal = DEFAULT_PADDING_DP.dp),
-        contentAlignment = Alignment.CenterStart
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = "Søk",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            Spacer(modifier = Modifier.width(12.dp))
-
-            Text(
-                text = text,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
-    }
-}
+//@Composable
+//fun SearchBarObject(
+//    onOpenSearch: () -> Unit,
+//    modifier: Modifier = Modifier,
+//    theme: ColorScheme = MaterialTheme.colorScheme,
+//    text: String = "Søk"
+//
+//) {
+//    Box(
+//        modifier = modifier
+//            .fillMaxWidth()
+//            .height(56.dp)
+//            .clip(RoundedCornerShape(28.dp))
+//            .background(theme.surfaceContainerLow)
+//            .clickable (onClickLabel = "Search address") { onOpenSearch() }
+//            .padding(horizontal = DEFAULT_PADDING_DP.dp),
+//        contentAlignment = Alignment.CenterStart
+//    ) {
+//        Row(
+//            verticalAlignment = Alignment.CenterVertically
+//        ) {
+//            Icon(
+//                imageVector = Icons.Default.Search,
+//                contentDescription = "Søk",
+//                tint = MaterialTheme.colorScheme.onSurfaceVariant
+//            )
+//
+//            Spacer(modifier = Modifier.width(12.dp))
+//
+//            Text(
+//                text = text,
+//                color = MaterialTheme.colorScheme.onSurfaceVariant,
+//                maxLines = 1,
+//                overflow = TextOverflow.Ellipsis
+//            )
+//        }
+//    }
+//}
 
 
 @Composable

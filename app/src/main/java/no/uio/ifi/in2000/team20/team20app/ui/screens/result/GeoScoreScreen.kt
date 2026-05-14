@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bookmark
@@ -28,31 +29,40 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RichTooltip
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipAnchorPosition
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.domain.model.scoreToGrade
 import no.uio.ifi.in2000.team20.team20app.ui.components.ErrorState
 import no.uio.ifi.in2000.team20.team20app.ui.components.LoadingState
-import no.uio.ifi.in2000.team20.team20app.ui.screens.home.ExpandableInfoBox
-import no.uio.ifi.in2000.team20.team20app.ui.screens.home.GeomarkingBadge
+import no.uio.ifi.in2000.team20.team20app.ui.components.ExpandableInfoBox
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.SavedViewModel
 
@@ -369,6 +379,71 @@ private fun GeomarkingCard(
 
         }
 
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun GeomarkingBadge(
+    grade: String,
+    modifier: Modifier = Modifier,
+    iconStyle: Boolean = true,
+    showTooltip: Boolean = false,
+) {
+    val badgeColor = when (grade.uppercase()) {
+        "A" -> Color(0xFF4CAF50)
+        "B" -> Color(0xFF8BC34A)
+        "C" -> Color(0xFFFFC107)
+        "D" -> Color(0xFFFFC56B)
+        "E" -> Color(0xFFEFA066)
+        "F" -> Color(0xFFE36C5C)
+        "?" -> Color(0xFFFFC107)
+        else -> Color(0xFFBDBDBD)
+    }
+
+    val tooltipState = rememberTooltipState(isPersistent = true)
+    val scope = rememberCoroutineScope()
+
+    TooltipBox(
+        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Above),
+        tooltip = {
+            RichTooltip(
+                title = { Text("Karakter ${grade.uppercase()}") }
+            ) {
+                Text("Merkingen er gitt utifra fra en skala fra A-F, der A betyr minst samlet risiko")
+            }
+        },
+        state = tooltipState,
+        enableUserInput = false
+    ) {
+        if (iconStyle) {
+            Card(
+                modifier = if (showTooltip) modifier.clickable { scope.launch { tooltipState.show() } } else modifier,
+                shape = CircleShape,
+                colors = CardDefaults.cardColors(containerColor = badgeColor)
+            ) {
+                Box(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = grade.uppercase().ifEmpty { "?" },
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
+            }
+        } else {
+            Text(
+                text = grade.uppercase().ifEmpty { "?" },
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold,
+                fontSize = 40.sp,
+                color = badgeColor,
+                modifier = if (showTooltip) modifier.clickable { scope.launch { tooltipState.show() } } else modifier
+            )
+        }
     }
 }
 

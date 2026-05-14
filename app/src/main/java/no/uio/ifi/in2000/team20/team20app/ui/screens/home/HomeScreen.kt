@@ -53,7 +53,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
-import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchBarObject
+import no.uio.ifi.in2000.team20.team20app.ui.components.SearchBarObject
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.SavedViewModel
@@ -130,129 +130,5 @@ fun HomeScreen(
             SearchBarObject(onOpenSearch = onOpenSearch, text  = "Søk etter en adresse...")
         }
     }
-}
-
-@Composable
-fun ExpandableInfoBox(
-    title: String,
-    modifier: Modifier = Modifier,
-    rightContent: @Composable (() -> Unit)? = null,
-    initiallyExpanded: Boolean = false,
-    content: @Composable () -> Unit,
-) {
-    var isExpanded by remember { mutableStateOf(initiallyExpanded) }
-
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(onClickLabel = if (!isExpanded) "utvid informasjonsboks" else "lukk informasjonsboks") {
-                isExpanded = !isExpanded
-            }
-        ,
-        shape = if (!isExpanded) RoundedCornerShape(24) else RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(modifier = Modifier.padding((DEFAULT_PADDING_DP*0.5).dp), verticalArrangement = Arrangement.Center) {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding((DEFAULT_PADDING_DP*0.5).dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.weight(1f)
-                )
-
-                if (rightContent != null) {
-                    rightContent()
-                    Spacer(modifier = Modifier.width(8.dp))
-                }
-
-                Icon(
-                    imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                    contentDescription = if (isExpanded) "Åpner $title informasjonsboks" else "Lukker $title informasjonsboks",
-                    modifier = Modifier.size(28.dp)
-                )
-            }
-
-            AnimatedVisibility(visible = isExpanded) {
-                Column(modifier = Modifier.padding(DEFAULT_PADDING_DP.dp)) {
-                    Spacer(modifier = Modifier.height(12.dp))
-                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                    Spacer(modifier = Modifier.height(12.dp))
-                    content()
-                }
-            }
-        }
-    }
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun GeomarkingBadge(
-    grade: String,
-    modifier: Modifier = Modifier,
-    iconStyle: Boolean = true,
-    showTooltip: Boolean = false,
-) {
-    val badgeColor = when (grade.uppercase()) {
-        "A" -> Color(0xFF4CAF50)
-        "B" -> Color(0xFF8BC34A)
-        "C" -> Color(0xFFFFC107)
-        "D" -> Color(0xFFFFC56B)
-        "E" -> Color(0xFFEFA066)
-        "F" -> Color(0xFFE36C5C)
-        "?" -> Color(0xFFFFC107)
-        else -> Color(0xFFBDBDBD)
-    }
-
-    val tooltipState = rememberTooltipState(isPersistent = true)
-    val scope = rememberCoroutineScope()
-
-    TooltipBox(
-        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Above),
-        tooltip = {
-            RichTooltip(
-                title = { Text("Karakter ${grade.uppercase()}") }
-            ) {
-                Text("Merkingen er gitt utifra fra en skala fra A-F, der A betyr minst samlet risiko")
-            }
-        },
-        state = tooltipState,
-        enableUserInput = false
-    ) {
-        if (iconStyle) {
-            Card(
-                modifier = if (showTooltip) modifier.clickable { scope.launch { tooltipState.show() } } else modifier,
-                shape = CircleShape,
-                colors = CardDefaults.cardColors(containerColor = badgeColor)
-            ) {
-                Box(
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = grade.uppercase(),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                }
-            }
-        } else {
-            Text(
-                text = grade.uppercase(),
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.Bold,
-                fontSize = 40.sp,
-                color = badgeColor,
-                modifier = if (showTooltip) modifier.clickable { scope.launch { tooltipState.show() } } else modifier
-            )
-        }
-    }
-
 }
 
