@@ -108,6 +108,7 @@ fun SavedScreen(
                             .padding(SMALL_PADDING_DP.dp),
                         text = "Når du har lagret et sted, vil det vises her.",
                         style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
                         fontSize = 16.sp
                     )
