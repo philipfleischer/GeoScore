@@ -23,7 +23,6 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-@Suppress("unused") // Hilt uses this data at compile-time
 object DatabaseModule {
 
     @Provides
