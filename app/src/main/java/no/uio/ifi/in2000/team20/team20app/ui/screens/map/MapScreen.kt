@@ -7,13 +7,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
@@ -218,12 +221,12 @@ fun MapScreen(
             }
 
             Row{
-                FloatingActionButton(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier.clip(CircleShape).size(48.dp),
-                    onClick = {
-                        if (selectedLayer.type != MapLayerDefinition.DEFAULT) {
-                            scope.launch {
+                if (selectedLayer.type != MapLayerDefinition.DEFAULT) {
+                    FloatingActionButton(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.clip(CircleShape).size(48.dp),
+                        onClick =
+                            {scope.launch {
                                 cameraPositionState.animate(
                                     CameraUpdateFactory.zoomTo(
                                         selectedLayer.urlFormatter.getRequiredZoom()
@@ -231,13 +234,14 @@ fun MapScreen(
                                 )
                             }
                         }
-                    }
-                ){
-                    Icon(
-                        imageVector = if(cameraPositionState.position.zoom >= selectedLayer.urlFormatter.getRequiredZoom()) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                        contentDescription = "",
-                        tint = MaterialTheme.colorScheme.onSecondary
                     )
+                    {
+                        Icon(
+                            imageVector = if (cameraPositionState.position.zoom >= selectedLayer.urlFormatter.getRequiredZoom()) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                            contentDescription = "",
+                            tint = MaterialTheme.colorScheme.onSecondary
+                        )
+                    }
                 }
                 Spacer(Modifier.weight(1f))
                 FloatingActionButton(
@@ -273,6 +277,7 @@ fun MapScreen(
                             )
                             Spacer(Modifier.weight(1f))
                             IconButton(
+                                modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
                                 onClick = mapViewModel::toggleLayersExpanded
                             ) {
                                 Icon(
