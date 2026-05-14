@@ -52,6 +52,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GeoScoreViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GeomarkingBadge
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.SavedViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
@@ -209,7 +210,10 @@ private fun SavedLocationCard(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.Top
         ) {
-            GradeBadge(grade = geoState.grade)
+            GeomarkingBadge(
+                grade = geoState.grade,
+                iconStyle = false,
+            )
 
             Column(
                 modifier = Modifier
@@ -290,26 +294,26 @@ private fun formatSavedAt(savedAt: Long): String {
     return "Sist generert: ${formatter.format(Date(savedAt))}"
 }
 
-@Composable
-private fun GradeBadge(grade: String) {
-    val gradeColor = when (grade) {
-        "A" -> Color(0xFF4CAF50)
-        "B" -> Color(0xFF8BC34A)
-        "C" -> Color(0xFFFFC107)
-        "D" -> Color(0xFFFFC56B)
-        "E" -> Color(0xFFEFA066)
-        "F" -> Color(0xFFE36C5C)
-        else -> Color(0xFFBDBDBD)
-    }
-
-    Text(
-        text = grade.ifEmpty { "?" },
-        style = MaterialTheme.typography.headlineSmall,
-        fontWeight = FontWeight.Bold,
-        color = gradeColor,
-        fontSize = 28.sp
-    )
-}
+//@Composable
+//private fun GradeBadge(grade: String) {
+//    val gradeColor = when (grade) {
+//        "A" -> Color(0xFF4CAF50)
+//        "B" -> Color(0xFF8BC34A)
+//        "C" -> Color(0xFFFFC107)
+//        "D" -> Color(0xFFFFC56B)
+//        "E" -> Color(0xFFEFA066)
+//        "F" -> Color(0xFFE36C5C)
+//        else -> Color(0xFFBDBDBD)
+//    }
+//
+//    Text(
+//        text = grade.ifEmpty { "?" },
+//        style = MaterialTheme.typography.headlineSmall,
+//        fontWeight = FontWeight.Bold,
+//        color = gradeColor,
+//        fontSize = 28.sp
+//    )
+//}
 
 @Composable
 private fun DeleteLocationDialog(
@@ -335,8 +339,7 @@ private fun DeleteLocationDialog(
                         true
                     }
                 )
-            )
-                                     },
+            ) },
         onDismissRequest = onDismiss,
         title = { Text("Fjern lokasjon") },
         text = { Text("Er du sikker på at du vil fjerne denne lokasjonen?")},

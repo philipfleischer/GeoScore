@@ -61,7 +61,7 @@ import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location.Companion.roundToStandard
 import no.uio.ifi.in2000.team20.team20app.domain.model.mapLayer.MapLayer
 import no.uio.ifi.in2000.team20.team20app.domain.model.mapLayer.MapLayerDefinition
-import no.uio.ifi.in2000.team20.team20app.ui.screens.search.SearchBarObject
+import no.uio.ifi.in2000.team20.team20app.ui.components.SearchBarObject
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MEDIUM_SCREEN_WIDTH
