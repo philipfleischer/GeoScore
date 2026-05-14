@@ -104,7 +104,6 @@ dependencies {
     implementation(libs.androidx.compose.material3.window.size.class1)
     //implementation(libs.androidx.room.compiler)
     implementation(libs.coil.compose)
-    implementation(libs.navigation3.runtime)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -126,7 +125,6 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.ktor.client.logging)
     implementation(libs.logback.classic)
-    implementation(libs.kotlinx.serialization.json.v163)
 
     // ROOM
     implementation(libs.androidx.room.runtime)
