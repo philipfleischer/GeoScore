@@ -6,12 +6,12 @@ import androidx.compose.ui.graphics.Color
 // Light mode
 val White = Color(255, 255, 255)
 val OffWhite = Color(243, 245, 246)
-val LightBlue = Color(213, 236, 248)
+val LightBlue = Color(218, 236, 248)
 val CloudySky = Color(200, 220, 233)
-val MayaBlue = Color(110, 189, 254)
+val MayaBlue = Color(152, 196, 254)
 val DustyBlue = Color(75, 151, 202)
 
-val DarkBlue = Color(22, 93, 131)
+val DarkBlue = Color(22, 85, 131)
 
 val RoyalGold = Color(254, 223, 108)
 val Salmon = Color(254, 125, 108)
@@ -28,5 +28,6 @@ val SlateGray = Color(0xFF69808C)
 // Dark mode
 
 val Black = Color(8, 8, 12)
+val Midnight = Color(45, 46, 65)
 val Charcoal = Color(36, 38, 51)
-val DarkGray = Color(63, 70, 89)
+val DarkGray = Color(94, 106, 151)

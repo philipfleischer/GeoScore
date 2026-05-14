@@ -50,6 +50,7 @@ import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.components.ErrorState
 import no.uio.ifi.in2000.team20.team20app.ui.components.SectionCard
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.theme.CloudySky
 import no.uio.ifi.in2000.team20.team20app.ui.theme.DarkBlue
 import no.uio.ifi.in2000.team20.team20app.ui.theme.DustyBlue
 import no.uio.ifi.in2000.team20.team20app.ui.theme.MayaBlue
@@ -229,7 +230,7 @@ fun ClimateStatsScreen(
                                 unitSuffix = "°C",
                                 indicatorCount = IndicatorCount.StepBased(stepBy = 5.0),
                                 showZeroLine = true,
-                                zeroLineColor = TrafficRed
+                                zeroLineColor = TrafficRed,
                             )
                         } else {
                             Text("Ingen klimadata tilgjengelig.")
@@ -525,7 +526,7 @@ private fun ChartSection(
         Text(
             text = description,
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f)
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(modifier = Modifier.height(12.dp))
 
