@@ -99,7 +99,7 @@ val LightColorScheme = lightColorScheme(
 )
 
 val DarkColorScheme = darkColorScheme(
-    surface = Black, // Essentially background
+    surface = Midnight, // Essentially background
     onSurface = White, // Text on background
     surfaceContainerHigh = DarkGray, // Cards
     surfaceContainerLow = DarkGray, // Bars/rails
@@ -107,7 +107,7 @@ val DarkColorScheme = darkColorScheme(
     primary = MayaBlue,
     onPrimary = Black,
     secondary = MayaBlue,
-    onSecondary = White,
+    onSecondary = Black,
     outline = Color.Transparent,
     error = Salmon
 )

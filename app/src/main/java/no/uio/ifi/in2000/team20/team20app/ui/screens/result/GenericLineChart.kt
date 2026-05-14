@@ -52,6 +52,7 @@ fun GenericLineChart(
     val months = listOf("Jan", " ", "Mar", " ", "Mai", " ",
         "Jul", " ", "Sep", " ", "Nov", " ")
 
+    val contrastColor = MaterialTheme.colorScheme.onSurfaceVariant
     Column(modifier = modifier
         .fillMaxWidth()
         .padding(16.dp)) {
@@ -59,7 +60,8 @@ fun GenericLineChart(
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(bottom = 8.dp),
+            color = contrastColor
         )
 
         LineChart(
@@ -75,10 +77,15 @@ fun GenericLineChart(
             } else {
                 ZeroLineProperties(enabled = false)
             },
-            labelHelperProperties = LabelHelperProperties(enabled = true),
+            labelHelperProperties = LabelHelperProperties(
+                enabled = true,
+                textStyle = TextStyle(color = contrastColor
+                )
+            ),
             labelProperties = LabelProperties(
                 enabled = true,
-                labels = months
+                labels = months,
+                textStyle = TextStyle(color = contrastColor)
             ),
             popupProperties = PopupProperties(
                 enabled = true,
@@ -86,10 +93,10 @@ fun GenericLineChart(
                 animationSpec = tween(300),
                 duration = 3000L,
                 textStyle = TextStyle(
-                    color = White,
+                    color = MaterialTheme.colorScheme.onSecondary,
                     fontSize = 11.sp
                 ),
-                containerColor = Charcoal,
+                containerColor = MaterialTheme.colorScheme.secondary,
                 cornerRadius = 8.dp,
                 contentHorizontalPadding = 8.dp,
                 contentVerticalPadding = 4.dp,
@@ -110,7 +117,8 @@ fun GenericLineChart(
             indicatorProperties = HorizontalIndicatorProperties(
                 enabled = true,
                 count = indicatorCount,
-                contentBuilder = { value -> "%.0f".format(value) }
+                contentBuilder = { value -> "%.0f".format(value) },
+                textStyle = TextStyle(color = contrastColor)
             ),
             gridProperties = GridProperties(
                 enabled = true,
@@ -122,7 +130,7 @@ fun GenericLineChart(
                     lineCount = verticalGridLineCount,
                     color = SolidColor(SlateGray.copy(alpha = 0.2f)),
                     style = StrokeStyle.Dashed(intervals = floatArrayOf(6f, 6f))
-                )
+                ),
             ),
             minValue = minValue,
             maxValue = maxValue,

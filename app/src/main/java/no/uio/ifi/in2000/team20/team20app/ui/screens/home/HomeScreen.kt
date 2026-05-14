@@ -74,6 +74,7 @@ fun HomeScreen(
 
     // Calculates window width and returns true if the size width class is compact, and false for everything else.
     val compactScreenWidth = !LocalWindowSizeClass.current.isWidthAtLeastBreakpoint(MEDIUM_SCREEN_WIDTH)
+    val paddingValue = DEFAULT_PADDING_DP
 
     LaunchedEffect(location) {
         if(location != null) {
@@ -89,10 +90,10 @@ fun HomeScreen(
         ,
         columns = GridCells.Fixed(if(compactScreenWidth) 1 else 2),
         contentPadding = PaddingValues(
-            start = (DEFAULT_PADDING_DP*2).dp,
-            end = if (compactScreenWidth) (DEFAULT_PADDING_DP*2).dp else (DEFAULT_PADDING_DP*5).dp,
-            top = (DEFAULT_PADDING_DP*5).dp,
-            bottom = (DEFAULT_PADDING_DP*2).dp,
+            start = (paddingValue*2).dp,
+            end = if (compactScreenWidth) (paddingValue*2).dp else (paddingValue*5).dp,
+            top = (paddingValue*5).dp,
+            bottom = (paddingValue*2).dp,
         ),
         verticalArrangement = Arrangement.spacedBy(25.dp),
         horizontalArrangement = Arrangement.spacedBy(25.dp)
@@ -104,7 +105,7 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxWidth(if (compactScreenWidth) 1f else 0.5f)
                     .semantics {
-                        isTraversalGroup = !compactScreenWidth
+                        isTraversalGroup = true
                     }
             ){
                 Text(
@@ -115,10 +116,11 @@ fun HomeScreen(
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.semantics{ heading() }
                 )
+                Spacer(Modifier.height(paddingValue.dp))
                 Text(
                     text = "Få innsikt i grunnforhold og naturfare. Søk opp en adresse og få en risikovurdering " +
                             "basert på geologisk og meterologisk data.",
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodyLarge,
                     fontSize = 20.sp,
                     color = theme.colorScheme.onSurface
                 )
