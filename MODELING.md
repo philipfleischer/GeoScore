@@ -488,3 +488,7 @@ classDiagram
     SavedRepositoryImpl "1" *-- "1" AppDatabase : uses
 
 ```
+
+### Bilde av klassediagrammet
+Dette er det samme klassediagrammet som ovenfor, strukturert litt annerledes:
+<img alt="Klassediagram" height="4679" src="Diagrams/strukturert_klassediagram.png" width="16159"/>
