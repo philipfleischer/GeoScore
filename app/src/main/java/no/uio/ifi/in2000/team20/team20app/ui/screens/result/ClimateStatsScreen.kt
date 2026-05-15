@@ -163,9 +163,9 @@ fun ClimateStatsScreen(
                         title = "Temperatur",
                         description =
                             "Grafen presenterer temperaturen i området basert på målinger fra 1991 til 2020.\n" +
-                            "Maks er snittet av høytemperatur. " +
+                            "Snitt er snittet av den typisk temperatur. " +
                             "Min er snittet av lavtemperatur. "+
-                            "Snitt er snittet av den typisk temperatur.\n" +
+                            "Maks er snittet av høytemperatur.\n" +
                             "Til sammen gir dette innsikt i områdets temperaturprofil i moderne tid",
                         chartHeight = 280.dp,
                         isLoading = frostUiState.isLoading,
@@ -247,7 +247,7 @@ fun ClimateStatsScreen(
                                 "Middelvind er snitt av typisk vindhastighet. " +
                                 "Maks middelvind er snittet av dager med høy vindhastighet. " +
                                 "Maks vindkast er snittet av høyeste vindkast per dag.\n" +
-                                "Til sammen gir dette innsikt i områdets vindprofil i moderne tid. Særlig maks vindkast er viktig å ta til vurdering da dette er spesielt skadelig."
+                                "Til sammen gir dette innsikt i hvor vindutsatt området er. Særlig maks vindkast er viktig å ta til vurdering da dette er spesielt skadelig."
                         ,
                         chartHeight = 200.dp,
                         isLoading = frostUiState.isLoading,
@@ -317,7 +317,7 @@ fun ClimateStatsScreen(
                     ChartSection(
                         title = "Soltimer",
                         description =
-                            "Grafen presenterer timer med direkte sollys i området basert på målinger fra 1991 til 2020.",
+                            "Grafen presenterer timer med direkte sollys i området basert på målinger fra 1991 til 2020. Merk at dette ikke er det samme som timer med dagslys.",
                         chartHeight = 200.dp,
                         isLoading = frostUiState.isLoading,
                         errorMessage = frostUiState.sunshineError,
@@ -369,7 +369,7 @@ fun ClimateStatsScreen(
                     ChartSection(
                         title = "Nedbør",
                         description =
-                            "Den første grafen presenterer antall nedbørsdager i området basert på målinger fra 1991 til 2020.\n"+
+                            "Den første grafen presenterer antall nedbørsdager per måned i området basert på målinger fra 1991 til 2020. "+
                             "En nedbørsdag er definert som en dag med minst 1,0 mm målbar nedbør.\n"+
                             "Den andre grafen presenterer snittet av den største nedbørsdagen.\n"+
                             "Merk at for begge grafer inkluderer nedbør både regn og snø.",
@@ -446,10 +446,10 @@ fun ClimateStatsScreen(
                 item {
                     ChartSection(
                         title = "Snø",
-                        description = "Grafen presenterer snødybden i området basert på målinger fra 1991–2020.\n" +
-                                "Snittdybde er snittet av snødybde." +
+                        description = "Grafen presenterer snødybden i området basert på målinger fra 1991–2020. " +
+                                "Snittdybde er snittet av snødybde. " +
                                 "Maksdybde er snittet av høyest snødybde.\n"+
-                                "Til sammen gir dette innsikt i områdets snøprofil i moderne tid.",
+                                "Til sammen gir dette et innblikk i hvor mye snø du kan forvente.",
                         chartHeight = 240.dp,
                         isLoading = frostUiState.isLoading,
                         errorMessage = frostUiState.snowError,
@@ -575,11 +575,19 @@ private fun ChartErrorPlaceholder(
             .background(MaterialTheme.colorScheme.surfaceContainerHigh),
         contentAlignment = Alignment.Center
     ) {
-        ErrorState(
-            message = message,
-            onRetry = onRetry,
-            modifier = Modifier.fillMaxWidth()
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            ErrorState(
+                message = message,
+                onRetry = onRetry,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
     }
 }
 
@@ -594,7 +602,7 @@ private fun friendlyErrorMessage(raw: String?): String = when {
     raw.contains("Frost 412") ||
     raw.contains("No V0 stations found") ||
     raw.contains("No stations found") ||
-    raw.contains("No nearby stations") -> "Ingen klimastasjoner funnet nær dette stedet."
+    raw.contains("No nearby stations") -> "Klimastasjonene i nærheten har ikke denne typen data tilgjengelig."
     else -> "Noe gikk galt. Prøv igjen senere."
 }
 

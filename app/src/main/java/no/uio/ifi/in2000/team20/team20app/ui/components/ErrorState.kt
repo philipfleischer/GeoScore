@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import no.uio.ifi.in2000.team20.team20app.ui.theme.LocalTheme
@@ -50,7 +51,8 @@ fun ErrorState(
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = message,
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center
         )
         if (onRetry != null) {
             Spacer(modifier = Modifier.height(16.dp))
