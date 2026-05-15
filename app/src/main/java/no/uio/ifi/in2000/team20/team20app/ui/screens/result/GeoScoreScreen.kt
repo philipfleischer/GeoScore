@@ -176,6 +176,16 @@ fun GeoScoreScreen(
                     onNavigateToMap = onNavigateToMap
                 )
             }
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+            item {
+                Text(
+                    color = MaterialTheme.colorScheme.onSurface,
+                    text = "Utbedringene så vel som karakterene er ikke faglig garantert. "+
+                            "All handling basert på denne informasjonen gjøres på eget ansvar."
+                )
+            }
         }
     }
 }
