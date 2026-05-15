@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team20.team20app.data.repository
 
-import android.util.Log
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.json.Json
@@ -92,10 +91,6 @@ class FrostRepository @Inject constructor(
             // Cache miss: fetch from API
             val data = dataSource.getTemperatureNormals(lat, lon, stations)
 
-            // Log which stations contributed data
-            val stationIds = data.data.map { it.sourceId }.distinct()
-            Log.d("FrostRepository", "Temperature data from stations: $stationIds (${stationIds.size} stations)")
-
             // V0 returns 360 raw monthly observations (30 years × 12 months).
             // aggregateByMonthV0 groups by calendar month and averages → 1991-2020 normals computed client-side.
             val meanMap    = data.aggregateByMonthV0("mean(air_temperature P1M)")
@@ -114,8 +109,6 @@ class FrostRepository @Inject constructor(
                     monthlyMin  = toJson(minList)
                 )
             )
-            Log.d("FrostRepository", "Temperature data cached for stationId: $stationId")
-
             Triple(meanList, maxList, minList)
         }
 
@@ -151,7 +144,6 @@ class FrostRepository @Inject constructor(
                     monthlyMaxGust = toJson(gustList)
                 )
             )
-            Log.d("FrostRepository", "Wind data cached for stationId: $stationId")
 
             Triple(meanList, maxList, gustList)
         }
@@ -192,7 +184,6 @@ class FrostRepository @Inject constructor(
                      distanceKm         = sunshineResult.distanceKm
                  )
              )
-             Log.d("FrostRepository", "Sunshine data cached for stationId: $stationId")
 
              Triple(hoursPerDay, sunshineResult.stationName, sunshineResult.distanceKm)
          }
@@ -227,7 +218,6 @@ class FrostRepository @Inject constructor(
                     monthlyMax  = toJson(maxList)
                 )
             )
-            Log.d("FrostRepository", "Snow data cached for stationId: $stationId")
 
             Pair(meanList, maxList)
         }
@@ -265,7 +255,6 @@ class FrostRepository @Inject constructor(
                     monthlyMaxDaily  = toJson(maxDailyList)
                 )
             )
-            Log.d("FrostRepository", "Precipitation data cached for stationId: $stationId")
 
             Pair(rainyDaysList, maxDailyList)
         }
@@ -275,7 +264,6 @@ class FrostRepository @Inject constructor(
         lon: Double
     ): WindAndPrecipitationObservationsResult {
         return coroutineScope {
-            Log.d("FrostRepository", "Wind data getting fetched")
             val precipitation = async { dataSource.getRankedObservationsForPrecipitation(lat, lon) }
             val wind = async { dataSource.getRankedObservationsForWind(lat, lon)
             }
@@ -293,7 +281,6 @@ class FrostRepository @Inject constructor(
         return stationCache[key] ?: run {
             val stations = dataSource.getStationsNearby(lat, lon)
             stationCache[key] = stations
-            Log.d("FrostRepository", "Fetched stations for $key: $stations")
             stations
         }
     }
@@ -305,7 +292,6 @@ class FrostRepository @Inject constructor(
         return sunshineStationCache[key] ?: run {
             val sunshineStationId = dataSource.getSunshineStationNearby(lat, lon)
             sunshineStationCache[key] = sunshineStationId
-            Log.d("FrostRepository", "Fetched sunshine station for $key: $sunshineStationId")
             sunshineStationId
         }
     }

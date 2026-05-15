@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team20.team20app.data.datasource
 
-import android.util.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -193,7 +192,6 @@ class FrostDataSource @Inject constructor(
             header("Authorization", authHeader)
         }.let { response ->
             if (!response.status.isSuccess()) {
-                Log.e("FrostDataSource", "availableTimeSeries error ${response.status.value}: ${response.bodyAsText()}")
                 throw Exception("Frost ${response.status.value}: ${response.bodyAsText()}")
             }
             response.body()
@@ -274,9 +272,6 @@ class FrostDataSource @Inject constructor(
         val d30 = async { fetchV1(lat, lon, 30.0, maxCount, startYear, endYear, "sum(precipitation_amount P1D)") }
 
         val (r10, r20, r30) = awaitAll(d10, d20, d30)
-        Log.d("FrostDataSource", "Precip 10km: ${r10.data.tseries.size} stns – ${r10.data.tseries.isNotEmpty()}")
-        Log.d("FrostDataSource", "Precip 20km: ${r20.data.tseries.size} stns – ${r20.data.tseries.isNotEmpty()}")
-        Log.d("FrostDataSource", "Precip 30km: ${r30.data.tseries.size} stns – ${r30.data.tseries.isNotEmpty()}")
 
         when {
             r10.data.tseries.isNotEmpty() -> r10
@@ -301,9 +296,6 @@ class FrostDataSource @Inject constructor(
             val d30 = async { fetchV1(lat, lon, 30.0, maxCount, startYear, endYear, "max(wind_speed_of_gust P1D)") }
 
             val (r10, r20, r30) = awaitAll(d10, d20, d30)
-            Log.d("FrostDataSource", "WindGust 10km: ${r10.data.tseries.size} stns – ${r10.data.tseries.isNotEmpty()}")
-            Log.d("FrostDataSource", "WindGust 20km: ${r20.data.tseries.size} stns – ${r20.data.tseries.isNotEmpty()}")
-            Log.d("FrostDataSource", "WindGust 30km: ${r30.data.tseries.size} stns – ${r30.data.tseries.isNotEmpty()}")
 
             //Choose data for the closest one that is not empty
             when {
@@ -322,9 +314,6 @@ class FrostDataSource @Inject constructor(
             val d30 = async { fetchV1(lat, lon, 30.0, maxCount, startYear, endYear, "mean(wind_speed P1D)") }
 
             val (r10, r20, r30) = awaitAll(d10, d20, d30)
-            Log.d("FrostDataSource", "WindMean 10km: ${r10.data.tseries.size} stns – ${r10.data.tseries.isNotEmpty()}")
-            Log.d("FrostDataSource", "WindMean 20km: ${r20.data.tseries.size} stns – ${r20.data.tseries.isNotEmpty()}")
-            Log.d("FrostDataSource", "WindMean 30km: ${r30.data.tseries.size} stns – ${r30.data.tseries.isNotEmpty()}")
 
             //Choose data for the closest one that is not empty
             when {
@@ -352,9 +341,7 @@ class FrostDataSource @Inject constructor(
             parameter("incobs", true)
             header("Authorization", authHeader)
         }
-        Log.d("FrostDataSource", "fetchV1 [${elementId}] dist=${dist}km → HTTP ${response.status.value}")
         if (!response.status.isSuccess()) {
-            Log.e("FrostDataSource", "fetchV1 error body: ${response.bodyAsText()}")
             return FrostV1ResponseDto()
         }
         return response.body()

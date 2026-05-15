@@ -1,11 +1,9 @@
 package no.uio.ifi.in2000.team20.team20app.data.datasource
 
-import android.util.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
-import io.ktor.client.statement.request
 import io.ktor.utils.io.CancellationException
 import no.uio.ifi.in2000.team20.team20app.data.dto.AddressResponse
 import no.uio.ifi.in2000.team20.team20app.di.GeoSearchClient
@@ -39,8 +37,6 @@ class AddressRemoteDataSource @Inject constructor(
                 parameter("asciiKompatibel", true)
             }
 
-            Log.d("GeoSearch", "Request URL: ${response.request.url}")
-
             if (response.status.value == HTTP_OK) {
                 val deserialized: AddressResponse = response.body()
 
@@ -62,19 +58,15 @@ class AddressRemoteDataSource @Inject constructor(
                     status = HTTP_SERVER_ERROR
                 )
             } else {
-                Log.d("GeoSearch", "Adresse API-kall feilet. Statuskode: ${response.status.value}")
-
                 throw Exception("Adresse API-kall feilet. Statuskode: ${response.status.value}")
             }
-        } catch (e: CancellationException){
-            Log.d("GeoSearch", "Adresse API-kall ble avbrutt. ${e.message}")
+        } catch (_: CancellationException){
             return AddressResponseWrapper(
                 metadata = null,
                 addresses = emptyList(),
                 status = CANCELLED_SEARCH
             )
-        } catch (e: Exception) {
-            Log.d("GeoSearch", "Adresse API-kall feilet. ${e.message}")
+        } catch (_: Exception) {
             return AddressResponseWrapper(
                 metadata = null,
                 addresses = emptyList(),

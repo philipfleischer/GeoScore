@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team20.team20app.data.repository.map
 
-import android.util.Log
 import androidx.core.net.toUri
 import no.uio.ifi.in2000.team20.team20app.domain.model.mapLayer.MapLayerDefinition
 import no.uio.ifi.in2000.team20.team20app.domain.model.urlFormatter.UrlFormatter
@@ -47,7 +46,6 @@ object FloodUrlFormatter : UrlFormatter {
         zoom: Int
     ): String {
         if (zoom < REQUIRED_ZOOM) return ""
-        Log.d("FloodUrlFormatter", "invoke: with zoom $zoom")
         return "https://kart.nve.no/enterprise/services/Flomsoner2/MapServer/WMSServer?".toUri()
             .buildUpon()
             .appendQueryParameter("SERVICE", "WMS")
@@ -79,7 +77,6 @@ object LandslideUrlFormatter : UrlFormatter {
         zoom: Int
     ): String {
         if (zoom < REQUIRED_ZOOM) return ""
-        Log.d("LandslideUrlFormatter", "invoke: with zoom $zoom")
         return "https://kart.nve.no/enterprise/services/JordFlomskredAktsomhet/MapServer/WMSServer?".toUri()
             .buildUpon()
             .appendQueryParameter("SERVICE", "WMS")
@@ -111,7 +108,6 @@ object RockslideUrlFormatter : UrlFormatter {
         zoom: Int
     ): String {
         if (zoom < REQUIRED_ZOOM) return ""
-        Log.d("RockslideUrlFormatter", "invoke: with zoom $zoom")
         return "https://kart.nve.no/enterprise/services/SkredSteinAktR/MapServer/WMSServer".toUri()
             .buildUpon()
             .appendQueryParameter("service", "WMS")

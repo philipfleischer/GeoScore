@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -64,10 +63,6 @@ data class FrostUiState(
 class FrostViewModel @Inject constructor(
     private val repo: FrostRepositoryService
 ) : ViewModel() {
-
-    init{
-        Log.d("ViewModel", "FrostViewModel created")
-    }
 
     private val _uiState = MutableStateFlow(FrostUiState())
     val uiState: StateFlow<FrostUiState> = _uiState.asStateFlow()
