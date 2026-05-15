@@ -27,9 +27,6 @@ import no.uio.ifi.in2000.team20.team20app.BuildConfig
 
 object Constants {
 
-    // GeoSearch
-    val ADDRESS_URL_FORMATTER = {encodedQuery:String -> "https://ws.geonorge.no/adresser/v1/sok?sok=$encodedQuery&fuzzy=false&utkoordsys=4258&treffPerSide=10&side=0&asciiKompatibel=true"}
-
     const val FROST_CLIENT_ID = BuildConfig.FROST_V0_CLIENT_ID
     const val FROST_CLIENT_SECRET = BuildConfig.FROST_V0_CLIENT_SECRET
     const val CHATGPT_API_KEY = BuildConfig.CHATGPT_API_KEY
