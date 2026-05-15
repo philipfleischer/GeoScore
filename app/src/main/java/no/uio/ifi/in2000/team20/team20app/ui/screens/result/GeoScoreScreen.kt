@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team20.team20app.ui.screens.result
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -81,9 +80,6 @@ fun GeoScoreScreen(
     val geoState by geoScoreViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(location) {
-
-        Log.d("GeoScoreScreen", "LaunchedEffect called with $location")
-
         frostViewModel.loadFrostStats(location)
         savedViewModel.checkIfSaved(location)
         geoScoreViewModel.load(location)

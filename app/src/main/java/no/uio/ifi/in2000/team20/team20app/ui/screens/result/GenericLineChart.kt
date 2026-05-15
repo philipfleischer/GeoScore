@@ -92,7 +92,7 @@ fun GenericLineChart(
             popupProperties = PopupProperties(
                 enabled = true,
                 mode = PopupProperties.Mode.PointMode(threshold = 8.dp),
-                animationSpec = tween(300),
+                animationSpec = tween(0),
                 duration = 3000L,
                 textStyle = TextStyle(
                     color = MaterialTheme.colorScheme.onSecondary,
