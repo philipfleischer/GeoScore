@@ -78,7 +78,6 @@ fun HomeScreen(
 
     LaunchedEffect(location) {
         if(location != null) {
-            frostViewModel.loadFrostStats(location!!)
             savedViewModel.checkIfSaved(location!!)
         }
     }

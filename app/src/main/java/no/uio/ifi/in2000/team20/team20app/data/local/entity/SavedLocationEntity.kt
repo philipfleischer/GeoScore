@@ -12,5 +12,6 @@ data class SavedLocationEntity(
     val county: String?,
     val lat: Double,
     val lon: Double,
-    val savedAt: Long = 0L
+    val savedAt: Long = 0L,
+    val geoScore: Double? = null
 )

@@ -72,7 +72,13 @@ class FrostViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(FrostUiState())
     val uiState: StateFlow<FrostUiState> = _uiState.asStateFlow()
 
+    private var lastLoadedCoordinates: Pair<Double, Double>? = null
+
     fun loadFrostStats(location: Location) {
+        val currentCoordinates = location.lat to location.lon
+        if (lastLoadedCoordinates == currentCoordinates) return
+
+        lastLoadedCoordinates = currentCoordinates
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             coroutineScope {
