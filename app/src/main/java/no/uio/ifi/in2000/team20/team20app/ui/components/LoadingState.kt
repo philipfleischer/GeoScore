@@ -24,10 +24,10 @@ import no.uio.ifi.in2000.team20.team20app.ui.theme.LocalTheme
 import no.uio.ifi.in2000.team20.team20app.ui.theme.lightThemeColors
 
 /*
- * Gjenbrukbar loading-komponent.
+ * Reusable loading component.
  *
- * Viser en sirkulær spinner og valgfri tekst mens data lastes inn.
- * Brukes på tvers av skjermer i appen.
+ * Displays a circular spinner and optional text while data is being loaded.
+ * Used across screens in the app.
  */
 @Composable
 fun LoadingState(

@@ -7,38 +7,38 @@ import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 @Serializable
 sealed interface Route: NavKey {
     /*
- * Denne filen definerer alle navigasjonsdestinasjonene som brukes i appen.
- *
- * Navigation 3 bruker NavKey-objekter i stedet for string-baserte routes
- * (som i Navigation 2). Hver skjerm i applikasjonen representeres derfor
- * av et NavKey-objekt eller en NavKey-dataklasse.
- *
- * @Serializable er nødvendig fordi Navigation 3 kan serialisere disse
- * objektene når de lagres i backstacken.
- *
- * Dataklasser brukes når en skjerm trenger å motta data, for eksempel
- * koordinater eller navn på et område.
- */
+     * This file defines all navigation destinations used in the app.
+     *
+     * Navigation 3 uses NavKey objects instead of string-based routes
+     * (as in Navigation 2). Each screen in the application is therefore
+     * represented by a NavKey object or a NavKey data class.
+     *
+     * @Serializable is required because Navigation 3 can serialize these
+     * objects when saving them in the back stack.
+     *
+     * Data classes are used when a screen needs to receive data, for example
+     * coordinates or the name of an area.
+     */
 
     /*
-     * Dette er Startskjermen i applikasjonen.
-     * Denne viser en oversikt over valgt område og gir tilgang til kart,
-     * områdedetaljer og klimastatistikk.
+     * This is the Home screen of the application.
+     * The landing screen with an introduction message and search bar.
+     * Contains a navigation bar for accessing other app sections.
      */
     @Serializable
     object HomeDestination : Route, NavKey
 
     /*
-     * Dette er Kartskjermen.
-     * Her skal brukeren kunne navigere i kartet og velge områder
-     * for å se risiko for naturhendelser.
+     * This is the Map screen.
+     * Here the user should be able to navigate on the map and select areas
+     * to see the risk of natural events.
      */
     @Serializable
     object MapDestination : Route, NavKey
 
     /*
-     * Dette er Lagret-skjermen.
-     * Det viser områder brukeren har lagret.
+     * This is the Saved screen.
+     * It shows areas the user has saved.
      */
     @Serializable
     object SavedDestination : Route, NavKey
@@ -49,25 +49,25 @@ sealed interface Route: NavKey {
     ) : Route, NavKey
 
     /*
-     * Dette er skjermen for klimastatistikk.
+     * This is the Climate Statistics screen.
      *
-     * Denne skjermen mottar også informasjon om et område
-     * slik at den kan hente historiske eller aggregerte klimadata
-     * (for eksempel nedbør, vind eller temperatur).
+     * This screen also receives information about an area
+     * so that it can fetch historical or aggregated climate data
+     * (for example precipitation, wind or temperature).
      */
     @Serializable
     data class ClimateStatsDestination(
         val location: Location
     ) : Route, NavKey
 
-    // DEtte er skjermen for SettingsScreen
+    // This is the Settings screen
     @Serializable
     object SettingsDestination : Route, NavKey
 
     /*
-     * Dette er søkeskjermen.
-     * Brukeren søker etter stednavn via Kartverkets API.
-     * Valgt sted oppdaterer AppViewModel og sender brukeren tilbake.
+     * This is the Search screen.
+     * The user searches for place names via the Kartverket API.
+     * The selected location updates AppViewModel and sends the user back.
      */
     @Serializable
     object SearchDestination : Route, NavKey

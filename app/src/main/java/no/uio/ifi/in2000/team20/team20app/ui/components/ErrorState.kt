@@ -23,10 +23,10 @@ import no.uio.ifi.in2000.team20.team20app.ui.theme.LocalTheme
 import no.uio.ifi.in2000.team20.team20app.ui.theme.lightThemeColors
 
 /*
- * Gjenbrukbar error-komponent.
+ * Reusable error component.
  *
- * Viser et advarselsikon, en feilmelding og valgfri "prøv igjen"-knapp.
- * Brukes på tvers av skjermer i appen.
+ * Displays a warning icon, an error message, and an optional "retry" button.
+ * Used across screens in the app.
  */
 @Composable
 fun ErrorState(

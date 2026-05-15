@@ -127,14 +127,11 @@ fun MapScreen(
         GoogleMap(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-//                .windowInsetsPadding(WindowInsets.safeDrawing)
-            ,
+                .background(MaterialTheme.colorScheme.surfaceVariant),
             cameraPositionState = cameraPositionState,
             properties = MapProperties(
                 maxZoomPreference = MAX_ZOOM,
-                minZoomPreference = MIN_ZOOM,
-                //mapStyleOptions = mapStyleOptions
+                minZoomPreference = MIN_ZOOM
             ),
             onMapLongClick = {latLng ->
                 val lat = roundToStandard(latLng.latitude)

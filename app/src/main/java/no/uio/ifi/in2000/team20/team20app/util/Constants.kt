@@ -73,11 +73,5 @@ object Constants {
     const val SMALL_PADDING_DP = 8
     const val LARGE_PADDING_DP = 24
 
-//    const val CARD_CORNER_RADIUS_DP = 16
-//    const val MAP_LEGEND_HEIGHT_DP = 120
-
     const val MEDIUM_SCREEN_WIDTH = WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND
-
-    // DATA REFRESH SETTINGS
-//    const val AUTO_REFRESH_INTERVAL_MINUTES = 2
 }

@@ -21,10 +21,10 @@ import no.uio.ifi.in2000.team20.team20app.ui.theme.LocalTheme
 import no.uio.ifi.in2000.team20.team20app.ui.theme.lightThemeColors
 
 /*
- * Gjenbrukbar empty-state-komponent.
+ * Reusable empty state component.
  *
- * Vises når ingen lokasjon er valgt eller ingen data finnes for området.
- * Brukes på tvers av skjermer i appen.
+ * Displayed when no location is selected or no data exists for the area.
+ * Used across screens in the app.
  */
 @Composable
 fun EmptyState(

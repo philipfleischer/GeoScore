@@ -25,6 +25,12 @@ import no.uio.ifi.in2000.team20.team20app.data.local.entity.TotalScoreCacheEntit
 import no.uio.ifi.in2000.team20.team20app.data.local.entity.VulnerabilityCacheEntity
 import no.uio.ifi.in2000.team20.team20app.data.local.entity.WindCacheEntity
 
+/**
+ * Room database for persisting user-saved locations and cached climate/risk data.
+ *
+ * Manages all local data including saved locations, GEOscore reports, and weather caches
+ * to minimize API calls and support offline access.
+ */
 @Database(
     entities = [
         SavedLocationEntity::class,

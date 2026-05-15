@@ -13,9 +13,6 @@ data class CustomTheme (
     val detail: Color,      // Borders, decoration
     val button: Color,
     val selected: Color,    // Selected elements such as navigation icons
-//    val buttonDetail: Color,
-//    val disabledButton: Color,
-//    val disabledButtonDetail: Color,
     val error: Color,
     val warning: Color,
     val trafficGreen: Color,
@@ -25,12 +22,7 @@ data class CustomTheme (
     val onBackground: Color,    // Text and contrast on background
     val onPrimary: Color,       // Text on cards, boxes and columns
     val onSecondary: Color,     // Text and icons on topbar and navigation bar/rail
-//    val onTertiary: Color,
     val onSelected: Color,      // Icon colors when selected
-//    val onButton: Color,
-//    val onDisabledButton: Color,
-//    val onError: Color,
-//    val onWarning: Color,
 
     val isLight: Boolean,
     )
@@ -39,7 +31,6 @@ val lightThemeColors = CustomTheme(
     background = LightBlue,
     onBackground = DarkGray,
     tertiary = DarkBlue,
-//    onTertiary = Platinum,
     secondary = MayaBlue,
     onSecondary = Black,
     primary = OffWhite, // Cards, boxes, columns
@@ -48,9 +39,6 @@ val lightThemeColors = CustomTheme(
     button = MayaBlue,
     selected = MayaBlue,
     onSelected = DarkBlue,
-//    buttonDetail = DustyBlue,
-//    disabledButton = AliceBlue,
-//    disabledButtonDetail = CloudySky,
     error = Salmon,
     warning = RoyalGold,
     trafficGreen = TrafficGreen,
@@ -63,14 +51,10 @@ val darkThemeColors = CustomTheme(
     background = Black,
     onBackground = OffWhite,
     tertiary = LightBlue,
-//    onTertiary = ,
     secondary = Charcoal,
     primary = DarkGray,
     detail = Black,
     button = MayaBlue,
-//    buttonDetail = DustyBlue,
-//    disabledButton = AliceBlue,
-//    disabledButtonDetail = Charcoal,
     selected = DarkGray,
     onPrimary = OffWhite,
     onSecondary = OffWhite,

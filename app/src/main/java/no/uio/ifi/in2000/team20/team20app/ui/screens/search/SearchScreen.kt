@@ -54,46 +54,6 @@ import no.uio.ifi.in2000.team20.team20app.ui.components.LoadingState
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
 import no.uio.ifi.in2000.team20.team20app.util.LocalWindowSizeClass
 
-//@Composable
-//fun SearchBarObject(
-//    onOpenSearch: () -> Unit,
-//    modifier: Modifier = Modifier,
-//    theme: ColorScheme = MaterialTheme.colorScheme,
-//    text: String = "Søk"
-//
-//) {
-//    Box(
-//        modifier = modifier
-//            .fillMaxWidth()
-//            .height(56.dp)
-//            .clip(RoundedCornerShape(28.dp))
-//            .background(theme.surfaceContainerLow)
-//            .clickable (onClickLabel = "Search address") { onOpenSearch() }
-//            .padding(horizontal = DEFAULT_PADDING_DP.dp),
-//        contentAlignment = Alignment.CenterStart
-//    ) {
-//        Row(
-//            verticalAlignment = Alignment.CenterVertically
-//        ) {
-//            Icon(
-//                imageVector = Icons.Default.Search,
-//                contentDescription = "Søk",
-//                tint = MaterialTheme.colorScheme.onSurfaceVariant
-//            )
-//
-//            Spacer(modifier = Modifier.width(12.dp))
-//
-//            Text(
-//                text = text,
-//                color = MaterialTheme.colorScheme.onSurfaceVariant,
-//                maxLines = 1,
-//                overflow = TextOverflow.Ellipsis
-//            )
-//        }
-//    }
-//}
-
-
 @Composable
 fun SearchScreen(
     onBackClick: () -> Unit,
@@ -112,7 +72,7 @@ fun SearchScreen(
 
     val padding = DEFAULT_PADDING_DP
 
-    // Slik at man er inni textfielden med engang man går inn i skjermen, og søkefeltet er tomt
+    // Focus the text field when entering the screen and reset search query
     LaunchedEffect(Unit) {
         searchViewModel.resetQuery()
         focusRequester.requestFocus()
@@ -152,12 +112,6 @@ fun SearchScreen(
                     onValueChange = { searchViewModel.updateInput(it) },
                     label = { Text("Sted", color = theme.colorScheme.secondary) },
                     placeholder = { Text("Skriv inn adresse...") },
-//                    leadingIcon = {
-//                        Icon(
-//                            imageVector = Icons.Default.Search,
-//                            contentDescription = "Search"
-//                        )
-//                    },
                     isError = uiState.inputError != null,
                     singleLine = true,
                     colors = TextFieldDefaults.colors(
@@ -184,11 +138,11 @@ fun SearchScreen(
                     end = if (compactScreenWidth) padding.dp else (padding*2).dp,
                 )
                 .background(theme.colorScheme.surface)
-            ,
-            verticalArrangement = Arrangement.Top
-        ) {
-            // her viser vi egen feilmelding hvis brukeren skriver ugyldig input.
-            if (uiState.inputError != null) {
+             ,
+             verticalArrangement = Arrangement.Top
+         ) {
+             // Show error message if user enters invalid input
+             if (uiState.inputError != null) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = uiState.inputError!!,
