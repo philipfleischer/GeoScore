@@ -29,7 +29,7 @@ object DatabaseModule {
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): AppDatabase =
         Room.databaseBuilder(context, AppDatabase::class.java, "team20_app_db")
-            .fallbackToDestructiveMigration() //TODO: Deprecation thingy
+            .fallbackToDestructiveMigration() //Deprecated, consider migrating
             .build()
 
     @Provides

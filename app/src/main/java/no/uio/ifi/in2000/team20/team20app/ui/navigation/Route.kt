@@ -60,10 +60,6 @@ sealed interface Route: NavKey {
         val location: Location
     ) : Route, NavKey
 
-    // This is the Settings screen
-    @Serializable
-    object SettingsDestination : Route, NavKey
-
     /*
      * This is the Search screen.
      * The user searches for place names via the Kartverket API.

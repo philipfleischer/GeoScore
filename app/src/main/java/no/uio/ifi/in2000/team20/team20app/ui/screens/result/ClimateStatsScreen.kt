@@ -50,7 +50,6 @@ import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import no.uio.ifi.in2000.team20.team20app.ui.components.ErrorState
 import no.uio.ifi.in2000.team20.team20app.ui.components.SectionCard
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.FrostViewModel
-import no.uio.ifi.in2000.team20.team20app.ui.theme.CloudySky
 import no.uio.ifi.in2000.team20.team20app.ui.theme.DarkBlue
 import no.uio.ifi.in2000.team20.team20app.ui.theme.DustyBlue
 import no.uio.ifi.in2000.team20.team20app.ui.theme.MayaBlue

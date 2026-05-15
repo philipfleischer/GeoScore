@@ -79,7 +79,7 @@ fun AdaptiveNavigationScaffold (
                     if(compactScreenWidth) Alignment.BottomCenter
                     else Alignment.CenterStart
                     )
-                    .onGloballyPositioned { navSize = it.size }
+                    .onGloballyPositioned { navSize = it.size } //DO NOT REMOVE!
                 ,
             )
         }
