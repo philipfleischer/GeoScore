@@ -13,6 +13,25 @@ import no.uio.ifi.in2000.team20.team20app.data.repository.SavedRepository
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
 import javax.inject.Inject
 
+
+data class LocationWithGeoscore(
+    val location: Location,
+    val geoscore: Double?
+)
+
+fun scoreToGradeVM(score: Double?): String =
+    if (score == null) { "?"} else {
+        when {
+            score < 17 -> "A"
+            score < 33 -> "B"
+            score < 50 -> "C"
+            score < 67 -> "D"
+            score < 83 -> "E"
+            score >= 83 -> "F"
+            else -> "?"
+        }
+    }
+
 /**
  * ViewModel for managing saved locations.
  * @property repository Repository for accessing saved locations
@@ -20,17 +39,12 @@ import javax.inject.Inject
  * @property isCurrentSaved Whether the current location is saved
  */
 
-data class LocationWithGeoscore(
-    val location: Location,
-    val geoscore: Double?
-)
-
 @HiltViewModel
 class SavedViewModel @Inject constructor(
     private val repository: SavedRepository
 ) : ViewModel() {
 
-    val saved: StateFlow<List<Location>> =
+    val saved: StateFlow<List<LocationWithGeoscore>> =
         repository.getAllSaved()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
@@ -43,9 +57,12 @@ class SavedViewModel @Inject constructor(
         }
     }
 
-    fun addSaved(location: Location, geoscore: Double?) {
+    fun addSaved(location: Location, geoScore: Double?) {
         viewModelScope.launch {
-            repository.addSaved(location)
+            repository.addSaved(LocationWithGeoscore(
+                location = location,
+                geoscore = geoScore
+            ))
             _isCurrentSaved.value = true
         }
     }

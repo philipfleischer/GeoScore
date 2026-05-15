@@ -29,7 +29,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,13 +47,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import no.uio.ifi.in2000.team20.team20app.domain.model.Location
-import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GeoScoreViewModel
 import no.uio.ifi.in2000.team20.team20app.ui.screens.result.GeomarkingBadge
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.AppViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.LocationWithGeoscore
 import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.SavedViewModel
+import no.uio.ifi.in2000.team20.team20app.ui.sharedViewModels.scoreToGradeVM
 import no.uio.ifi.in2000.team20.team20app.util.Constants.DEFAULT_PADDING_DP
 import no.uio.ifi.in2000.team20.team20app.util.Constants.LARGE_PADDING_DP
 import no.uio.ifi.in2000.team20.team20app.util.Constants.MEDIUM_SCREEN_WIDTH
@@ -125,21 +124,16 @@ fun SavedScreen(
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(saved) { area ->
-                        val geoScoreViewModel: GeoScoreViewModel = hiltViewModel(key = area.address)
+                    items(saved) { locWithGS ->
                         SavedLocationCard(
-                            location = area,
-                            geoScoreViewModel = geoScoreViewModel,
+                            locWithGS = locWithGS,
                             onOpenReport = {
-                                sharedViewModel.setSelectedArea(area)
-                                onSavedClick(area)
+                                sharedViewModel.setSelectedArea(locWithGS.location)
+                                onSavedClick(locWithGS.location)
                             },
-                            onSavedToggle = { isSaved ->
-                                if (isSaved) {
-                                    savedViewModel.removeSaved(area)
-//                                } else {
-//                                    savedViewModel.addSaved(area)
-                                }
+                            onSavedToggle = {
+                                    savedViewModel.removeSaved(locWithGS.location)
+
                             }
                         )
                     }
@@ -151,13 +145,10 @@ fun SavedScreen(
 
 @Composable
 private fun SavedLocationCard(
-    location: Location,
-    geoScoreViewModel: GeoScoreViewModel,
+    locWithGS: LocationWithGeoscore,
     onOpenReport: () -> Unit,
     onSavedToggle: (Boolean) -> Unit,
 ) {
-    val geoState by geoScoreViewModel.uiState.collectAsStateWithLifecycle()
-
     val showDeleteDialog = remember {mutableStateOf(false)}
 
     if (showDeleteDialog.value) {
@@ -167,13 +158,11 @@ private fun SavedLocationCard(
                 onSavedToggle(true)
                 showDeleteDialog.value = false
             },
-            location = location.name
+            location = locWithGS.location.name
         )
     }
 
-    LaunchedEffect(location) {
-        geoScoreViewModel.load(location)
-    }
+
 
     // Saved geo-score result cards
     Card(
@@ -182,14 +171,14 @@ private fun SavedLocationCard(
             .semantics(mergeDescendants = true) {
                 customActions = listOf(
                     CustomAccessibilityAction(
-                        label = "Slett lagret adresse ${location.name}",
+                        label = "Slett lagret adresse ${locWithGS.location.name}",
                         action = {
                             showDeleteDialog.value = true
                             true
                         }
                     ),
                     CustomAccessibilityAction(
-                        label = "Åpne georapport for lagret adresse ${location.name}",
+                        label = "Åpne georapport for lagret adresse ${locWithGS.location.name}",
                         action = {
                             onOpenReport()
                             true
@@ -211,7 +200,7 @@ private fun SavedLocationCard(
             verticalAlignment = Alignment.Top
         ) {
             GeomarkingBadge(
-                grade = geoState.grade,
+                grade = scoreToGradeVM(locWithGS.geoscore),
                 iconStyle = false,
             )
 
@@ -224,14 +213,14 @@ private fun SavedLocationCard(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
-                    text = location.address,
+                    text = locWithGS.location.address,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )
 
                 Text(
-                    text = formatSavedAt(location.savedAt),
+                    text = formatSavedAt(locWithGS.location.savedAt),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
