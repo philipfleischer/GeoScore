@@ -120,9 +120,9 @@ class FrostDataSourceTest {
 
     @Test
     fun getTemperatureNormalsReturnsData() = runBlocking {
-        // Arrange
-        val lat = 59.91
-        val lon = 10.74
+        // Arrange — use Blindern in Oslo, which has reliable historical climate data
+        val lat = 59.9523
+        val lon = 10.7099
         val stations = dataSource.getStationsNearby(lat = lat, lon = lon)
 
         // Act
