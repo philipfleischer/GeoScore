@@ -96,28 +96,32 @@ class SearchViewModel @Inject constructor(
 
         setLoadingState()
 
-        val result = repository.getSearchResults(query)
+        try {
+            val result = repository.getSearchResults(query)
 
-        when (result.status) {
-            HTTP_OK -> {
-                if (result.locations.isEmpty()) {
-                    setErrorState("Ingen resultater funnet.")
-                }else {
-                    setSuccessState(result.locations)
+            when (result.status) {
+                HTTP_OK -> {
+                    if (result.locations.isEmpty()) {
+                        setErrorState("Ingen resultater funnet.")
+                    }else {
+                        setSuccessState(result.locations)
+                    }
+                }
+                HTTP_CLIENT_ERROR -> {
+                    setErrorState("Klient feilet. Prøv igjen.")
+                }
+                HTTP_SERVER_ERROR -> {
+                    setErrorState("Server feilet. Prøv igjen.")
+                }
+                CANCELLED_SEARCH -> {
+                    // We don't want to restart the loading animation
+                }
+                NO_INTERNET -> {
+                    setErrorState("Ingen internet. Koble til å prøv igjen.")
                 }
             }
-            HTTP_CLIENT_ERROR -> {
-                setErrorState("Klient feilet. Prøv igjen.")
-            }
-            HTTP_SERVER_ERROR -> {
-                setErrorState("Server feilet. Prøv igjen.")
-            }
-            CANCELLED_SEARCH -> {
-                // We don't want to restart the loading animation
-            }
-            NO_INTERNET -> {
-                setErrorState("Ingen internet. Koble til å prøv igjen.")
-            }
+        } catch (e: Exception) {
+            setErrorState("Søk feilet. Prøv igjen.")
         }
     }
 

@@ -168,13 +168,13 @@ class FrostDataSource @Inject constructor(
                 "elements",
                 listOf(
                     // Mean wind speed per month - raw historical values
-                    // "Slik blåser det typisk her i januar"
+                    // "This is how the wind typically blows here in January"
                     "mean(wind_speed P1M)",
                     // Highest measured wind speed per month - raw
-                    // "Så kraftig kan middelvinden bli i januar, typisk stormtyrke i januar"
+                    // "This is how strong the average wind can get in January, typically storm force in January"
                     "max(wind_speed P1M)",
                     // Highest measured wind gust per month - raw
-                    // "Så kraftig kan vindkastene være i januar"
+                    // "This is how strong the wind gusts can be in January"
                     "max(wind_speed_of_gust P1M)"
                 ).joinToString(",").replace(" ", "%20")
             )

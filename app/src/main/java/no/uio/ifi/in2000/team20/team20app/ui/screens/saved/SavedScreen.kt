@@ -294,27 +294,6 @@ private fun formatSavedAt(savedAt: Long): String {
     return "Sist generert: ${formatter.format(Date(savedAt))}"
 }
 
-//@Composable
-//private fun GradeBadge(grade: String) {
-//    val gradeColor = when (grade) {
-//        "A" -> Color(0xFF4CAF50)
-//        "B" -> Color(0xFF8BC34A)
-//        "C" -> Color(0xFFFFC107)
-//        "D" -> Color(0xFFFFC56B)
-//        "E" -> Color(0xFFEFA066)
-//        "F" -> Color(0xFFE36C5C)
-//        else -> Color(0xFFBDBDBD)
-//    }
-//
-//    Text(
-//        text = grade.ifEmpty { "?" },
-//        style = MaterialTheme.typography.headlineSmall,
-//        fontWeight = FontWeight.Bold,
-//        color = gradeColor,
-//        fontSize = 28.sp
-//    )
-//}
-
 @Composable
 private fun DeleteLocationDialog(
     onDismiss: () -> Unit,

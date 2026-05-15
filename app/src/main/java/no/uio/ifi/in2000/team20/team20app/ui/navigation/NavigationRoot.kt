@@ -46,19 +46,6 @@ fun NavigationRoot() {
 
     val goToSearch: () -> Unit = { backStack.add(Route.SearchDestination) }
 
-    // Helper to pop back to (but not including) a destination matching the predicate
-//    val popBackTo: ((NavKey) -> Boolean) -> Boolean = { predicate ->
-//        val targetIndex = backStack.indexOfLast { predicate(it) }
-//        if (targetIndex >= 0) {
-//            while (backStack.size > targetIndex + 1) {
-//                backStack.removeLastOrNull()
-//            }
-//            true
-//        } else {
-//            false
-//        }
-//    }
-
     NavDisplay(
         backStack = backStack,
         onBack = goBack,
