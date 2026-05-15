@@ -59,7 +59,7 @@ class FrostDataSource @Inject constructor(
 ) : FrostDataSourceService {
 
     private val authHeader: String
-        get() = "Basic " + "${Constants.FROST_CLIENT_ID}:${Constants.FROST_CLIENT_SECRET}".encodeBase64() //TODO: Deprecated
+        get() = "Basic " + "${Constants.FROST_CLIENT_ID}:${Constants.FROST_CLIENT_SECRET}".encodeBase64() //Consider migrating
 
     // Checks HTTP status and throws with Frost's error body on non-2xx responses
     private suspend inline fun <reified T> io.ktor.client.statement.HttpResponse.frostBody(): T {

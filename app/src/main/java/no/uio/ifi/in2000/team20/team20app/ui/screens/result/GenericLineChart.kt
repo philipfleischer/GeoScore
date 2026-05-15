@@ -27,9 +27,7 @@ import ir.ehsannarmani.compose_charts.models.Line
 import ir.ehsannarmani.compose_charts.models.PopupProperties
 import ir.ehsannarmani.compose_charts.models.StrokeStyle
 import ir.ehsannarmani.compose_charts.models.ZeroLineProperties
-import no.uio.ifi.in2000.team20.team20app.ui.theme.Charcoal
 import no.uio.ifi.in2000.team20.team20app.ui.theme.SlateGray
-import no.uio.ifi.in2000.team20.team20app.ui.theme.White
 import kotlin.math.abs
 
 @Composable

@@ -120,7 +120,7 @@ class SearchViewModel @Inject constructor(
                     setErrorState("Ingen internet. Koble til å prøv igjen.")
                 }
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             setErrorState("Søk feilet. Prøv igjen.")
         }
     }

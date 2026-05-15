@@ -59,8 +59,7 @@ fun NavigationRoot() {
                         onOpenSearch = goToSearch,
                         modifier = Modifier.padding(insets),
                         sharedViewModel = appViewModel,
-                        savedViewModel = savedViewModel,
-                        frostViewModel = frostViewModel
+                        savedViewModel = savedViewModel
                     )
                 }
             }
