@@ -137,8 +137,8 @@ fun SavedScreen(
                             onSavedToggle = { isSaved ->
                                 if (isSaved) {
                                     savedViewModel.removeSaved(area)
-                                } else {
-                                    savedViewModel.addSaved(area)
+//                                } else {
+//                                    savedViewModel.addSaved(area)
                                 }
                             }
                         )

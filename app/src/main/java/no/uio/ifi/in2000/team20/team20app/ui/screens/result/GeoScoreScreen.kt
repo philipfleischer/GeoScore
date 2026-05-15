@@ -170,7 +170,7 @@ fun GeoScoreScreen(
                         if (saved) {
                             savedViewModel.removeSaved(location)
                         } else {
-                            savedViewModel.addSaved(location)
+                            savedViewModel.addSaved(location, geoState.geoScore?.geoScore)
                         }
                     },
                     onNavigateToMap = onNavigateToMap

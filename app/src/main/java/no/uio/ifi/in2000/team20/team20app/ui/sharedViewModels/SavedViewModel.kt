@@ -19,6 +19,12 @@ import javax.inject.Inject
  * @property saved Flow of all saved locations
  * @property isCurrentSaved Whether the current location is saved
  */
+
+data class LocationWithGeoscore(
+    val location: Location,
+    val geoscore: Double?
+)
+
 @HiltViewModel
 class SavedViewModel @Inject constructor(
     private val repository: SavedRepository
@@ -37,7 +43,7 @@ class SavedViewModel @Inject constructor(
         }
     }
 
-    fun addSaved(location: Location) {
+    fun addSaved(location: Location, geoscore: Double?) {
         viewModelScope.launch {
             repository.addSaved(location)
             _isCurrentSaved.value = true
