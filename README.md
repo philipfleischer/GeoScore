@@ -32,6 +32,14 @@
 - KSP - Kotlin symbol prosessor
 - Hilt - Dependency injection
 
+## Errors
+- IDE gir følgende:
+  - 2 deprecated metoder. Dette skyldes oppgradering av bibliotek versjon. Løsningene er forholdvis enkle, men vi har ikke tilstrekkelig tid til å verifisere robusthet.
+  - 1 assigned verdi blir aldri lest. Til tross for det blir UI'en vår helt rar om vi fjerner den så vi har kommentert denne med IKKE RØR.
+- LogCat gir følgende:
+  - Noen frame skips, men vi har GoogleMap som er et ganske UI-intensivt element.
+  - GoogleMap gir også fra seg en haug med Flogger-logg advarsler fra seg. Etter vår undersøkning kommer dette fra dens interne implementasjon.  
+
 ## Team 20
 - David Hovde
 - Jurius Abdo
