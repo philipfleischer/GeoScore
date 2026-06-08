@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -7,6 +9,13 @@ plugins {
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.kotlin.parcelize)
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+}
+
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) {
+        file.inputStream().use { load(it) }
+    }
 }
 
 android {
@@ -25,18 +34,19 @@ android {
         buildConfigField(
             "String",
             "FROST_V0_CLIENT_ID",
-            "\"3672f8b6-dfce-4af1-aadb-83acb1e1eaa6\"")
+            "\"${localProperties.getProperty("FROST_V0_CLIENT_ID", "")}\""
+        )
 
         buildConfigField(
             "String",
             "FROST_V0_CLIENT_SECRET",
-            "\"8c09a90b-f218-4f08-9170-9dab3be01ede\""
+            "\"${localProperties.getProperty("FROST_V0_CLIENT_SECRET", "")}\""
         )
 
         buildConfigField(
             "String",
             "CHATGPT_API_KEY",
-            "\"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\""
+            "\"${localProperties.getProperty("CHATGPT_API_KEY", "")}\""
         )
     }
 

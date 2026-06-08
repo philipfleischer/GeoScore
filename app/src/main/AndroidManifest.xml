@@ -14,6 +14,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Team20App">
 
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBV6WWhPL6cEE8U3iFHX2LJ4oF2Un-P2bE"/>
