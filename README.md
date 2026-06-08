@@ -39,6 +39,8 @@
 - LogCat gir følgende:
   - Noen frame skips, men vi har GoogleMap som er et ganske UI-intensivt element.
   - GoogleMap gir også fra seg en haug med Flogger-logg advarsler fra seg. Etter vår undersøkning kommer dette fra dens interne implementasjon.  
+- Ufullstendig funksjonalitet:
+  - Last ned knappen for lagrede rapporter er ikke implementert. 
 
 ## Team 20
 - David Hovde
