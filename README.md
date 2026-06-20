@@ -6,19 +6,16 @@ Applikasjonen kombinerer kart, historiske værdata, flom- og skredinformasjon, l
 
 ## Demo
 
-En kort demo av hovedflyten i appen er tilgjengelig som video:
+Se en kort demo av hovedflyten i appen:
 
-Demo hovedflyt: demo-hovedflyt.mp4
+[![GeoScore demo](docs/images/GeoScore_Thumbnail.png)](https://youtube.com/shorts/A3kdl7jjJJE)
 
 Videoen viser blant annet:
-
 - søk etter adresse/lokasjon
 - visning av valgt sted i kart
 - beregning av GeoScore
 - visning av rapport og klimadata
 - bruk av lagrede steder
-
-Dersom videoen ikke vises direkte i GitHub, kan den lastes ned og åpnes lokalt.
 
 ## Hvordan kjøre applikasjonen
 
