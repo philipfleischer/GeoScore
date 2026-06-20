@@ -6,7 +6,7 @@ Applikasjonen kombinerer kart, historiske værdata, flom- og skredinformasjon, l
 
 ## Demo
 
-Se en kort demo av hovedflyten i appen:
+Se en kort demo av hovedflyten i appen (trykk på bildet):
 
 [![GeoScore demo](docs/images/GeoScore_Thumbnail.png)](https://youtube.com/shorts/A3kdl7jjJJE)
 
