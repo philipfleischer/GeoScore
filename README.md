@@ -1,48 +1,106 @@
-## Hvordan kjøre applikasjonen
-- Appen er ikke publisert noe sted
-- Appen kan brukes som en tilsendt APK eller fra kildekode.
+# GeoScore / Geomerking
 
-- Som per gruppelærer er API-nøkler hardkodet inn som strenger for å gjøre sensuren enklere.
+GeoScore er en Android-applikasjon utviklet i IN2000 ved Universitetet i Oslo. Appen gir brukeren en samlet vurdering av naturfare og klimarelaterte forhold for en valgt adresse eller lokasjon.
+
+Applikasjonen kombinerer kart, historiske værdata, flom- og skredinformasjon, lokale beregninger og en AI-generert rapport for å gi brukeren en mer forståelig vurdering av risiko knyttet til blant annet vind, nedbør, flom og skred.
+
+## Demo
+
+En kort demo av hovedflyten i appen er tilgjengelig som video:
+
+Demo hovedflyt: demo-hovedflyt.mp4
+
+Videoen viser blant annet:
+
+- søk etter adresse/lokasjon
+- visning av valgt sted i kart
+- beregning av GeoScore
+- visning av rapport og klimadata
+- bruk av lagrede steder
+
+Dersom videoen ikke vises direkte i GitHub, kan den lastes ned og åpnes lokalt.
+
+## Hvordan kjøre applikasjonen
+
+Appen er ikke publisert i Google Play Store.
+
+Den kan kjøres på to måter:
+
+- ved å installere en tilsendt APK-fil
+- ved å åpne prosjektet i Android Studio og kjøre appen fra kildekode
+
+### Kjøring fra kildekode
+
+1. Klon repositoryet.
+2. Åpne prosjektet i Android Studio.
+3. Sørg for at Android SDK 24 eller nyere er installert.
+4. Bygg og kjør appen på emulator eller fysisk Android-enhet.
+
+## API-nøkler
+
+I den opprinnelige IN2000-innleveringen ble API-nøkler lagt direkte inn i prosjektet etter avklaring med gruppelærer, for å gjøre sensur og kjøring enklere.
+
+For videreutvikling eller offentlig bruk bør API-nøkler ikke hardkodes. De bør heller legges i for eksempel:
+
+- local.properties
+- Gradle secrets-plugin
+- miljøvariabler
+- annen sikker konfigurasjon som ikke sjekkes inn i Git
 
 ## Avhengigheter
-- Appens krever en Android SDK på 24 eller høyere (Android 7). 
-- Appens eneste forutsatte tillatelse er internett-tilkobling
 
-## Biblioteker
-- Jetpack Compose - UI
-- Navigation3 - Jetpack Navigation
-- Hilt - Dependency injection
-- JUnit - Testing
-- Coil - Bilder
-- Kotlinx Serialization - Serialisering
-- Kotlinx Coroutines - Coroutines
-- Room - Database
-- Material 3 - Material Design
-- OpenAI - Natural Language Processing
-  - Et API for språkmodeller
-- Google Maps Compose - Kartløsning
-  - Et google repo for bruk av Google Maps i Compose-apper
-- Compose Charts - Grafisk presentasjon av data
-  - Et open-source bibliotek for grafer i Jetpack Compose
+- Android SDK 24 eller høyere, tilsvarende Android 7.0+
+- Internett-tilkobling
 
-## Plugins
-- Kotlin serialization - Gjør klasser serializable ved å annotere de som @Serializable
-- Kotlin parcelable - Gjør klasser parcelable ved å annotere de som @Parcelize
-  - Dette brukes for å restaurere tilstand ved prosess-død
-- KSP - Kotlin symbol prosessor
-- Hilt - Dependency injection
+Appen krever ingen spesielle tillatelser utover tilgang til internett.
 
-## Errors
-- IDE gir følgende:
-  - 2 deprecated metoder. Dette skyldes oppgradering av bibliotek versjon. Løsningene er forholdvis enkle, men vi har ikke tilstrekkelig tid til å verifisere robusthet.
-  - 1 assigned verdi blir aldri lest. Til tross for det blir UI'en vår helt rar om vi fjerner den så vi har kommentert denne med IKKE RØR.
-- LogCat gir følgende:
-  - Noen frame skips, men vi har GoogleMap som er et ganske UI-intensivt element.
-  - GoogleMap gir også fra seg en haug med Flogger-logg advarsler fra seg. Etter vår undersøkning kommer dette fra dens interne implementasjon.  
-- Ufullstendig funksjonalitet:
-  - Last ned knappen for lagrede rapporter er ikke implementert. 
+## Teknologier og biblioteker
+
+- Kotlin – hovedspråk
+- Jetpack Compose – brukergrensesnitt
+- Material 3 – designkomponenter
+- Navigation 3 – navigasjon mellom skjermer
+- Hilt – dependency injection
+- Room – lokal database og caching
+- Kotlinx Coroutines – asynkron programmering
+- Kotlinx Serialization – serialisering/deserialisering av data
+- Coil – bildehåndtering
+- Google Maps Compose – kartvisning
+- Compose Charts – visualisering av historiske klimadata
+- JUnit – testing
+- OpenAI API – generering av tekstlig rapport og forklaringer
+
+## Gradle-plugins
+
+- Kotlin Serialization – gjør det mulig å bruke @Serializable
+- Kotlin Parcelize – gjør det mulig å bruke @Parcelize
+- KSP – Kotlin Symbol Processing, blant annet brukt av Room/Hilt
+- Hilt Gradle Plugin – dependency injection-oppsett
+
+## Kjent status og begrensninger
+
+### IDE-varsler
+
+Prosjektet kan gi enkelte IDE-varsler, blant annet:
+
+- noen deprecated-metoder som følge av bibliotekoppgraderinger
+- én verdi som blir tilordnet, men ikke lest direkte
+
+Disse varslene påvirker ikke hovedflyten i appen slik prosjektet ble levert, men bør ryddes opp i ved videreutvikling.
+
+### LogCat-varsler
+
+Ved bruk av Google Maps kan LogCat vise flere interne advarsler og Flogger-meldinger. Etter testing ser disse ut til å komme fra Google Maps sin interne implementasjon og ikke fra appens egen logikk.
+
+Det kan også forekomme enkelte frame skips, spesielt på kartskjermen, siden Google Maps er et relativt tungt UI-element.
+
+### Ufullstendig funksjonalitet
+
+- Knappen for å laste ned lagrede rapporter er ikke ferdig implementert.
+- Enkelte deler av appen er laget som en prototype/MVP og bør videreutvikles før eventuell produksjonssetting.
 
 ## Team 20
+
 - David Hovde
 - Jurius Abdo
 - Matilda Wold Dahl
