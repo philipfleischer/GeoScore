@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeoScore — Studiedokument for jobbintervjuer</title>
+<style>
+  :root {
+    --primary: #1a5276;
+    --accent: #2e86c1;
+    --light: #eaf4fb;
+    --border: #aed6f1;
+    --code-bg: #1e2a35;
+    --code-text: #c9e3f5;
+    --text: #1a1a2e;
+    --muted: #555;
+    --warn: #7d6608;
+    --warn-bg: #fef9e7;
+    --tip-bg: #eafaf1;
+    --tip-border: #27ae60;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Georgia', serif;
+    color: var(--text);
+    background: #f9f9fb;
+    line-height: 1.75;
+    font-size: 16px;
+  }
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 40px 80px;
+    background: #fff;
+    box-shadow: 0 2px 24px rgba(0,0,0,0.08);
+  }
+  h1 { font-size: 2.4rem; color: var(--primary); border-bottom: 3px solid var(--accent); padding-bottom: 12px; margin-bottom: 8px; }
+  h2 { font-size: 1.7rem; color: var(--primary); margin-top: 52px; margin-bottom: 14px; border-left: 5px solid var(--accent); padding-left: 14px; }
+  h3 { font-size: 1.25rem; color: var(--accent); margin-top: 32px; margin-bottom: 10px; }
+  h4 { font-size: 1.05rem; color: #2c3e50; margin-top: 22px; margin-bottom: 8px; font-style: italic; }
+  p { margin-bottom: 14px; }
+  ul, ol { margin: 10px 0 16px 24px; }
+  li { margin-bottom: 6px; }
+  strong { color: #1a3a5c; }
+  em { color: #555; }
+  code {
+    font-family: 'Courier New', monospace;
+    background: #edf2f7;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.88em;
+    color: #c0392b;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 20px 24px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85em;
+    line-height: 1.6;
+    margin: 16px 0 24px;
+  }
+  pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 24px;
+    font-size: 0.92em;
+  }
+  th {
+    background: var(--primary);
+    color: #fff;
+    padding: 10px 14px;
+    text-align: left;
+  }
+  td {
+    padding: 9px 14px;
+    border-bottom: 1px solid #dce9f5;
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: var(--light); }
+  .callout {
+    border-left: 4px solid var(--accent);
+    background: var(--light);
+    padding: 14px 18px;
+    border-radius: 0 6px 6px 0;
+    margin: 18px 0;
+  }
+  .callout.tip {
+    border-left-color: var(--tip-border);
+    background: var(--tip-bg);
+  }
+  .callout.warn {
+    border-left-color: #e67e22;
+    background: var(--warn-bg);
+  }
+  .callout-title {
+    font-weight: bold;
+    font-size: 0.95em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+    color: var(--primary);
+  }
+  .callout.tip .callout-title { color: var(--tip-border); }
+  .callout.warn .callout-title { color: #e67e22; }
+  .section-tag {
+    display: inline-block;
+    background: var(--accent);
+    color: white;
+    font-size: 0.72em;
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-family: sans-serif;
+    letter-spacing: 0.05em;
+    font-weight: bold;
+    vertical-align: middle;
+    margin-left: 10px;
+  }
+  .section-tag.secondary {
+    background: #7f8c8d;
+  }
+  .toc {
+    background: var(--light);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 28px;
+    margin: 28px 0 40px;
+  }
+  .toc h3 { margin-top: 0; color: var(--primary); }
+  .toc ol { margin-top: 8px; }
+  .toc li { margin-bottom: 4px; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .formula-box {
+    background: #eef8ee;
+    border: 1px solid #a9dfbf;
+    border-radius: 6px;
+    padding: 16px 20px;
+    font-family: monospace;
+    font-size: 0.95em;
+    margin: 14px 0;
+    text-align: center;
+  }
+  .grade-table { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+  .grade-badge {
+    display: inline-block;
+    width: 80px;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.9em;
+    color: #fff;
+  }
+  .g-a { background: #4CAF50; }
+  .g-b { background: #8BC34A; }
+  .g-c { background: #FFC107; color: #333; }
+  .g-d { background: #FFC56B; color: #333; }
+  .g-e { background: #EFA066; }
+  .g-f { background: #E36C5C; }
+  hr { border: none; border-top: 1px solid #ddd; margin: 40px 0; }
+  .meta-info { color: var(--muted); font-size: 0.9em; margin-bottom: 28px; font-family: sans-serif; }
+  .interview-q {
+    background: #fef5e7;
+    border: 1px solid #f0b27a;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin: 12px 0;
+    font-style: italic;
+  }
+  .interview-q::before { content: "❓ Mulig intervjuspørsmål: "; font-style: normal; font-weight: bold; color: #e67e22; }
+  @media print {
+    body { background: white; }
+    .page { box-shadow: none; padding: 20px; }
+    pre { font-size: 0.78em; }
+    h2 { page-break-before: always; }
+    h2:first-of-type { page-break-before: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>GeoScore</h1>
+<div class="meta-info">
+  Studiedokument for jobbintervjuer · Skrevet på norsk · IN2000 Universitetet i Oslo, Team 20 · Karakter: A
+  <br>Philip Fleischer, David Hovde, Jurius Abdo, Matilda Wold Dahl, Veronica Corsepius Melen, Victoria Reinseth-Tollefsen
+</div>
+
+<div class="toc">
+  <h3>Innholdsfortegnelse</h3>
+  <ol>
+    <li><a href="#oversikt">Prosjektoversikt og hva appen gjør</a> <span class="section-tag">KJERNEPITCH</span></li>
+    <li><a href="#arkitektur">Arkitektur — Clean Architecture og MVVM</a> <span class="section-tag">KJERNEPITCH</span></li>
+    <li><a href="#algoritme">GeoScore-algoritmen</a> <span class="section-tag">KJERNEPITCH</span></li>
+    <li><a href="#hilt">Dependency Injection med Hilt</a> <span class="section-tag">KJERNEPITCH</span></li>
+    <li><a href="#datalaget">Datalaget — DataSources, DTOs og Repositories</a> <span class="section-tag">KJERNEPITCH</span></li>
+    <li><a href="#caching">Caching-strategi</a> <span class="section-tag">KJERNEPITCH</span></li>
+    <li><a href="#ui">UI-laget — Jetpack Compose og UDF</a> <span class="section-tag">KJERNEPITCH</span></li>
+    <li><a href="#brukerdesign">Brukerdesign og UX</a></li>
+    <li><a href="#ai">AI-integrasjon med ChatGPT</a></li>
+    <li><a href="#api">Eksternale API-integrasjoner</a></li>
+    <li><a href="#navigasjon">Navigasjon og navigasjonsmønster</a></li>
+    <li><a href="#agile">Agil metodikk og prosjektprosess</a></li>
+    <li><a href="#teknologier">Teknologier og biblioteker</a></li>
+    <li><a href="#intervju">Intervjuspørsmål og svar</a></li>
+  </ol>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2 id="oversikt">1. Prosjektoversikt og hva appen gjør <span class="section-tag">KJERNEPITCH</span></h2>
+
+<h3>Hva er GeoScore?</h3>
+<p>GeoScore er en Android-applikasjon vi bygde i løpet av seks måneder i emnet IN2000 Programvareutvikling med prosjektarbeid ved Universitetet i Oslo. Teamet besto av seks studenter. Prosjektet ble vurdert til <strong>karakter A</strong>.</p>
+
+<p>Appen hjelper folk som vurderer å kjøpe bolig å forstå klimarisikoen ved en adresse. Slagordet er: <em>"Vit hva du kjøper — før du kjøper det."</em></p>
+
+<h3>Kjerneproblemet appen løser</h3>
+<p>Når du kjøper bolig i Norge i dag, er det vanskelig å finne ett samlet sted som gir deg svar på spørsmål som:</p>
+<ul>
+  <li>Ligger huset i et flomrisikoområde?</li>
+  <li>Er stedet utsatt for skred?</li>
+  <li>Hvor mye ekstremvær har det vært her de siste 30 årene?</li>
+  <li>Hva bør jeg gjøre for å beskytte huset mitt?</li>
+</ul>
+<p>GeoScore samler geologisk og meteorologisk data fra offentlige norske datakilder og gir brukeren én samlet karakter (A–F) og en AI-generert tekstrapport med konkrete råd.</p>
+
+<h3>Hva kan brukeren gjøre i appen?</h3>
+<ol>
+  <li><strong>Søke opp en adresse</strong> via Geonorges adresse-API med live forslag mens man skriver.</li>
+  <li><strong>Se adressen på kart</strong> med Google Maps, og eventuelt trykke på kartet for å velge en lokasjon.</li>
+  <li><strong>Generere en GeoScore</strong> — appen henter vind- og nedbørsdata fra Frost API og sjekker om stedet er i flom- eller skredsone via NVE ArcGIS. Deretter beregnes en samlet score A–F.</li>
+  <li><strong>Lese en AI-rapport</strong> — ChatGPT (GPT-4o) genererer en forklarende tekst med risikovurdering og tiltak basert på scorene.</li>
+  <li><strong>Utforske historisk klimadata</strong> — temperaturer, nedbør, vind, snø og solskinn plottet i grafer (1991–2020-normaler).</li>
+  <li><strong>Lagre steder</strong> for å komme raskt tilbake til dem.</li>
+  <li><strong>Se kartlag</strong> fra NVE for flom, jordskred og steinskred direkte på kartet.</li>
+</ol>
+
+<div class="callout tip">
+  <div class="callout-title">Pitch-tips</div>
+  Start alltid med <em>problemet</em>, ikke teknologien. "Vi laget en app som hjelper boligkjøpere å forstå klimarisikoen ved en adresse — og vi fikk A." Det er en god åpning.
+</div>
+
+<div class="interview-q">Hva er GeoScore, og hvorfor laget dere det?</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2 id="arkitektur">2. Arkitektur — Clean Architecture og MVVM <span class="section-tag">KJERNEPITCH</span></h2>
+
+<h3>Overordnet prinsipp</h3>
+<p>Appen følger <strong>Androids anbefalte lagdelte arkitektur</strong>, som er inspirert av Clean Architecture. Hvert lag kjenner kun til laget under seg — aldri det over. Dette sikrer at forretningslogikken er uavhengig av rammeverk, og at man enkelt kan bytte ut implementasjoner uten å røre resten av koden.</p>
+
+<pre><code>UI-lag (Jetpack Compose + ViewModel)
+        ↓
+Domain-lag (Use Cases + Domenemodeller)
+        ↓
+Data-lag (Repositories + DataSources + Room)</code></pre>
+
+<h3>Pakkestruktur</h3>
+<pre><code>app/src/main/java/no/uio/ifi/in2000/team20/team20app/
+├── data/
+│   ├── api/              — API-endepunktsdefinisjoner (Ktor-routes)
+│   ├── datasource/       — Direkte kommunikasjon med eksterne API-er
+│   ├── dto/              — Data Transfer Objects (serialiserte API-responser)
+│   ├── local/
+│   │   ├── AppDatabase.kt
+│   │   ├── dao/          — 11 Room DAOs
+│   │   └── entity/       — 11 Room-entiteter
+│   └── repository/       — Implementasjoner av repository-grensesnitt
+├── domain/
+│   ├── model/            — Rene Kotlin data-klasser (GeoScore, Location, Report...)
+│   └── usecase/          — 5 use cases med ett ansvarsområde hver
+├── ui/
+│   ├── screens/          — En pakke per skjerm (screen + ViewModel)
+│   ├── sharedViewModels/ — AppViewModel, FrostViewModel, SavedViewModel
+│   ├── navigation/       — NavigationRoot, Route-sealed-klasser
+│   ├── components/       — Gjenbrukbare Compose-komponenter
+│   └── theme/            — Farger, typografi, Material 3-tema
+└── di/                   — 4 Hilt-DI-moduler</code></pre>
+
+<h3>MVVM-mønsteret (Model–View–ViewModel)</h3>
+<p>MVVM er designmønsteret vi bruker i UI-laget. Det deler ansvar på tre klare nivåer:</p>
+
+<table>
+  <tr><th>Del</th><th>I GeoScore</th><th>Ansvar</th></tr>
+  <tr><td><strong>View</strong></td><td>Jetpack Compose-skjermer (<code>GeoScoreScreen</code>, <code>SearchScreen</code>...)</td><td>Vise data, ta imot brukerinput, kalle ViewModel-funksjoner</td></tr>
+  <tr><td><strong>ViewModel</strong></td><td><code>GeoScoreViewModel</code>, <code>SearchViewModel</code>...</td><td>Holde og oppdatere UI-state via <code>StateFlow&lt;UiState&gt;</code></td></tr>
+  <tr><td><strong>Model</strong></td><td>Use cases + Repositories + DataSources</td><td>Hente, bearbeide og levere data</td></tr>
+</table>
+
+<h3>Unidirectional Data Flow (UDF) — Énveis dataflyt</h3>
+<p>Et kjernepunkt i Android-arkitektur er at data flyter <em>én vei</em>. Dette gjør det lett å forstå og debugge appens tilstand:</p>
+
+<pre><code>Bruker trykker "Generer rapport"
+    → Skjerm kaller geoScoreViewModel.load(location)
+        → ViewModel oppdaterer _uiState til isScoreLoading = true
+            → Skjerm re-rendrer automatisk (viser spinner)
+        → ViewModel kaller getGeoScore.calculateGeoScore(lat, lon)
+            → Use case henter data → returnerer GeoScore
+        → ViewModel oppdaterer _uiState til geoScore = result
+            → Skjerm re-rendrer og viser resultatet</code></pre>
+
+<h3>Lav kobling — hva betyr det i praksis?</h3>
+<p>I GeoScore betyr lav kobling at ingenting "vet mer enn det trenger å vite":</p>
+<ul>
+  <li>Alle repositories er definert som <strong>grensesnitt (interface)</strong> i domenelaget. ViewModels og use cases avhenger bare av grensesnittet, aldri av implementasjonen.</li>
+  <li>Eksempel: <code>GetHazardScore</code> injiserer <code>ScoreCacheRepository</code>-grensesnittet og vet ingenting om Room, DAOs eller SQL.</li>
+  <li>Hilt injiserer den korrekte implementasjonen automatisk ved oppstart.</li>
+</ul>
+
+<h3>Høy kohesjon — hva betyr det i praksis?</h3>
+<p>Høy kohesjon betyr at hver klasse gjør én ting, og gjør den godt:</p>
+<ul>
+  <li><code>GetHazardScore</code> beregner kun hazard-scoren. Den lagrer den og returnerer den — ingenting annet.</li>
+  <li><code>ScoreCacheRepository</code> eier all cache-logikk for scores. Use cases trenger ikke å tenke på Room.</li>
+  <li><code>ChatGPTRepositoryImpl</code> eier rapport-caching — den henter fra Room om mulig, ellers fra API.</li>
+</ul>
+
+<div class="interview-q">Kan du forklare MVVM og Clean Architecture i prosjektet ditt?</div>
+<div class="interview-q">Hva mener du med lav kobling og høy kohesjon? Gi et konkret eksempel fra koden din.</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2 id="algoritme">3. GeoScore-algoritmen <span class="section-tag">KJERNEPITCH</span></h2>
+
+<h3>Hva er GeoScore?</h3>
+<p>GeoScore er en samlet risikokarakter fra 0–100 (konvertert til A–F) som kombinerer tre uavhengige risikokomponenter. Jo høyere score, jo høyere risiko.</p>
+
+<div class="formula-box">
+  GeoScore = HazardScore × 0,20 + ExposureScore × 0,40 + VulnerabilityScore × 0,40
+</div>
+
+<h3>De tre komponentene</h3>
+
+<h4>1. HazardScore (Farepoengsum) — vekt: 20%</h4>
+<p>Måler <em>intensiteten</em> av ekstremvær — hvor mye over terskelen er vinden og nedbøren i gjennomsnitt?</p>
+<ul>
+  <li>Terskelverdi for ekstremnedbør: <strong>40 mm/dag</strong></li>
+  <li>Terskelverdi for ekstremvind: <strong>40 m/s vindkast</strong></li>
+  <li>For nedbør: beregnes gjennomsnittlig overskridelse over terskelen for alle ekstremdager</li>
+  <li>Dette normaliseres mot en referansemaksimum: <code>REF_MAX_PRECIP_OVER_THRESHOLD = 15 mm</code> og <code>REF_MAX_WIND_OVER_THRESHOLD = 7 m/s</code></li>
+</ul>
+
+<pre><code>// Fra GetHazardScore.kt
+val extremePrecipDays = precipitationResults.values.filter { it > EXTREME_PRECIPITATION_THRESHOLD }
+
+val precipOverTheThreshold = if (extremePrecipDays.isEmpty()) 0.0
+    else extremePrecipDays.map { it - EXTREME_PRECIPITATION_THRESHOLD }.average()
+
+val precipitationScore = min(100.0, (precipOverTheThreshold / REF_MAX_PRECIP_OVER_THRESHOLD) * 100)
+val windScore = min(100.0, (windOverTheThreshold / REF_MAX_WIND_OVER_THRESHOLD) * 100)
+
+// Hazard = nedbør vekter 65%, vind vekter 35%
+val score = PRECIPITATION_WEIGHT * precipitationScore + WIND_WEIGHT * windScore</code></pre>
+
+<h4>2. ExposureScore (Eksponeringspoengsum) — vekt: 40%</h4>
+<p>Måler <em>hyppigheten</em> av ekstremvær — hvor mange dager har det vært ekstremvær det siste halvørhundret?</p>
+<ul>
+  <li>Teller alle unike dager med enten ekstremnedbør (≥ 40mm) ELLER ekstremvind (≥ 40 m/s)</li>
+  <li>Normaliseres mot et spenn: <code>MIN = 0</code>, <code>MAX = 15 dager × 30 år = 450</code></li>
+</ul>
+
+<pre><code>// Fra GetExposureScore.kt
+val extremePrecipDates = precipitationResults.filter { it.value >= EXTREME_PRECIPITATION_THRESHOLD }.keys
+val extremeWindDates   = windResults.filter { it.value >= EXTREME_WIND_GUST_THRESHOLD }.keys
+
+// toSet() fjerner duplikater (dager med BÅDE ekstremnedbør OG -vind telles én gang)
+val sumOfextremeWeatherDates = (extremePrecipDates + extremeWindDates).toSet().size
+
+val exposure = ((sumOfextremeWeatherDates - MIN_EXTREME_WEATHER_COUNT).toDouble()
+              / (MAX_EXTREME_WEATHER_COUNT - MIN_EXTREME_WEATHER_COUNT)) * 100
+
+val score = max(0.0, min(100.0, exposure))</code></pre>
+
+<h4>3. VulnerabilityScore (Sårbarhetsscore) — vekt: 40%</h4>
+<p>Måler <em>geografisk risiko</em> — er stedet i en registrert flom- eller skredsone?</p>
+<ul>
+  <li>Henter data fra NVE ArcGIS: <code>isInFloodZone</code> og <code>isInLandslideZone</code></li>
+  <li>I flomzone → floodScore = 100, ellers 0</li>
+  <li>I skredsone → landslideScore = 100, ellers 0</li>
+  <li>Vulnearability = landslide vekter 55%, flom vekter 45%</li>
+</ul>
+
+<pre><code>// Fra GetVulnerabilityScore.kt — parallelle API-kall med coroutines
+val (isInFloodZone, isInLandslideZone) = coroutineScope {
+    val floodDeferred     = async { zonesRepository.isInFloodZone(lat, lon) }
+    val landslideDeferred = async { zonesRepository.isInLandslideZone(lat, lon) }
+    Pair(floodDeferred.await(), landslideDeferred.await())
+}
+
+val floodScore     = if (isInFloodZone)     100.0 else 0.0
+val landslideScore = if (isInLandslideZone) 100.0 else 0.0
+val score = FLODD_WEIGHT * floodScore + LANDSLIDE_WEIGHT * landslideScore</code></pre>
+
+<h3>Karakterskalaen</h3>
+<div class="grade-table">
+  <div class="grade-badge g-a">A<br><small>0–16<br>Svært lav</small></div>
+  <div class="grade-badge g-b">B<br><small>17–32<br>Lav</small></div>
+  <div class="grade-badge g-c">C<br><small>33–49<br>Moderat</small></div>
+  <div class="grade-badge g-d">D<br><small>50–66<br>Høy</small></div>
+  <div class="grade-badge g-e">E<br><small>67–82<br>Svært høy</small></div>
+  <div class="grade-badge g-f">F<br><small>83–100<br>Kritisk</small></div>
+</div>
+
+<pre><code>// Fra GeoScore.kt
+fun scoreToGrade(score: Double?): String = when {
+    score!! < 17 -> "A"
+    score < 33   -> "B"
+    score < 50   -> "C"
+    score < 67   -> "D"
+    score < 83   -> "E"
+    score >= 83  -> "F"
+    else         -> "?"
+}</code></pre>
+
+<h3>GetGeoScore — orkestrering med parallelle coroutines</h3>
+<p><code>GetGeoScore</code> er use casen som setter det hele sammen. Den er et godt eksempel på effektiv bruk av Kotlin Coroutines:</p>
+
+<pre><code>// Fra GetGeoScore.kt
+suspend fun calculateGeoScore(lat: Double, lon: Double): GeoScore {
+    val locationKey = "%.2f, %.2f".format(lat, lon)
+
+    // Sjekk cache først — unngå unødvendige API-kall
+    val cachedTotal = scoreCacheRepository.getGeoScoreCache(locationKey)
+    if (cachedTotal != null) return cachedTotal
+
+    val observations: WindAndPrecipitationObservationsResult
+    val vulnerabilityResult: VulnerabilityScoreResult
+
+    coroutineScope {
+        // observations og vulnerability kjøres PARALLELT
+        val observationsDeferred = async { frostRepository.getWindAndPrecipitationObservations(lat, lon) }
+        val vulnerabilityDeferred = async { getVulnerabilityScore.calculateVulnerabilityScore(lat, lon) }
+
+        observations = observationsDeferred.await()
+        vulnerabilityResult = vulnerabilityDeferred.await()
+
+        // hazard og exposure avhenger av observations — kjøres etterpå
+        hazardResult = getHazardScore.calculateHazardScore(lat, lon, observations)
+        exposureResult = getExposureScore.calculateExposureScore(lat, lon, observations)
+    }
+
+    val geoScore = GeoScore(
+        ...
+        geoScore = (hazardResult.hazardScore * HAZARDSCORE_WEIGHT)
+                 + (exposureResult.exposureScore * EXPOSURESCORE_WEIGHT)
+                 + (vulnerabilityResult.vulnerabilityScore * VULNERABILITYSCORE_WEIGHT)
+    )
+    scoreCacheRepository.saveGeoScore(geoScore)
+    return geoScore
+}</code></pre>
+
+<div class="callout tip">
+  <div class="callout-title">Nøkkelpoeng for intervjuet</div>
+  Forklar at <strong>observations og vulnerability kjøres parallelt</strong> fordi de ikke avhenger av hverandre. Hazard og exposure kan ikke starte før observations er ferdig. Dette er en bevisst arkitekturelt valg for ytelse.
+</div>
+
+<div class="interview-q">Hvordan fungerer GeoScore-algoritmen din?</div>
+<div class="interview-q">Hvorfor har dere valgt disse vektene (20/40/40)?</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2 id="hilt">4. Dependency Injection med Hilt <span class="section-tag">KJERNEPITCH</span></h2>
+
+<h3>Hva er Dependency Injection?</h3>
+<p>Dependency Injection (DI) er et mønster der objekter ikke lager sine egne avhengigheter, men får dem levert utenfra. I stedet for at <code>GeoScoreViewModel</code> lager en instans av <code>GetGeoScore</code> selv, får den den injisert via konstruktøren.</p>
+
+<p><strong>Fordeler:</strong></p>
+<ul>
+  <li>Lett å teste — man kan injisere falske implementasjoner (mocks)</li>
+  <li>Sentralisert konfigurasjons — en plass bestemmer hvilken implementasjon som brukes</li>
+  <li>Ingen direkte kobling mellom klasser</li>
+</ul>
+
+<h3>Hvordan Hilt er satt opp i GeoScore</h3>
+<p>Hilt er Googles anbefalte DI-rammeverk for Android, bygget på Dagger. Vi bruker versjon 2.59.2.</p>
+
+<table>
+  <tr><th>Annotasjon</th><th>Brukt på</th><th>Hva den gjør</th></tr>
+  <tr><td><code>@HiltAndroidApp</code></td><td><code>GeoScoreApp</code></td><td>Initialiserer Hilt for hele appen</td></tr>
+  <tr><td><code>@AndroidEntryPoint</code></td><td><code>MainActivity</code></td><td>Gjør det mulig å injisere i Activity</td></tr>
+  <tr><td><code>@HiltViewModel</code></td><td>Alle ViewModels</td><td>ViewModels kan bruke constructor injection</td></tr>
+  <tr><td><code>@Inject constructor</code></td><td>Repos, datasources, use cases</td><td>Hilt håndterer instansiering</td></tr>
+  <tr><td><code>@Singleton</code></td><td>Nettverksklienter, DAOs, repositories</td><td>Én instans deles gjennom hele appen</td></tr>
+</table>
+
+<h3>De fire Hilt-modulene</h3>
+
+<h4>NetworkModule — nettverksklienter</h4>
+<pre><code>// Fra NetworkModule.kt
+@Module
+@InstallIn(SingletonComponent::class)
+object NetworkModule {
+
+    @FrostClient          // Qualifier — skiller mellom de tre klientene
+    @Provides
+    @Singleton
+    fun provideFrostHttpClient(): HttpClient = HttpClient(CIO) {
+        install(ContentNegotiation) {
+            json(Json { ignoreUnknownKeys = true })
+        }
+        expectSuccess = false   // Kaster ikke exception på 4xx/5xx
+        defaultRequest {
+            header("User-Agent", "IN2000-Team20 jeryosa@uio.no")
+        }
+    }
+
+    @Provides
+    @Singleton
+    fun provideOpenAIClient(): OpenAI = OpenAI(Constants.CHATGPT_API_KEY)
+}</code></pre>
+
+<p>Vi bruker <code>@Qualifier</code>-annotasjoner (<code>@FrostClient</code>, <code>@GeoSearchClient</code>, <code>@NveZonesClient</code>) for å skille mellom de tre ulike Ktor HttpClient-instansene, siden alle er av samme type.</p>
+
+<h4>DatabaseModule — Room-databasen</h4>
+<pre><code>// Konseptuelt — gir ut Room-databasen og alle 11 DAOs som singletons
+@Provides @Singleton fun provideDatabase(app: Application): AppDatabase =
+    Room.databaseBuilder(app, AppDatabase::class.java, "team20_app_db").build()
+
+@Provides @Singleton fun provideTemperatureCacheDao(db: AppDatabase) = db.temperatureCacheDao()</code></pre>
+
+<h4>DataSourceModule og RepositoryModule</h4>
+<p>Disse bruker <code>@Binds</code> for å fortelle Hilt at når noen ber om et grensesnitt, skal den korrekte implementasjonen leveres:</p>
+<pre><code>// RepositoryModule.kt — binder grensesnitt til implementasjon
+@Binds abstract fun bindFrostRepository(impl: FrostRepository): FrostRepositoryService
+@Binds abstract fun bindNveZonesRepository(impl: NveZonesRepository): NveZonesRepositoryService
+@Binds abstract fun bindScoreCacheRepository(impl: ScoreCacheRepositoryImpl): ScoreCacheRepository</code></pre>
+
+<div class="interview-q">Hva er Dependency Injection, og hvorfor er det nyttig?</div>
+<div class="interview-q">Hva er forskjellen på @Provides og @Binds i Hilt?</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2 id="datalaget">5. Datalaget — DataSources, DTOs og Repositories <span class="section-tag">KJERNEPITCH</span></h2>
+
+<h3>De tre lagene i datalaget</h3>
+
+<h4>DataSource — rå API-kall</h4>
+<p>DataSources er klassene som snakker direkte med eksterne API-er. De vet ingenting om domenemodeller — de returnerer rå DTOer. Eksempel fra <code>FrostDataSource</code>:</p>
+
+<pre><code>// Fra FrostDataSource.kt — henter rådata fra Frost V0
+override suspend fun getTemperatureNormals(lat: Double, lon: Double, sources: String): FrostV0ObservationResponseDto {
+    return client.get(FrostRoutes.OBSERVATIONS_V0) {
+        url.encodedParameters.append("sources", sources)
+        url.encodedParameters.append("elements",
+            "mean(air_temperature P1M),mean(max(air_temperature P1D) P1M),mean(min(air_temperature P1D) P1M)"
+        )
+        url.encodedParameters.append("referencetime", "1991-01-01/2020-12-31")
+        header("Authorization", authHeader)
+    }.frostBody()  // Kaster exception med Frost's feilmelding ved ikke-2xx
+}</code></pre>
+
+<p>For <strong>NVE ArcGIS</strong> sender vi koordinater som geometri-parameter til et ArcGIS-tjenestekall:</p>
+<pre><code>// Fra NveZonesRemoteDataSource.kt
+override suspend fun getFloodZoneData(lon: Double, lat: Double): ArcGisResponseDto {
+    return client.get(NveRoutes.FLOM) {
+        parameter("geometry", """{"x":$lon,"y":$lat,"spatialReference":{"wkid":4326}}""")
+        parameter("geometryType", "esriGeometryPoint")
+        parameter("spatialRel", "esriSpatialRelIntersects")
+        parameter("returnGeometry", false)
+        parameter("f", "json")
+    }.body()
+}</code></pre>
+
+<h4>DTOer (Data Transfer Objects)</h4>
+<p>DTOer er Kotlin data-klasser som speiler JSON-strukturen fra API-ene. De er annotert med <code>@Serializable</code> (kotlinx.serialization) slik at Ktor kan deserialisere dem automatisk:</p>
+<pre><code>// Eksempel på DTO-struktur
+@Serializable
+data class FrostV0ObservationResponseDto(
+    val data: List&lt;ObservationEntry&gt;
+)
+
+@Serializable
+data class ObservationEntry(
+    val referenceTime: String,           // "1991-01-01T00:00:00.000Z"
+    val observations: List&lt;Observation&gt;
+)
+
+@Serializable
+data class Observation(
+    val elementId: String,   // "mean(air_temperature P1M)"
+    val value: Double
+)</code></pre>
+
+<h4>Repositories — kartlegger data til domenemodeller</h4>
+<p>Repositories er mellomlaget mellom datalaget og domenelaget. De:</p>
+<ol>
+  <li>Kaller DataSource for rådata</li>
+  <li>Aggregerer og bearbeider rå-DTOen til noe meningsfylt</li>
+  <li>Cacher resultatet i Room (eller in-memory)</li>
+  <li>Returnerer domenemodeller</li>
+</ol>
+
+<p>Et klassisk eksempel er <code>FrostRepository.aggregateByMonthV0()</code> — en funksjon som tar 360 rådata-observasjoner (30 år × 12 måneder) og aggregerer dem til 12 månedlige normaler:</p>
+
+<pre><code>// Fra FrostRepository.kt — extension function på DTO
+private fun FrostV0ObservationResponseDto.aggregateByMonthV0(elementId: String): Map&lt;Int, Double&gt; {
+    return data
+        .mapNotNull { entry ->
+            // Trekk ut månedsnummer fra ISO 8601-tidsstempel (tegn 5–6)
+            val month = entry.referenceTime.substring(5, 7).toIntOrNull() ?: return@mapNotNull null
+            val value = entry.observations.find { it.elementId == elementId }?.value
+                ?: return@mapNotNull null
+            month to value
+        }
+        .groupBy({ it.first }, { it.second })
+        .mapValues { (_, values) -> values.average() }  // Gjennomsnitt per måned over 30 år
+}</code></pre>
+
+<div class="callout">
+  <div class="callout-title">Viktig skille</div>
+  <strong>DTOer</strong> er kun i datalaget og bærer rå JSON-data. <strong>Domenemodeller</strong> (som <code>GeoScore</code>, <code>Location</code>) er i domenelaget og er fri for alle Android- og nettverksavhengigheter. Repositories oversetter mellom disse to verdenene.
+</div>
+
+<h3>Room — lokal database</h3>
+<p>Room er Androids ORM (Object-Relational Mapping) over SQLite. Vi bruker det for å cache data lokalt.</p>
+<p>Databasen heter <code>team20_app_db</code> og har 11 tabeller:</p>
+
+<table>
+  <tr><th>Tabell</th><th>Innhold</th><th>Eier</th></tr>
+  <tr><td><code>saved_locations</code></td><td>Brukerens lagrede adresser</td><td>SavedRepository</td></tr>
+  <tr><td><code>hazard_cache</code></td><td>Beregnet hazard-score per lokasjon</td><td>ScoreCacheRepository</td></tr>
+  <tr><td><code>exposure_cache</code></td><td>Beregnet eksponerings-score</td><td>ScoreCacheRepository</td></tr>
+  <tr><td><code>vulnerability_cache</code></td><td>Beregnet sårbarhetsscore</td><td>ScoreCacheRepository</td></tr>
+  <tr><td><code>total_score_cache</code></td><td>Samlet GeoScore</td><td>ScoreCacheRepository</td></tr>
+  <tr><td><code>report_cache</code></td><td>AI-generert rapport fra ChatGPT</td><td>ChatGPTRepository</td></tr>
+  <tr><td><code>temperature_cache</code></td><td>Temperatur-normaler fra Frost</td><td>FrostRepository</td></tr>
+  <tr><td><code>wind_cache</code></td><td>Vinddata fra Frost</td><td>FrostRepository</td></tr>
+  <tr><td><code>sunshine_cache</code></td><td>Solskinndata fra Frost</td><td>FrostRepository</td></tr>
+  <tr><td><code>snow_cache</code></td><td>Snødybdedata fra Frost</td><td>FrostRepository</td></tr>
+  <tr><td><code>precipitation_cache</code></td><td>Nedbørsdata fra Frost</td><td>FrostRepository</td></tr>
+</table>
+
+<p>Hvert sett (entity + DAO) følger samme mønster:</p>
+<pre><code>// Entity — definerer en rad i databasen
+@Entity(tableName = "temperature_cache")
+data class TemperatureCacheEntity(
+    @PrimaryKey val stationId: String,
+    val monthlyMean: String,   // JSON-serialisert List&lt;Double&gt;
+    val monthlyMax: String,
+    val monthlyMin: String
+)
+
+// DAO — spørringsgrensesnitt
+@Dao
+interface TemperatureCacheDao {
+    @Query("SELECT * FROM temperature_cache WHERE stationId = :key")
+    suspend fun getByKey(key: String): TemperatureCacheEntity?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(entity: TemperatureCacheEntity)
+}</code></pre>
+
+<div class="interview-q">Hva er en DTO, og hvorfor trenger vi dem?</div>
+<div class="interview-q">Hva er Room, og hva bruker dere det til?</div>
+<div class="interview-q">Hva er forskjellen på en Entity og en DAO i Room?</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2 id="caching">6. Caching-strategi <span class="section-tag">KJERNEPITCH</span></h2>
+
+<h3>Hvorfor cache?</h3>
+<p>GeoScore-beregningen gjør mange API-kall: Frost V1 (vind + nedbør over 30 år), NVE ArcGIS (to kall), og ChatGPT. Uten caching ville en allerede besøkt adresse ta like lang tid å laste andre gang. Med caching returneres resultatet umiddelbart.</p>
+<p>I tillegg er historiske normaler (1991–2020) <em>uforanderlige</em> — de trenger aldri å utløpe, noe som gjør caching særlig naturlig her.</p>
+
+<h3>To-lags caching i FrostRepository</h3>
+
+<h4>Lag 1: In-memory cache (stasjons-ID)</h4>
+<p>Koordinater rundes til 2 desimaler (~1 km presisjon) og brukes som nøkkel i en <code>mutableMapOf</code> i minnet. Når vi kaller <code>getTemperatureData</code>, <code>getWindData</code> og de andre metodene for samme lokasjon, gjøres kun ett API-kall for å finne nærmeste stasjon:</p>
+
+<pre><code>// Fra FrostRepository.kt
+private val stationCache = mutableMapOf&lt;String, String&gt;()
+
+private suspend fun getOrCacheStations(lat: Double, lon: Double): String {
+    val key = "%.2f, %.2f".format(lat, lon)
+    return stationCache[key] ?: run {
+        val stations = dataSource.getStationsNearby(lat, lon)
+        stationCache[key] = stations
+        stations
+    }
+}</code></pre>
+
+<h4>Lag 2: Room-cache (klimadata, indeksert på stasjon-ID)</h4>
+<p>Klimadataene caches i Room med nærmeste stasjon-ID som primærnøkkel. To lokasjoner som deler nærmeste stasjon gjenbruker cachet data uten et nytt API-kall:</p>
+
+<pre><code>// Fra FrostRepository.getTemperatureData()
+val stations = getOrCacheStations(lat, lon)
+val stationId = stations.split(",").first()  // Nærmeste stasjon som cache-nøkkel
+
+val cached = temperatureCacheDao.getByKey(stationId)
+if (cached != null) {
+    // Cache-treff: returner umiddelbart uten nettverkskall
+    return@runCatching Triple(fromJson(cached.monthlyMean), ...)
+}
+
+// Cache-miss: hent fra API, lagre i Room
+val data = dataSource.getTemperatureNormals(lat, lon, stations)
+temperatureCacheDao.insert(TemperatureCacheEntity(stationId = stationId, ...))
+Triple(meanList, maxList, minList)</code></pre>
+
+<h4>Solskinn som spesialtilfelle</h4>
+<p>Kun 36 av Norges hundrevis av meteorologiske stasjoner måler solskinn. Derfor gjøres et eget stasjonssøk bare for solskinn, og resultatet caches separat i <code>sunshineStationCache</code> (in-memory) og <code>sunshineCacheDao</code> (Room):</p>
+
+<pre><code>// Trinn 1: hent alle stasjons-IDer som har solskinndata (1991-2020)
+val availableResponse: FrostV0AvailableTimeSeriesResponseDto =
+    client.get(FrostRoutes.AVAILABLE_TIMESERIES_V0) {
+        append("elements", "sum(duration_of_sunshine P1M)")
+        ...
+    }
+
+// Trinn 2: finn nærmeste av disse 36 stasjonene
+val sourcesResponse = client.get(FrostRoutes.SOURCES_V0) {
+    append("geometry", "nearest(POINT($lon $lat))")
+    append("ids", allSunshineIds)
+    append("nearestmaxcount", "1")
+    ...
+}</code></pre>
+
+<h3>Score-caching med ScoreCacheRepository</h3>
+<p>Alle tre use cases sjekker Room-cachen med <code>locationKey = "%.2f, %.2f".format(lat, lon)</code> som nøkkel. Samme nøkkelformat brukes konsekvent gjennom hele appen:</p>
+
+<pre><code>// Mønster som brukes i alle use cases
+val locationKey = "%.2f, %.2f".format(lat, lon)
+val cachedResult = scoreCacheRepository.getHazardCache(locationKey)
+if (cachedResult != null) return cachedResult   // Hurtig returnering fra cache
+// ... beregning ...
+scoreCacheRepository.saveHazardScore(locationKey, result)
+return result</code></pre>
+
+<div class="callout warn">
+  <div class="callout-title">Kjent begrensning</div>
+  <code>FrostRepository</code> aggregerer klimanormaler fra de 10 nærmeste stasjonene, men cacher med kun den <em>nærmeste</em> stasjons-ID som nøkkel. Teknisk sett representerer den cachede dataen et gjennomsnitt av 10 stasjoner, ikke én. Dette er en akseptert avveining innenfor tidsrammen, men bør adresseres ved videreutvikling.
+</div>
+
+<div class="interview-q">Hvordan håndterer dere caching i appen?</div>
+<div class="interview-q">Hva er fordelene og ulempene med din caching-strategi?</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2 id="ui">7. UI-laget — Jetpack Compose og UDF <span class="section-tag">KJERNEPITCH</span></h2>
+
+<h3>Jetpack Compose</h3>
+<p>Jetpack Compose er Googles moderne, deklarative UI-rammeverk for Android. I stedet for å manipulere XML-layouts og Views imperative (endre én ting av gangen), beskriver man i Compose <em>hvordan UIet skal se ut</em> som en funksjon av tilstanden. Når tilstanden endres, re-rendres UI automatisk.</p>
+
+<pre><code>// Composables er funksjoner annotert med @Composable
+@Composable
+fun GeomarkingBadge(grade: String, ...) {
+    val badgeColor = when (grade.uppercase()) {
+        "A" -> Color(0xFF4CAF50)   // Grønn
+        "B" -> Color(0xFF8BC34A)
+        "C" -> Color(0xFFFFC107)   // Gul
+        "D" -> Color(0xFFFFC56B)
+        "E" -> Color(0xFFEFA066)
+        "F" -> Color(0xFFE36C5C)   // Rød
+        else -> Color(0xFFFFC107)
+    }
+    Card(shape = CircleShape, colors = CardDefaults.cardColors(containerColor = badgeColor)) {
+        Text(text = grade, fontWeight = FontWeight.Bold, color = Color.White)
+    }
+}</code></pre>
+
+<h3>StateFlow og collectAsStateWithLifecycle</h3>
+<p>ViewModel holder UI-state i en <code>MutableStateFlow</code>, som eksponeres som en <code>StateFlow</code> til skjermen. Composables observerer denne via <code>collectAsStateWithLifecycle()</code>:</p>
+
+<pre><code>// ViewModel — holder state privat og mutable
+private val _uiState = MutableStateFlow(GeoScoreUiState())
+val uiState: StateFlow&lt;GeoScoreUiState&gt; = _uiState.asStateFlow()
+
+// Composable — observer med livssyklus-bevissthet
+val geoState by geoScoreViewModel.uiState.collectAsStateWithLifecycle()
+
+// UI re-rendres automatisk når geoState endres
+if (geoState.isScoreLoading) {
+    LoadingState(message = listOf("Henter data...", "Nesten ferdig..."))
+    return@Scaffold
+}
+if (geoState.scoreError != null) {
+    ErrorState(message = "Ingen internettforbindelse.", onRetry = { geoScoreViewModel.load(location) })
+    return@Scaffold
+}
+// Vis resultater
+GeomarkingCard(location = location, geoState = geoState, ...)</code></pre>
+
+<p><code>collectAsStateWithLifecycle()</code> er viktig: den stopper innsamling av data når skjermen ikke er synlig (bakgrunn/minimert), noe som sparer batteri og unngår minnelekkasjer.</p>
+
+<h3>LaunchedEffect — sideeffekter i Compose</h3>
+<p>Fordi Composables er "rene" funksjoner (de bare beskriver UI), brukes <code>LaunchedEffect</code> til å starte asynkrone operasjoner som ikke er direkte del av UI-beskrivelsen:</p>
+
+<pre><code>// Fra GeoScoreScreen.kt — laster data når skjermen vises med en gitt lokasjon
+LaunchedEffect(location) {
+    frostViewModel.loadFrostStats(location)
+    savedViewModel.checkIfSaved(location)
+    geoScoreViewModel.load(location)
+}</code></pre>
+
+<p><code>LaunchedEffect(location)</code> betyr: "Kjør dette koroutine-blokket én gang, og kjør det på nytt hvis <code>location</code> endres."</p>
+
+<h3>UiState som sealed class / data class</h3>
+<p>Hver skjerm har sin egen <code>UiState</code>-data-klasse som representerer alle mulige tilstander:</p>
+<pre><code>data class GeoScoreUiState(
+    val isScoreLoading: Boolean = false,   // Viser spinner
+    val geoScore: GeoScore? = null,        // Null = ikke lastet ennå
+    val grade: String = "",
+    val scoreError: String? = null,        // Ikke-null = noe gikk galt
+    val isReportLoading: Boolean = false,
+    val aiReport: Report? = null,
+    val reportError: String? = null
+)</code></pre>
+
+<p>Med <code>.update { it.copy(...) }</code> oppdateres kun de relevante feltene:</p>
+<pre><code>// ViewModel oppdaterer state atomisk
+_uiState.update { it.copy(isScoreLoading = true, scoreError = null) }</code></pre>
+
+<h3>viewModelScope og Dispatchers</h3>
+<p>All nettverkskommunikasjon og IO skjer utenfor main thread via Kotlin Coroutines:</p>
+<pre><code>// Fra GeoScoreViewModel.kt
+fun load(location: Location) {
+    viewModelScope.launch(Dispatchers.IO) {   // Flytt til IO-tråd
+        _uiState.update { it.copy(isScoreLoading = true) }
+        runCatching { getGeoScore.calculateGeoScore(location.lat, location.lon) }
+            .fold(
+                onSuccess = { score -> _uiState.update { it.copy(geoScore = score, ...) } },
+                onFailure = { e  -> _uiState.update { it.copy(scoreError = e.message) } }
+            )
+    }
+}</code></pre>
+
+<div class="interview-q">Hva er Jetpack Compose, og hvordan skiller det seg fra tradisjonell Android-utvikling?</div>
+<div class="interview-q">Hva er StateFlow, og hvorfor bruker man det i Android?</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2 id="brukerdesign">8. Brukerdesign og UX</h2>
+
+<h3>Designfilosofi</h3>
+<p>Vi fulgte <strong>Material 3</strong> (Material You) designsystemet — Googles moderne retningslinjer for Android-design. Det gir konsistent typografi, farger (inkludert dynamisk temafarging), komponenter og bevegelse.</p>
+
+<h3>Adaptivt layout — responsiv for ulike skjermstørrelser</h3>
+<p>En av de mer avanserte UX-løsningene er <code>AdaptiveNavigationScaffold</code>, som automatisk bytter mellom:</p>
+<ul>
+  <li><strong>NavigationBar</strong> (bunnlinje) på kompakte skjermer (telefoner)</li>
+  <li><strong>NavigationRail</strong> (sidesøyle) på medium/store skjermer (nettbrett, foldable)</li>
+</ul>
+
+<pre><code>// Fra AdaptiveNavigationScaffold.kt
+val compactScreenWidth = !LocalWindowSizeClass.current
+    .isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
+
+val layoutType = if (!compactScreenWidth) NavigationSuiteType.NavigationRail
+                 else                     NavigationSuiteType.NavigationBar</code></pre>
+
+<p>Hjemskjermen er også adaptiv — på brede skjermer vises innhold i 2 kolonner via <code>LazyVerticalGrid</code>:</p>
+<pre><code>LazyVerticalGrid(
+    columns = GridCells.Fixed(if (compactScreenWidth) 1 else 2)
+)</code></pre>
+
+<h3>Tilgjengelighet (Accessibility)</h3>
+<p>Vi har implementert semantikk-informasjon for skjermlesere (TalkBack) på kritiske steder:</p>
+<pre><code>// Tydelig handlingsbeskrivel for bookmark-knappen
+IconButton(
+    modifier = Modifier.semantics {
+        onClick(
+            label = if (isCurrentSaved) "Remove address from saved" else "Save address",
+            action = { onSavedToggle(isCurrentSaved); true }
+        )
+    }
+)
+
+// Heading-markering for skjermleser-navigasjon
+Text("Vit hva du kjøper", modifier = Modifier.semantics { heading() })
+
+// Grupper semantisk relaterte elementer
+Column(modifier = Modifier.semantics(mergeDescendants = true) {})</code></pre>
+
+<h3>Navigasjonsflyt — brukerreisen</h3>
+<p>Vi har tenkt grundig på brukerreisen. Typisk flyt:</p>
+<ol>
+  <li><strong>Hjemskjerm</strong> → 2. <strong>Søkeskjerm</strong> (tastatur åpnes automatisk) → 3. <strong>Kartskjerm</strong> (adresse markert med pin) → 4. <strong>GeoScore-skjerm</strong> (rapport) → 5. <strong>Klimadata-skjerm</strong> (grafer)</li>
+</ol>
+
+<h3>Søkefunksjonalitet med debounce</h3>
+<p>Søkefeltet bruker <strong>debouncing</strong> for å ikke sende et API-kall for hvert tastetrykk — det ventes 300ms etter siste tastefeil:</p>
+<pre><code>// Fra SearchViewModel.kt
+companion object {
+    private const val DEBOUNCE_DELAY_MS = 300L
+}
+
+fun updateInput(text: String) {
+    searchJob?.cancel()   // Avbryt forrige søk
+    searchJob = viewModelScope.launch {
+        delay(DEBOUNCE_DELAY_MS)   // Vent 300ms
+        performSearch(text)         // Søk bare om ingenting nytt skrives
+    }
+}</code></pre>
+
+<h3>UX for lasting og feil</h3>
+<p>Vi har gjenbrukbare komponenter for alle mellomtilstander:</p>
+<ul>
+  <li><code>LoadingState</code> — viser en animert spinner med vekselnde tekstmeldinger ("Henter data...", "Nesten ferdig...")</li>
+  <li><code>ErrorState</code> — viser feilmelding med "Prøv igjen"-knapp</li>
+  <li><code>EmptyState</code> — vises når en liste er tom</li>
+  <li><code>ExpandableInfoBox</code> — for kollapsbare seksjoner i rapporten</li>
+</ul>
+
+<div class="interview-q">Hvordan har dere tenkt på brukeropplevelse i GeoScore?</div>
+<div class="interview-q">Hva er adaptivt layout, og hvordan er det implementert?</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2 id="ai">9. AI-integrasjon med ChatGPT</h2>
+
+<h3>Arkitekturen for AI-rapporten</h3>
+<p>Etter at GeoScore er beregnet, sendes scorene til ChatGPT (GPT-4o) for å generere en forklarende rapport i fire deler: nedbør, vind, flom og skred.</p>
+
+<p>Dataflyten:</p>
+<pre><code>GeoScoreViewModel.loadReport(score)
+    → GetAiReport.generateReport(geoScore)
+        → ChatGPTRepository.generateReport(geoScore)
+            ├── Sjekk Room-cache (reportCacheDao)
+            │   └── Cache-treff: returner umiddelbart
+            └── Cache-miss: ChatGPTRemoteDataSource.getReport(geoScore)
+                    → OpenAI SDK → GPT-4o → parse svar → lagre i Room → returner</code></pre>
+
+<h3>Prompt engineering</h3>
+<p>Vi har designet en nøye strukturert prompt som:</p>
+<ul>
+  <li>Definerer rollen ("Du er en klimarisiko-ekspert")</li>
+  <li>Beskriver karakterskalaen eksplisitt (0–16 = A, 17–32 = B...)</li>
+  <li>Injiserer de fire scorene dynamisk</li>
+  <li>Spesifiserer eksakt format — fire avsnitt separert med <code>---</code></li>
+  <li>Instruerer om håndtering av <code>INGEN_DATA</code>-tilfeller</li>
+  <li>Setter ordgrenser og tone</li>
+</ul>
+
+<pre><code>// Fra ChatGPTRemoteDataSource.kt — forkortet
+content = "Du er en klimarisiko-ekspert...\n" +
+    "Scorer for denne lokasjonen:\n" +
+    "- Nedbør: ${geoScore.precipitationScore ?: "INGEN_DATA"}\n" +
+    "- Vind/storm: ${geoScore.windScore ?: "INGEN_DATA"}\n" +
+    "- Flom: ${geoScore.floodScore}\n" +
+    "- Skred: ${geoScore.landslideScore}\n" +
+    "\nSkriv FIRE separate avsnitt separert med ---\n" +
+    "Hvert avsnitt skal:\n" +
+    "- Være 2-3 setninger\n" +
+    "- Inneholde punktliste med tiltak hvis karakteren er lavere enn B"</code></pre>
+
+<h3>Parsing av GPT-svaret</h3>
+<p>ChatGPT returnerer én lang streng. Vi parser den ved å splitte på separatoren <code>---</code>:</p>
+<pre><code>// Fra ChatGPTRepositoryImpl.kt
+val result = dataSource.getReport(geoScore)
+val parts = result?.split("---")
+
+return Report(
+    locationKey = geoScore.locationKey,
+    extremePrecipitationText = parts?.getOrNull(0)?.trim() ?: "",
+    extremeWindText          = parts?.getOrNull(1)?.trim() ?: "",
+    floodText                = parts?.getOrNull(2)?.trim() ?: "",
+    landslideText            = parts?.getOrNull(3)?.trim() ?: ""
+)</code></pre>
+
+<h3>AI-rapport caching</h3>
+<p>ChatGPT-kall er dyre (tid og penger). Rapporten caches permanent i Room under <code>report_cache</code>-tabellen. Andre gang man ser på samme adresse kommer rapporten umiddelbart:</p>
+<pre><code>override suspend fun generateReport(geoScore: GeoScore): Report {
+    val cachedReport = reportCacheDao.getByKey(geoScore.locationKey)
+    if (cachedReport != null) return cachedReport.toDomain()   // Umiddelbar retur fra cache
+
+    val report = getAiGeneratedReport(geoScore)   // API-kall bare ved cache-miss
+    reportCacheDao.insert(report.toEntity())
+    return report
+}</code></pre>
+
+<div class="callout tip">
+  <div class="callout-title">Snakkepunkt</div>
+  GPT-4o brukes fremfor GPT-3.5 fordi det gir mer presise og norske svar. AI-integrasjonen er et godt eksempel på at appen ikke bare henter data, men tolker og kommuniserer data på en menneske-lesbar måte.
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2 id="api">10. Eksternale API-integrasjoner</h2>
+
+<table>
+  <tr><th>API</th><th>Hva det gir</th><th>Autentisering</th></tr>
+  <tr>
+    <td><strong>Frost V0</strong> (met.no)</td>
+    <td>Historiske klimanormaler 1991–2020: temperatur, vind, nedbør, snø, solskinn fra nærmeste målestasjon</td>
+    <td>Basic Auth (client ID + secret, base64-encodet)</td>
+  </tr>
+  <tr>
+    <td><strong>Frost V1 RC</strong> (met.no)</td>
+    <td>Daglige observasjoner 1990–2020 for GeoScore-beregning (nedbør og vindkast per dag)</td>
+    <td>Basic Auth (samme nøkler)</td>
+  </tr>
+  <tr>
+    <td><strong>NVE ArcGIS</strong></td>
+    <td>Sjekker om koordinat ligger innenfor kartlagt flom- eller skredsone</td>
+    <td>Ingen — offentlig tjeneste</td>
+  </tr>
+  <tr>
+    <td><strong>Geonorge adresse-API</strong></td>
+    <td>Live adresseforslag på norske adresser → returnerer koordinater</td>
+    <td>Ingen — offentlig tjeneste</td>
+  </tr>
+  <tr>
+    <td><strong>OpenAI (GPT-4o)</strong></td>
+    <td>Genererer norsk forklaringstekst og tiltak basert på scorene</td>
+    <td>API-nøkkel (Bearer token)</td>
+  </tr>
+  <tr>
+    <td><strong>Google Maps</strong></td>
+    <td>Interaktivt kart med pins, WMS-kartlag (NVE-soner visuelt)</td>
+    <td>Google Maps API-nøkkel</td>
+  </tr>
+</table>
+
+<h3>Frost V1 — ranked observations</h3>
+<p>Frost V1 er en nyere API-versjon som returnerer de <em>best rangerte</em> observasjonene nær et koordinat. Vi prøver tre radier parallelt (10, 20, 30 km) og bruker den nærmeste som returnerer data:</p>
+
+<pre><code>// Fra FrostDataSource.kt — parallelle fallback-søk
+override suspend fun getRankedObservationsForPrecipitation(...): FrostV1ResponseDto = coroutineScope {
+    val d10 = async { fetchV1(lat, lon, 10.0, ...) }   // 10 km radius
+    val d20 = async { fetchV1(lat, lon, 20.0, ...) }   // 20 km radius
+    val d30 = async { fetchV1(lat, lon, 30.0, ...) }   // 30 km radius
+
+    val (r10, r20, r30) = awaitAll(d10, d20, d30)   // Alle tre kjøres parallelt
+
+    when {
+        r10.data.tseries.isNotEmpty() -> r10   // Foretrekk nærmeste
+        r20.data.tseries.isNotEmpty() -> r20
+        r30.data.tseries.isNotEmpty() -> r30
+        else -> FrostV1ResponseDto()            // Tom respons — ingen data
+    }
+}</code></pre>
+
+<p>For vind prøves først vindkast (<code>max(wind_speed_of_gust P1D)</code>). Hvis ingen stasjon har dette, faller vi tilbake til gjennomsnittlig vindhastighet (<code>mean(wind_speed P1D)</code>).</p>
+
+<h3>Ktor som HTTP-klient</h3>
+<p>Vi bruker Ktor (3.4.3) med CIO-engine for alle HTTP-kall. Ktor er Kotlin-first, koroutine-basert og main-safe. Serialisering gjøres med <code>kotlinx.serialization</code>.</p>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2 id="navigasjon">11. Navigasjon og navigasjonsmønster</h2>
+
+<h3>Navigation 3 — type-safe navigasjon</h3>
+<p>Vi bruker <strong>Navigation 3</strong> (versjon 1.1.1) — Jetpack Navigation for Compose. Rutene er definert som <strong>sealed-klasser</strong> som arver fra <code>Route</code>, noe som gir type-safe navigasjon og forhindrer runtime-feil fra feil strenger:</p>
+
+<pre><code>// Route.kt
+sealed interface Route : NavKey {
+    data object HomeDestination     : Route
+    data object MapDestination      : Route
+    data object SavedDestination    : Route
+    data object SearchDestination   : Route
+    data class GeoscoreDestination(val location: Location)      : Route
+    data class ClimateStatsDestination(val location: Location)  : Route
+}</code></pre>
+
+<p>At <code>GeoscoreDestination</code> har <code>location</code> som konstruktørparameter betyr at lokasjonen sendes direkte som objekt — ikke som streng i en URL-sti slik man måtte gjøre med Navigation 2.</p>
+
+<h3>Tilbake-navigasjon fra KlimaStatsScreen</h3>
+<p>Et interessant navigasjonsdetalj: Når brukeren trykker tilbake fra klimadataskjermen, hopper de over GeoScore-skjermen og returnerer til kart/lagrede steder:</p>
+<pre><code>// Fra NavigationRoot.kt
+onBackClick = {
+    val geoScoreIndex = backStack.indexOfLast { it is Route.GeoscoreDestination }
+    if (geoScoreIndex > 0) {
+        while (backStack.size > geoScoreIndex) {
+            backStack.removeLastOrNull()  // Fjern klimadata- og geoscore-destinasjonen
+        }
+    } else { goBack() }
+}</code></pre>
+
+<h3>Delte ViewModels</h3>
+<p>Tre ViewModels deles mellom skjermer og instansieres på Activity-nivå i <code>NavigationRoot</code>:</p>
+<ul>
+  <li><code>AppViewModel</code> — holder valgt lokasjon tilgjengelig overalt. Bruker <code>SavedStateHandle</code> for å overleve prosessdød (OS-drept bakgrunnsapp).</li>
+  <li><code>FrostViewModel</code> — <code>HomeScreen</code> starter forhåndslasting av klimadata mens brukeren ser på kartet, slik at grafene er klare når brukeren trykker "Historisk klimadata".</li>
+  <li><code>SavedViewModel</code> — <code>isCurrentSaved</code>-flagget må være konsistent overalt (bookmark-ikonet).</li>
+</ul>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2 id="agile">12. Agil metodikk og prosjektprosess</h2>
+
+<h3>Scrum-tilnærming</h3>
+<p>Vi fulgte en tilpasset Scrum-metode gjennom seks måneder. Prosjektloggen (<em>Prosesslogg_IN2000_V26.pdf</em>) og sluttrapporten (<em>team20_rapport.pdf</em>) dokumenterer prosessen i detalj.</p>
+<ul>
+  <li><strong>Sprinter</strong> — prosjektet var delt inn i iterasjoner der vi planla, implementerte og evaluerte.</li>
+  <li><strong>Standup-møter</strong> — regelmessige kortmøter for å synkronisere fremdrift.</li>
+  <li><strong>Retrospektiver</strong> — etter hver sprint reflekterte vi over hva som fungerte og hva som ikke fungerte.</li>
+  <li><strong>Issues og Pull Requests</strong> på GitHub — alle endringer gikk gjennom code review.</li>
+</ul>
+
+<h3>Teamavtalen</h3>
+<p>Vi inngikk en formell teamavtale (<em>20_teamavtale.pdf</em>) ved prosjektstart som definerte forventninger, kommunikasjonsrutiner og konflikthåndtering.</p>
+
+<h3>Rollefordeling</h3>
+<p>Teamet på seks hadde ulike ansvarsområder som ble rotert og justert gjennom prosjektet. En viktig lærdom var å kommunisere arkitekturvalg tidlig for å unngå motstridende implementasjoner.</p>
+
+<h3>Tekniske utfordringer underveis</h3>
+<ul>
+  <li><strong>Frost API-versjonering</strong> — Frost V0 og V1 returnerer ulike dataformater. Vi måtte bygge to separate integrasjoner og aggregeringslogikk for V0 client-side.</li>
+  <li><strong>Solskinndata</strong> — Bare 36 norske stasjoner har solskinndata. Vi oppdaget dette sent og måtte legge til et eget to-stegs oppslag.</li>
+  <li><strong>Hilt og AGP 9.0</strong> — Hilt 2.57 er inkompatibel med Android Gradle Plugin 9.0 (bruker <code>BaseExtension</code> som ble fjernet). Vi måtte oppgradere til Hilt 2.59+.</li>
+  <li><strong>Navigation 3</strong> — Relativt ny versjon uten mye dokumentasjon. Vi lærte mye gjennom prøving og feiling.</li>
+</ul>
+
+<div class="interview-q">Hvilke tekniske utfordringer møtte dere, og hvordan løste dere dem?</div>
+<div class="interview-q">Hva lærte du av å jobbe i et team på seks?</div>
+<div class="interview-q">Hva ville du gjort annerledes neste gang?</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2 id="teknologier">13. Teknologier og biblioteker</h2>
+
+<table>
+  <tr><th>Teknologi</th><th>Versjon</th><th>Hva den gjør</th></tr>
+  <tr><td><strong>Kotlin</strong></td><td>2.3.21</td><td>Kodespråk — null-safety, extension functions, coroutines, data classes</td></tr>
+  <tr><td><strong>Jetpack Compose</strong></td><td>BOM 2026.05.00</td><td>Deklarativt UI-rammeverk — erstatter XML-layouts</td></tr>
+  <tr><td><strong>Material 3</strong></td><td>—</td><td>Googles designsystem — farger, typografi, komponenter</td></tr>
+  <tr><td><strong>Navigation 3</strong></td><td>1.1.1</td><td>Type-safe navigasjon mellom Compose-skjermer</td></tr>
+  <tr><td><strong>Hilt</strong></td><td>2.59.2</td><td>Dependency Injection — bygget på Dagger</td></tr>
+  <tr><td><strong>KSP</strong></td><td>2.3.8</td><td>Kotlin Symbol Processing — code generation for Hilt og Room</td></tr>
+  <tr><td><strong>Room</strong></td><td>2.8.4</td><td>ORM over SQLite — lokal database og caching</td></tr>
+  <tr><td><strong>Ktor</strong></td><td>3.4.3</td><td>Kotlin-first HTTP-klient, CIO-engine, koroutine-basert</td></tr>
+  <tr><td><strong>kotlinx.serialization</strong></td><td>1.11.0</td><td>JSON-serialisering / deserialisering av API-responser</td></tr>
+  <tr><td><strong>OpenAI client</strong></td><td>4.1.0</td><td>Kotlin SDK for OpenAI API (ChatGPT)</td></tr>
+  <tr><td><strong>Google Maps Compose</strong></td><td>8.3.0</td><td>Interaktivt kart med Compose-API</td></tr>
+  <tr><td><strong>Kotlin Coroutines</strong></td><td>1.11.0</td><td>Asynkrone operasjoner uten callback-helvete</td></tr>
+  <tr><td><strong>Coil</strong></td><td>—</td><td>Bildehåndtering i Compose</td></tr>
+  <tr><td><strong>JUnit 4</strong></td><td>4.13.2</td><td>Unit testing</td></tr>
+  <tr><td><strong>minSdk</strong></td><td>24 (Android 7.0)</td><td>Støtter ~95% av aktive Android-enheter</td></tr>
+  <tr><td><strong>targetSdk / compileSdk</strong></td><td>36</td><td>Nyeste Android-funksjonalitet og sikkerhet</td></tr>
+</table>
+
+<h3>Kotlin Coroutines — kort forklaring</h3>
+<p>Coroutines er Kotlins mekanisme for asynkron programmering. De er lette tråder som kan suspenderes og gjenopptas uten å blokkere en ekte OS-tråd.</p>
+<ul>
+  <li><code>suspend fun</code> — en funksjon som kan pause uten å blokkere tråden</li>
+  <li><code>coroutineScope { }</code> — lager en ny koroutine-kontekst der alle barn ventes på</li>
+  <li><code>async { }</code> — starter en koroutine som returnerer en <code>Deferred&lt;T&gt;</code></li>
+  <li><code>await()</code> — venter på resultatet fra <code>async</code></li>
+  <li><code>awaitAll()</code> — venter på flere <code>Deferred</code> parallelt</li>
+  <li><code>launch { }</code> — starter en koroutine der man ikke trenger returverdien</li>
+</ul>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2 id="intervju">14. Intervjuspørsmål og anbefalte svar</h2>
+
+<h3>Om prosjektet generelt</h3>
+
+<div class="callout">
+  <div class="callout-title">Spørsmål: "Fortell meg om GeoScore"</div>
+  <p>GeoScore er en Android-app jeg laget sammen med fem andre studenter i løpet av seks måneder i IN2000 ved UiO. Vi fikk A. Appen hjelper folk som vurderer å kjøpe bolig å forstå klimarisikoen ved en adresse — om det er flomfare, skredutsatt, og om det har vært ekstremvær de siste 30 årene. Vi kombinerer data fra Meteorologisk institutts Frost-API, NVEs kartdata og ChatGPT for å gi en samlet risikokarakter (A–F) og en forklarende tekstrapport.</p>
+</div>
+
+<div class="callout">
+  <div class="callout-title">Spørsmål: "Hva var din rolle?"</div>
+  <p>Jeg var med på å designe og implementere [din faktiske bidrag her — f.eks. algoritmen, UI, caching, API-integrasjoner]. I tillegg var jeg involvert i arkitekturvalg for hele appen.</p>
+</div>
+
+<h3>Om arkitektur og designmønstre</h3>
+
+<div class="callout">
+  <div class="callout-title">Spørsmål: "Forklar MVVM"</div>
+  <p>MVVM er et arkitekturmønster som deler UI-koden i tre lag: View er Compose-skjermene som viser data. ViewModel holder UI-state som en StateFlow og tar imot hendelser fra View. Model er domenelaget — use cases og repositories som henter og bearbeider data. Data flyter alltid nedover: view → ViewModel → domain/data, og tilstand flyter alltid tilbake som en StateFlow. View re-rendres automatisk når tilstanden endres.</p>
+</div>
+
+<div class="callout">
+  <div class="callout-title">Spørsmål: "Hva er Dependency Injection?"</div>
+  <p>DI er et mønster der en klasse ikke lager sine egne avhengigheter selv, men får dem levert utenfra. I GeoScore bruker vi Hilt — GeoScoreViewModel trenger GetGeoScore og GetAiReport. I stedet for at ViewModelen lager disse selv, ber den om dem via konstruktøren, og Hilt injiserer de korrekte implementasjonene. Dette gjør koden testbar fordi man enkelt kan injisere falske implementasjoner i tester.</p>
+</div>
+
+<div class="callout">
+  <div class="callout-title">Spørsmål: "Forklar Clean Architecture"</div>
+  <p>Clean Architecture deler koden i lag der avhengighetene alltid peker innover. I GeoScore: UI-laget (Compose + ViewModels) kjenner til domenelaget, men aldri datalaget direkte. Domenelaget (use cases + modeller) har ingen Android-avhengigheter — det er ren Kotlin. Datalaget implementerer grensesnitt definert i domenelaget. Hvis vi bytter ut Ktor med en annen HTTP-klient i morgen, trenger vi ikke å endre en eneste linje i domenelaget eller UI-laget.</p>
+</div>
+
+<h3>Om konkrete tekniske valg</h3>
+
+<div class="callout">
+  <div class="callout-title">Spørsmål: "Hvorfor Kotlin Coroutines fremfor Threads?"</div>
+  <p>Coroutines er lettere enn OS-tråder. Du kan ha tusenvis av koroutiner uten å bruke mye minne. De kan suspenderes og gjenopptas uten å blokkere en tråd — viktig på Android der man ikke vil blokkere main-tråden. Med coroutines kan vi skrive asynkron kode som <em>ser ut</em> som synkron kode, noe som er mye lettere å lese og debugge enn callbacks.</p>
+</div>
+
+<div class="callout">
+  <div class="callout-title">Spørsmål: "Hva er Room og hvorfor bruker dere det?"</div>
+  <p>Room er Androids ORM (Object-Relational Mapping) over SQLite. Vi bruker det for lokal caching av klimadata og beregnede scores. Når brukeren ser på en adresse for andre gang, returnerer vi data fra Room umiddelbart i stedet for å gjøre nye API-kall. Historiske klimanormaler fra 1991–2020 endrer seg aldri, så cachen utløper aldri.</p>
+</div>
+
+<div class="callout">
+  <div class="callout-title">Spørsmål: "Hva er Jetpack Compose?"</div>
+  <p>Compose er Googles moderne, deklarative UI-rammeverk for Android. I stedet for å definere layouts i XML og deretter oppdatere Views imperativt, beskriver man i Compose UI som en funksjon av tilstanden. Når tilstanden endres, re-rendres kun de delene av UIet som er berørt. Det ligner på React for web.</p>
+</div>
+
+<h3>Om utfordringer og læring</h3>
+
+<div class="callout">
+  <div class="callout-title">Spørsmål: "Hva var vanskeligst med prosjektet?"</div>
+  <p>Frost API-integrasjonen var teknisk krevende — V0 og V1 returnerer helt ulike datastrukturer. Vi oppdaget at forhåndsberegnede klimanormaler ikke var tilgjengelige via API-et, og måtte aggregere 30 år med rådata client-side. Solskinndata var et spesialtilfelle der bare 36 stasjoner i Norge har data, noe vi oppdaget sent og måtte legge til eget oppslag for. Å koordinere seks utviklere med ulik erfaring var også en lærerik utfordring.</p>
+</div>
+
+<div class="callout">
+  <div class="callout-title">Spørsmål: "Hva ville du gjort annerledes?"</div>
+  <p>Vi valgte Navigation 3 som er relativt ny og hadde lite dokumentasjon. Jeg ville undersøkt modenhetsnivået bedre. Repository-grensesnittene heter <code>FrostRepositoryService</code> i stedet for bare <code>FrostRepository</code> — navnekonvensjonen er inkonsistent. Dette og noen andre navneproblem ville jeg refaktorert. Caching-strategien for Frost kunne også vært mer presis — vi bruker nærmeste stasjon-ID som nøkkel, men dataen er aggregert fra 10 stasjoner.</p>
+</div>
+
+<hr>
+
+<div class="callout tip">
+  <div class="callout-title">Siste råd</div>
+  <p>Du trenger ikke forstå <em>alt</em> fra dag én. Fokuser på å kunne forklare GeoScore-algoritmen, MVVM/Clean Architecture, Hilt og caching-strategien flytende. Ha konkrete kodeeksempler friskt i minnet. Resten kan du si "jeg ville sett nærmere på det" — det viser ærlighet og lærevillighet.</p>
+</div>
+
+<p style="color: #aaa; font-size: 0.85em; margin-top: 40px; text-align: center;">
+  GeoScore · IN2000 · Team 20 · UiO 2025–2026 · Karakter A<br>
+  Studiedokument generert 2026 — kun for intern studiebruk
+</p>
+
+</div>
+</body>
+</html>
