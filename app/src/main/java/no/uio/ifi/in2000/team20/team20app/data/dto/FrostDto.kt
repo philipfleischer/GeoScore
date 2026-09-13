@@ -1,6 +1,33 @@
 package no.uio.ifi.in2000.team20.team20app.data.dto
 
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.JsonDecoder
+import kotlinx.serialization.json.JsonPrimitive
+
+/**
+ * Frost's v1/rc API is inconsistent about whether "value" and "qualitycode"
+ * are returned as quoted strings (e.g. "3.6") or raw JSON numbers (e.g. 3.6).
+ * This serializer accepts either shape and always exposes it as a String,
+ * so callers can keep using String.toDoubleOrNull() unchanged.
+ */
+object LenientStringSerializer : KSerializer<String> {
+    override val descriptor: SerialDescriptor =
+        PrimitiveSerialDescriptor("LenientString", PrimitiveKind.STRING)
+
+    override fun serialize(encoder: Encoder, value: String) = encoder.encodeString(value)
+
+    override fun deserialize(decoder: Decoder): String {
+        val jsonDecoder = decoder as? JsonDecoder ?: return decoder.decodeString()
+        return (jsonDecoder.decodeJsonElement() as? JsonPrimitive)?.content
+            ?: decoder.decodeString()
+    }
+}
 
 /**
  * Data Transfer Objects for Frost API responses.
@@ -122,9 +149,12 @@ data class FrostObservationEntryDto(
 )
 
 // Note: Frost v1 returns value and qualitycode as strings despite the schema showing numbers
+// — except when it doesn't and sends raw numbers instead, hence the lenient serializer.
 @Serializable
 data class FrostObservationBodyDto(
+    @Serializable(with = LenientStringSerializer::class)
     val value: String? = null,
+    @Serializable(with = LenientStringSerializer::class)
     val qualitycode: String? = null
 )
 
@@ -155,6 +185,7 @@ data class FrostV1ObservationDto(
 
 @Serializable
 data class FrostV1ObservationBodyDto(
+    @Serializable(with = LenientStringSerializer::class)
     val value: String
 )
 

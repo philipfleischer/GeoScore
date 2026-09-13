@@ -85,6 +85,7 @@ android {
 
 secrets {
     propertiesFileName = "secrets.properties"
+    defaultPropertiesFileName = "local.defaults.properties"
     ignoreList.clear()
 }
 
